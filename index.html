@@ -231,15 +231,6 @@
         .toast.show { transform: translateY(0); }
         .empty-state { text-align: center; padding: 40px; color: #737373; font-size: 14px; }
         .helper-text { color: #737373; font-size: 10px; margin-top: 4px; }
-        .contact-badge {
-            background: #05966920;
-            border-radius: 20px;
-            padding: 4px 12px;
-            font-size: 11px;
-            color: #fbbf24;
-            display: inline-block;
-            margin-bottom: 8px;
-        }
     </style>
 </head>
 <body>
@@ -358,7 +349,7 @@
         <div class="modal-content">
             <h3>Update WhatsApp</h3>
             <input type="text" id="whatsappInput" placeholder="Enter number (e.g., 919876543210)">
-            <div class="helper-text">This will be saved to Master Contacts sheet for all months</div>
+            <div class="helper-text">This will be saved to Master Contacts sheet</div>
             <div class="modal-buttons">
                 <button class="btn btn-primary" onclick="saveWhatsApp()">Save</button>
                 <button class="btn" onclick="closeModal()">Cancel</button>
@@ -384,6 +375,7 @@
         const SHEET_ID = '1EhkGO3omreFx_cbIWM9ZMQbTtWkTT2tm4ePgN-Ii8GQ';
         const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzvalBcKoiYuBgYmZi2Zego_3_UJicNTfH-WYsXQkM6atpOtuEiAIZAp1Z9jHqSMi4b/exec';
 
+        // Fee structure
         const FEES = {
             regular: {
                 'Kalyan Nagar': 1200,
@@ -398,6 +390,7 @@
             }
         };
 
+        // Student data
         const STUDENTS = {
             'Kalyan Nagar': [
                 'MOHITH.S', 'Rishanth R Shekar', 'Gahan', 'RUTVIK', 'Sohan R Prasad',
@@ -446,9 +439,13 @@
 
         async function loadContacts() {
             try {
-                 const url = `${WEB_APP_URL}?action=getContacts&sheetId=${SHEET_ID}`;
-        const response = await fetch(url);
-        const data = await response.json();
+                const params = new URLSearchParams({
+                    action: 'getContacts',
+                    sheetId: SHEET_ID
+                });
+                const url = `${WEB_APP_URL}?${params.toString()}`;
+                const response = await fetch(url);
+                const data = await response.json();
                 
                 if (data.success && data.data) {
                     contacts = {};
@@ -532,7 +529,14 @@
 
         async function loadFromSheet() {
             try {
-                const url = `${WEB_APP_URL}?action=getFees&batch=${currentBatch}&month=${currentMonth}&feeType=${currentFeeType}&sheetId=${SHEET_ID}`;
+                const params = new URLSearchParams({
+                    action: 'getFees',
+                    batch: currentBatch,
+                    month: currentMonth,
+                    feeType: currentFeeType,
+                    sheetId: SHEET_ID
+                });
+                const url = `${WEB_APP_URL}?${params.toString()}`;
                 const response = await fetch(url);
                 const data = await response.json();
                 
@@ -632,11 +636,13 @@
                 showToast('Select a batch first', 'error');
                 return;
             }
+            
             const amount = FEES[currentFeeType]?.[currentBatch];
+            
             if (amount) {
                 let count = 0;
                 students.forEach(s => {
-                    if (!s.totalFees) {
+                    if (!s.totalFees || s.totalFees === 0) {
                         s.totalFees = amount;
                         s.pending = amount - s.paid;
                         count++;
@@ -644,9 +650,10 @@
                 });
                 renderTable();
                 calculateStats();
-                showToast(`✨ Applied ₹${amount} to ${count} students ✨`, 'success');
+                const feeTypeName = currentFeeType === 'regular' ? 'Regular' : 'Summer Camp';
+                showToast(`✨ Applied ${feeTypeName} fees: ₹${amount} to ${count} students ✨`, 'success');
             } else {
-                showToast('No default fee for this batch', 'error');
+                showToast(`No default ${currentFeeType} fee for this batch. Set manually.`, 'error');
             }
         }
 
@@ -656,27 +663,41 @@
                 showToast('Set total fees first', 'error');
                 return;
             }
-            if (!confirm(`🎉 Mark ${name} as paid?`)) return;
+            if (!confirm(`🎉 Mark ${name} as paid for ${student.month}?`)) return;
             
             student.paid = student.totalFees;
             student.pending = 0;
             student.status = 'Paid';
-            await saveStudent(student);
-            renderTable();
-            calculateStats();
-            showToast(`🎉 ${name} marked as paid!`, 'success');
-        }
-
-        async function saveStudent(student) {
+            
             try {
                 await fetch(WEB_APP_URL, {
                     method: 'POST',
                     mode: 'no-cors',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'saveFees', sheetId: SHEET_ID, student })
+                    body: JSON.stringify({ 
+                        action: 'saveFees', 
+                        sheetId: SHEET_ID, 
+                        student: {
+                            studentName: student.studentName,
+                            batch: student.batch,
+                            month: student.month,
+                            feeType: student.feeType,
+                            whatsapp: student.whatsapp || '',
+                            totalFees: student.totalFees,
+                            paid: student.paid,
+                            pending: student.pending,
+                            status: student.status
+                        }
+                    })
                 });
+                
+                renderTable();
+                calculateStats();
+                showToast(`🎉 ${name} marked as paid!`, 'success');
+                
             } catch (error) {
                 console.error('Save error:', error);
+                showToast('❌ Failed to save', 'error');
             }
         }
 
@@ -693,7 +714,6 @@
                     })
                 });
                 contacts[studentName] = whatsapp;
-                // No saveStudent call here - only update contacts sheet
             } catch (error) {
                 console.error('Update contact error:', error);
             }
@@ -709,7 +729,6 @@
             const whatsapp = document.getElementById('whatsappInput').value.trim();
             if (selectedStudent) {
                 selectedStudent.whatsapp = whatsapp;
-                // Only update contacts sheet, NOT fees sheet
                 await updateContact(selectedStudent.studentName, selectedStudent.batch, whatsapp);
                 renderTable();
                 closeModal();
@@ -729,11 +748,10 @@
                 selectedStudent.totalFees = amount;
                 selectedStudent.pending = amount - (selectedStudent.paid || 0);
                 selectedStudent.status = selectedStudent.pending <= 0 ? 'Paid' : 'Pending';
-                await saveStudent(selectedStudent);
                 renderTable();
                 calculateStats();
                 closeModal();
-                showToast('💰 Fees saved!', 'success');
+                showToast('💰 Fees saved locally! Click Sync to save to sheet.', 'success');
             }
         }
 
@@ -743,15 +761,77 @@
                 showToast('Add WhatsApp number first', 'error');
                 return;
             }
-            const phone = student.whatsapp.replace(/\D/g, '');
-            const message = `Hey! 👋%0a%0aThis is your friendly Coffeeland FC fee reminder! 🫶⚽%0a%0a━━━━━━━━━━━━━━━━%0a📋 *Your Summary*%0a━━━━━━━━━━━━━━━━%0a👤 *Student:* ${student.studentName}%0a🏃 *Batch:* ${student.batch}%0a📅 *Month:* ${student.month}%0a━━━━━━━━━━━━━━━━%0a💰 *Fee Details*%0a━━━━━━━━━━━━━━━━%0a💵 Total: ₹${student.totalFees}%0a✅ Paid: ₹${student.paid}%0a⏳ Pending: ₹${student.pending}%0a━━━━━━━━━━━━━━━━%0a%0a⚽ *Payment:* UPI: coffeeland@okhdfcbank%0a%0aDrop a message after payment! 📱%0a%0a– Coffeeland FC Team 💛🖤`;
+            
+            let phone = student.whatsapp.toString().replace(/\D/g, '');
+            if (phone.length === 10) phone = '91' + phone;
+            
+            const message = `Hey! 👋%0a%0a` +
+                            `This is your friendly Coffeeland FC fee reminder! 🫶⚽%0a%0a` +
+                            `━━━━━━━━━━━━━━━━%0a` +
+                            `📋 *Your Summary*%0a` +
+                            `━━━━━━━━━━━━━━━━%0a` +
+                            `👤 *Student:* ${student.studentName}%0a` +
+                            `🏃 *Batch:* ${student.batch}%0a` +
+                            `📅 *Month:* ${student.month}%0a` +
+                            `━━━━━━━━━━━━━━━━%0a` +
+                            `💰 *Fee Details*%0a` +
+                            `━━━━━━━━━━━━━━━━%0a` +
+                            `💵 Total: ₹${student.totalFees}%0a` +
+                            `✅ Paid: ₹${student.paid}%0a` +
+                            `⏳ Pending: ₹${student.pending}%0a` +
+                            `━━━━━━━━━━━━━━━━%0a%0a` +
+                            `⚽ *Payment:* UPI: coffeeland@okhdfcbank%0a%0a` +
+                            `Drop a message after payment! 📱%0a%0a` +
+                            `– Coffeeland FC Team 💛🖤`;
+            
             window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
-            showToast('✨ WhatsApp opened!', 'success');
+            
+            // Log reminder to sheet
+            fetch(WEB_APP_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    action: 'logReminder', 
+                    sheetId: SHEET_ID, 
+                    reminder: {
+                        studentName: student.studentName,
+                        batch: student.batch,
+                        month: student.month,
+                        feeType: student.feeType,
+                        reminderTime: new Date().toISOString(),
+                        pendingAmount: student.pending
+                    }
+                })
+            }).catch(e => console.error('Log error:', e));
+            
+            showToast(`✨ Reminder sent to ${name}!`, 'success');
         }
 
         async function syncData() {
             for (const student of students) {
-                await saveStudent(student);
+                if (student.totalFees) {
+                    await fetch(WEB_APP_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ 
+                            action: 'saveFees', 
+                            sheetId: SHEET_ID, 
+                            student: {
+                                studentName: student.studentName,
+                                batch: student.batch,
+                                month: student.month,
+                                feeType: student.feeType,
+                                whatsapp: student.whatsapp || '',
+                                totalFees: student.totalFees,
+                                paid: student.paid,
+                                pending: student.pending,
+                                status: student.status
+                            }
+                        })
+                    });
+                }
             }
             showToast('🔄 All data synced to sheet!', 'success');
         }
