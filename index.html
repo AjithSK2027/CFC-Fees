@@ -446,9 +446,9 @@
 
         async function loadContacts() {
             try {
-                const url = `${WEB_APP_URL}?action=getContacts&sheetId=${SHEET_ID}`;
-                const response = await fetch(url);
-                const data = await response.json();
+                 const url = `${WEB_APP_URL}?action=getContacts&sheetId=${SHEET_ID}`;
+        const response = await fetch(url);
+        const data = await response.json();
                 
                 if (data.success && data.data) {
                     contacts = {};
