@@ -771,3 +771,25 @@
                 await saveStudent(student);
             }
             showToast('🔄 All data synced to sheet!', 'success');
+        }
+
+        function filterTable() { renderTable(); }
+        
+        function showToast(msg, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.className = `toast ${type}`;
+            toast.classList.add('show');
+            clearTimeout(timeout);
+            timeout = setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+        
+        function closeModal() {
+            document.getElementById('whatsappModal').style.display = 'none';
+            document.getElementById('feesModal').style.display = 'none';
+        }
+        
+        window.onclick = (e) => { if (e.target.classList.contains('modal')) closeModal(); };
+    </script>
+</body>
+</html>
