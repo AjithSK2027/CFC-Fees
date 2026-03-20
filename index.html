@@ -373,7 +373,7 @@
     <script>
         // Configuration
         const SHEET_ID = '1EhkGO3omreFx_cbIWM9ZMQbTtWkTT2tm4ePgN-Ii8GQ';
-        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzrSn-09-kuJfW3QvVQPmkrVU1tBEDeHTKlR8BacQ-yhnKSMiBYwxyT7sDYj6pqVX_3/exec';
+        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzFbDEm7voYiy9EFGL9e83ETVkQRA6MH4_RA1Hi19j3hOU-QLJsPly-tRFvkNwK8nAN/exec';
 
         // Fee structure
         const FEES = {
@@ -669,7 +669,7 @@
             
             window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
             
-            fetch(WEB_APP_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'saveReminder', sheetId: SHEET_ID, reminder: { studentName: student.studentName, batch: student.batch, month: student.month, feeType: student.feeType, reminderTime: new Date().toISOString(), reminderNumber: student.reminderCount, pendingAmount: student.pending, totalFees: student.totalFees, paid: student.paid } }) }).catch(e => console.error('Log error:', e));
+            fetch(WEB_APP_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'saveReminder', sheetId: SHEET_ID, reminder: { studentName: student.studentName, batch: student.batch, month: student.month, feeType: student.feeType, whatsapp: student.whatsapp, reminderTime: new Date().toISOString(), reminderNumber: student.reminderCount, pendingAmount: student.pending, totalFees: student.totalFees, paid: student.paid } }) }).catch(e => console.error('Log error:', e));
             
             renderTable();
             showToast(`📢 Reminder #${student.reminderCount} sent to ${name}!`, 'success');
