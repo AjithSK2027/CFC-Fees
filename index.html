@@ -231,16 +231,14 @@
         .toast.show { transform: translateY(0); }
         .empty-state { text-align: center; padding: 40px; color: #737373; font-size: 14px; }
         .helper-text { color: #737373; font-size: 10px; margin-top: 4px; }
-        .debug-panel {
-            background: #1a1a1a;
-            border-radius: 12px;
-            padding: 8px 12px;
-            margin-bottom: 12px;
+        .contact-badge {
+            background: #05966920;
+            border-radius: 20px;
+            padding: 4px 12px;
             font-size: 11px;
-            font-family: monospace;
             color: #fbbf24;
-            word-break: break-all;
-            display: none;
+            display: inline-block;
+            margin-bottom: 8px;
         }
     </style>
 </head>
@@ -334,8 +332,6 @@
             <span>📞 </span><span id="contactStatusText">Loading contacts...</span>
         </div>
 
-        <div id="debugInfo" class="debug-panel"></div>
-
         <div class="table-container">
             <table>
                 <thead>
@@ -362,7 +358,7 @@
         <div class="modal-content">
             <h3>Update WhatsApp</h3>
             <input type="text" id="whatsappInput" placeholder="Enter number (e.g., 919876543210)">
-            <div class="helper-text">This will be saved to Master Contacts sheet</div>
+            <div class="helper-text">This will be saved to Master Contacts sheet for all months</div>
             <div class="modal-buttons">
                 <button class="btn btn-primary" onclick="saveWhatsApp()">Save</button>
                 <button class="btn" onclick="closeModal()">Cancel</button>
@@ -386,7 +382,7 @@
     <script>
         // Configuration
         const SHEET_ID = '1EhkGO3omreFx_cbIWM9ZMQbTtWkTT2tm4ePgN-Ii8GQ';
-        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxCHg5u4-76AOADMH99Zpl-I6vQEHu5qymfmiB8r52F9UmVLs7sZwJoPwlKwK17MFvh/exec';
+        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzaNyTxkqd5cAqDi6ALwivDAkBWa79osUbVKe8OscwkELF0qGvJaQ8-1ug95rg5Ap9W/exec';
 
         const FEES = {
             regular: {
@@ -450,13 +446,9 @@
 
         async function loadContacts() {
             try {
-                document.getElementById('contactStatusText').innerHTML = '📡 Fetching contacts...';
                 const url = `${WEB_APP_URL}?action=getContacts&sheetId=${SHEET_ID}`;
-                console.log('Fetching contacts from:', url);
-                
                 const response = await fetch(url);
                 const data = await response.json();
-                console.log('Contacts response:', data);
                 
                 if (data.success && data.data) {
                     contacts = {};
@@ -467,25 +459,15 @@
                     document.getElementById('contactStatusText').innerHTML = `✅ ${count} contacts loaded from master sheet`;
                     document.getElementById('contactStatus').style.background = '#05966920';
                     
-                    // Show sample in debug
-                    const sample = Object.entries(contacts).slice(0, 3);
-                    document.getElementById('debugInfo').innerHTML = `📞 Sample: ${JSON.stringify(sample)}`;
-                    document.getElementById('debugInfo').style.display = 'block';
-                    
-                    // If a batch is already selected, reload students
                     if (document.getElementById('batchSelect').value) {
                         loadStudents();
                     }
                 } else {
                     document.getElementById('contactStatusText').innerHTML = '⚠️ No contacts found. Add numbers in "Student Contacts" sheet.';
-                    document.getElementById('contactStatus').style.background = '#d9770620';
                 }
             } catch (error) {
                 console.error('Load contacts error:', error);
-                document.getElementById('contactStatusText').innerHTML = '❌ Error loading contacts: ' + error.message;
-                document.getElementById('contactStatus').style.background = '#ef444420';
-                document.getElementById('debugInfo').innerHTML = `Error: ${error.message}`;
-                document.getElementById('debugInfo').style.display = 'block';
+                document.getElementById('contactStatusText').innerHTML = '❌ Error loading contacts';
             }
         }
 
@@ -711,6 +693,7 @@
                     })
                 });
                 contacts[studentName] = whatsapp;
+                // No saveStudent call here - only update contacts sheet
             } catch (error) {
                 console.error('Update contact error:', error);
             }
@@ -726,8 +709,8 @@
             const whatsapp = document.getElementById('whatsappInput').value.trim();
             if (selectedStudent) {
                 selectedStudent.whatsapp = whatsapp;
+                // Only update contacts sheet, NOT fees sheet
                 await updateContact(selectedStudent.studentName, selectedStudent.batch, whatsapp);
-                await saveStudent(selectedStudent);
                 renderTable();
                 closeModal();
                 showToast('📱 WhatsApp saved to master contacts!', 'success');
