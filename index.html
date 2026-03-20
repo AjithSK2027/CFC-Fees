@@ -756,57 +756,74 @@
         }
 
         function sendReminder(name) {
-            const student = students.find(s => s.studentName === name);
-            if (!student?.whatsapp) {
-                showToast('Add WhatsApp number first', 'error');
-                return;
+    const student = students.find(s => s.studentName === name);
+    if (!student?.whatsapp) {
+        showToast('Add WhatsApp number first', 'error');
+        return;
+    }
+    
+    if (student.status === 'Paid') {
+        showToast(`${name} already paid! No reminder needed.`, 'error');
+        return;
+    }
+    
+    // Clean phone number
+    let phone = student.whatsapp.toString().replace(/\D/g, '');
+    if (phone.length === 10) phone = '91' + phone;
+    
+    const message = `Hey! 👋%0a%0a` +
+                    `This is your friendly Coffeeland FC fee reminder! 🫶⚽%0a%0a` +
+                    `━━━━━━━━━━━━━━━━%0a` +
+                    `📋 *Your Summary*%0a` +
+                    `━━━━━━━━━━━━━━━━%0a` +
+                    `👤 *Student:* ${student.studentName}%0a` +
+                    `🏃 *Batch:* ${student.batch}%0a` +
+                    `📅 *Month:* ${student.month}%0a` +
+                    `━━━━━━━━━━━━━━━━%0a` +
+                    `💰 *Fee Details*%0a` +
+                    `━━━━━━━━━━━━━━━━%0a` +
+                    `💵 Total: ₹${student.totalFees}%0a` +
+                    `✅ Paid: ₹${student.paid}%0a` +
+                    `⏳ Pending: ₹${student.pending}%0a` +
+                    `━━━━━━━━━━━━━━━━%0a%0a` +
+                    `⚽ *Payment Options:*%0a` +
+                    `• UPI: coffeeland@okhdfcbank%0a` +
+                    `• Google Pay: 9876543210%0a` +
+                    `• Cash at field%0a%0a` +
+                    `Drop a message after payment! 📱%0a%0a` +
+                    `– Coffeeland FC Team 💛🖤`;
+    
+    // Open WhatsApp
+    window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
+    
+    // Save reminder to Fees sheet
+    fetch(WEB_APP_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+            action: 'saveReminder', 
+            sheetId: SHEET_ID, 
+            reminder: {
+                studentName: student.studentName,
+                batch: student.batch,
+                month: student.month,
+                feeType: student.feeType,
+                reminderTime: new Date().toISOString(),
+                pendingAmount: student.pending,
+                totalFees: student.totalFees,
+                paid: student.paid
             }
-            
-            let phone = student.whatsapp.toString().replace(/\D/g, '');
-            if (phone.length === 10) phone = '91' + phone;
-            
-            const message = `Hey! 👋%0a%0a` +
-                            `This is your friendly Coffeeland FC fee reminder! 🫶⚽%0a%0a` +
-                            `━━━━━━━━━━━━━━━━%0a` +
-                            `📋 *Your Summary*%0a` +
-                            `━━━━━━━━━━━━━━━━%0a` +
-                            `👤 *Student:* ${student.studentName}%0a` +
-                            `🏃 *Batch:* ${student.batch}%0a` +
-                            `📅 *Month:* ${student.month}%0a` +
-                            `━━━━━━━━━━━━━━━━%0a` +
-                            `💰 *Fee Details*%0a` +
-                            `━━━━━━━━━━━━━━━━%0a` +
-                            `💵 Total: ₹${student.totalFees}%0a` +
-                            `✅ Paid: ₹${student.paid}%0a` +
-                            `⏳ Pending: ₹${student.pending}%0a` +
-                            `━━━━━━━━━━━━━━━━%0a%0a` +
-                            `⚽ *Payment:* UPI: coffeeland@okhdfcbank%0a%0a` +
-                            `Drop a message after payment! 📱%0a%0a` +
-                            `– Coffeeland FC Team 💛🖤`;
-            
-            window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
-            
-            // Log reminder to sheet
-            fetch(WEB_APP_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    action: 'logReminder', 
-                    sheetId: SHEET_ID, 
-                    reminder: {
-                        studentName: student.studentName,
-                        batch: student.batch,
-                        month: student.month,
-                        feeType: student.feeType,
-                        reminderTime: new Date().toISOString(),
-                        pendingAmount: student.pending
-                    }
-                })
-            }).catch(e => console.error('Log error:', e));
-            
-            showToast(`✨ Reminder sent to ${name}!`, 'success');
-        }
+        })
+    }).catch(e => console.error('Log error:', e));
+    
+    // Mark that reminder was sent in local state
+    student.lastReminder = new Date().toISOString();
+    student.reminderSent = true;
+    
+    renderTable();
+    showToast(`✨ Reminder sent to ${name}! Pending: ₹${student.pending} ✨`, 'success');
+}
 
         async function syncData() {
             for (const student of students) {
