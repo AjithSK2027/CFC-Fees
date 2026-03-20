@@ -231,14 +231,16 @@
         .toast.show { transform: translateY(0); }
         .empty-state { text-align: center; padding: 40px; color: #737373; font-size: 14px; }
         .helper-text { color: #737373; font-size: 10px; margin-top: 4px; }
-        .contact-badge {
-            background: #fbbf2420;
-            border-radius: 20px;
-            padding: 4px 12px;
+        .debug-panel {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 8px 12px;
+            margin-bottom: 12px;
             font-size: 11px;
+            font-family: monospace;
             color: #fbbf24;
-            display: inline-block;
-            margin-bottom: 8px;
+            word-break: break-all;
+            display: none;
         }
     </style>
 </head>
@@ -328,9 +330,11 @@
             </div>
         </div>
 
-        <div id="contactStatus" style="background: #1a1a1a; border-radius: 12px; padding: 8px 12px; margin-bottom: 12px; font-size: 12px; display: none;">
-            <span>📞 </span><span id="contactStatusText"></span>
+        <div id="contactStatus" style="background: #1a1a1a; border-radius: 12px; padding: 8px 12px; margin-bottom: 12px; font-size: 12px;">
+            <span>📞 </span><span id="contactStatusText">Loading contacts...</span>
         </div>
+
+        <div id="debugInfo" class="debug-panel"></div>
 
         <div class="table-container">
             <table>
@@ -446,9 +450,13 @@
 
         async function loadContacts() {
             try {
+                document.getElementById('contactStatusText').innerHTML = '📡 Fetching contacts...';
                 const url = `${WEB_APP_URL}?action=getContacts&sheetId=${SHEET_ID}`;
+                console.log('Fetching contacts from:', url);
+                
                 const response = await fetch(url);
                 const data = await response.json();
+                console.log('Contacts response:', data);
                 
                 if (data.success && data.data) {
                     contacts = {};
@@ -456,21 +464,28 @@
                         contacts[c.studentName] = c.whatsapp;
                     });
                     const count = Object.keys(contacts).length;
-                    document.getElementById('contactStatusText').textContent = `${count} contacts loaded from master sheet`;
-                    document.getElementById('contactStatus').style.display = 'block';
+                    document.getElementById('contactStatusText').innerHTML = `✅ ${count} contacts loaded from master sheet`;
+                    document.getElementById('contactStatus').style.background = '#05966920';
                     
-                    // If a batch is already selected, reload students to show numbers
-                    if (currentBatch) {
+                    // Show sample in debug
+                    const sample = Object.entries(contacts).slice(0, 3);
+                    document.getElementById('debugInfo').innerHTML = `📞 Sample: ${JSON.stringify(sample)}`;
+                    document.getElementById('debugInfo').style.display = 'block';
+                    
+                    // If a batch is already selected, reload students
+                    if (document.getElementById('batchSelect').value) {
                         loadStudents();
                     }
                 } else {
-                    document.getElementById('contactStatusText').textContent = 'No contacts found. Add numbers in "Student Contacts" sheet.';
-                    document.getElementById('contactStatus').style.display = 'block';
+                    document.getElementById('contactStatusText').innerHTML = '⚠️ No contacts found. Add numbers in "Student Contacts" sheet.';
+                    document.getElementById('contactStatus').style.background = '#d9770620';
                 }
             } catch (error) {
                 console.error('Load contacts error:', error);
-                document.getElementById('contactStatusText').textContent = 'Error loading contacts. Check Apps Script deployment.';
-                document.getElementById('contactStatus').style.display = 'block';
+                document.getElementById('contactStatusText').innerHTML = '❌ Error loading contacts: ' + error.message;
+                document.getElementById('contactStatus').style.background = '#ef444420';
+                document.getElementById('debugInfo').innerHTML = `Error: ${error.message}`;
+                document.getElementById('debugInfo').style.display = 'block';
             }
         }
 
@@ -756,25 +771,3 @@
                 await saveStudent(student);
             }
             showToast('🔄 All data synced to sheet!', 'success');
-        }
-
-        function filterTable() { renderTable(); }
-        
-        function showToast(msg, type = 'success') {
-            const toast = document.getElementById('toast');
-            toast.textContent = msg;
-            toast.className = `toast ${type}`;
-            toast.classList.add('show');
-            clearTimeout(timeout);
-            timeout = setTimeout(() => toast.classList.remove('show'), 3000);
-        }
-        
-        function closeModal() {
-            document.getElementById('whatsappModal').style.display = 'none';
-            document.getElementById('feesModal').style.display = 'none';
-        }
-        
-        window.onclick = (e) => { if (e.target.classList.contains('modal')) closeModal(); };
-    </script>
-</body>
-</html>
