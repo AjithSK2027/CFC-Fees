@@ -8,24 +8,14 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background: #0a0a0a;
             min-height: 100vh;
             padding: 12px;
         }
-
-        .container {
-            max-width: 100%;
-            margin: 0 auto;
-        }
-
+        .container { max-width: 100%; margin: 0 auto; }
         .header {
             background: #111111;
             border: 1px solid #222222;
@@ -38,13 +28,7 @@
             justify-content: space-between;
             gap: 12px;
         }
-
-        .logo-area {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
+        .logo-area { display: flex; align-items: center; gap: 12px; }
         .logo {
             width: 40px;
             height: 40px;
@@ -55,24 +39,9 @@
             justify-content: center;
             padding: 6px;
         }
-
-        .logo img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-
-        .title h1 {
-            color: white;
-            font-size: 18px;
-            font-weight: 600;
-        }
-
-        .title p {
-            color: #737373;
-            font-size: 11px;
-        }
-
+        .logo img { width: 100%; height: 100%; object-fit: contain; }
+        .title h1 { color: white; font-size: 18px; font-weight: 600; }
+        .title p { color: #737373; font-size: 11px; }
         .toggle-container {
             display: flex;
             gap: 6px;
@@ -81,7 +50,6 @@
             border-radius: 40px;
             border: 1px solid #2a2a2a;
         }
-
         .toggle-option {
             padding: 8px 16px;
             border-radius: 30px;
@@ -91,66 +59,37 @@
             font-size: 13px;
             font-weight: 500;
             cursor: pointer;
-            transition: all 0.2s ease;
         }
-
-        .toggle-option.active {
-            background: #fbbf24;
-            color: #111111;
-        }
-
+        .toggle-option.active { background: #fbbf24; color: #111111; }
         .total-collected {
             background: #1a1a1a;
             border: 1px solid #2a2a2a;
             border-radius: 40px;
             padding: 8px 16px;
         }
-
-        .total-collected span {
-            color: #737373;
-            font-size: 12px;
-        }
-
-        .total-collected strong {
-            color: #fbbf24;
-            font-size: 14px;
-            font-weight: 600;
-            margin-left: 8px;
-        }
-
+        .total-collected span { color: #737373; font-size: 12px; }
+        .total-collected strong { color: #fbbf24; font-size: 14px; margin-left: 8px; }
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 12px;
             margin-bottom: 16px;
         }
-
         .stat-card {
             background: #111111;
             border: 1px solid #222222;
             border-radius: 16px;
             padding: 16px;
         }
-
         .stat-label {
             color: #737373;
             font-size: 11px;
             font-weight: 500;
             text-transform: uppercase;
-            letter-spacing: 0.3px;
             margin-bottom: 6px;
         }
-
-        .stat-number {
-            color: white;
-            font-size: 20px;
-            font-weight: 600;
-        }
-
-        .stat-number.gold {
-            color: #fbbf24;
-        }
-
+        .stat-number { color: white; font-size: 20px; font-weight: 600; }
+        .stat-number.gold { color: #fbbf24; }
         .filters {
             background: #111111;
             border: 1px solid #222222;
@@ -158,26 +97,14 @@
             padding: 16px;
             margin-bottom: 16px;
         }
-
-        .filters-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .filter-group {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
+        .filters-grid { display: flex; flex-direction: column; gap: 12px; }
+        .filter-group { display: flex; flex-direction: column; gap: 6px; }
         .filter-group label {
             color: #737373;
             font-size: 11px;
             font-weight: 500;
             text-transform: uppercase;
         }
-
         .filter-group select {
             width: 100%;
             padding: 12px;
@@ -188,13 +115,7 @@
             font-size: 14px;
             cursor: pointer;
         }
-
-        .button-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 4px;
-        }
-
+        .button-group { display: flex; gap: 10px; margin-top: 4px; }
         .btn {
             flex: 1;
             padding: 12px;
@@ -208,13 +129,7 @@
             border: 1px solid #2a2a2a;
             text-align: center;
         }
-
-        .btn-primary {
-            background: #fbbf24;
-            color: #111111;
-            border: none;
-        }
-
+        .btn-primary { background: #fbbf24; color: #111111; border: none; }
         .table-container {
             background: #111111;
             border: 1px solid #222222;
@@ -222,13 +137,7 @@
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
         }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 700px;
-        }
-
+        table { width: 100%; border-collapse: collapse; min-width: 700px; }
         th {
             text-align: left;
             padding: 14px 12px;
@@ -239,41 +148,22 @@
             text-transform: uppercase;
             border-bottom: 1px solid #222222;
         }
-
         td {
             padding: 12px;
             color: white;
             font-size: 13px;
             border-bottom: 1px solid #1a1a1a;
         }
-
         .status-badge {
             padding: 4px 10px;
             border-radius: 30px;
             font-size: 11px;
             font-weight: 600;
             display: inline-block;
-            white-space: nowrap;
         }
-
-        .status-paid {
-            background: #05966920;
-            color: #10b981;
-            border: 1px solid #10b98130;
-        }
-
-        .status-pending {
-            background: #d9770620;
-            color: #f59e0b;
-            border: 1px solid #f59e0b30;
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-        }
-
+        .status-paid { background: #05966920; color: #10b981; border: 1px solid #10b98130; }
+        .status-pending { background: #d9770620; color: #f59e0b; border: 1px solid #f59e0b30; }
+        .action-buttons { display: flex; gap: 6px; flex-wrap: wrap; }
         .action-btn {
             padding: 6px 12px;
             border-radius: 8px;
@@ -283,41 +173,12 @@
             cursor: pointer;
             white-space: nowrap;
         }
-
-        .action-paid {
-            background: #05966920;
-            color: #10b981;
-            border: 1px solid #10b98130;
-        }
-
-        .action-paid:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .action-remind {
-            background: #fbbf2420;
-            color: #fbbf24;
-            border: 1px solid #fbbf2430;
-        }
-
-        .action-edit {
-            background: #3b82f620;
-            color: #3b82f6;
-            border: 1px solid #3b82f630;
-        }
-
-        .whatsapp-number {
-            color: #fbbf24;
-            font-size: 12px;
-            word-break: break-all;
-            cursor: pointer;
-        }
-        
-        .whatsapp-number:hover {
-            text-decoration: underline;
-        }
-
+        .action-paid { background: #05966920; color: #10b981; border: 1px solid #10b98130; }
+        .action-paid:disabled { opacity: 0.5; cursor: not-allowed; }
+        .action-remind { background: #fbbf2420; color: #fbbf24; border: 1px solid #fbbf2430; }
+        .action-edit { background: #3b82f620; color: #3b82f6; border: 1px solid #3b82f630; }
+        .whatsapp-number { color: #fbbf24; font-size: 12px; cursor: pointer; }
+        .whatsapp-number:hover { text-decoration: underline; }
         .modal {
             display: none;
             position: fixed;
@@ -331,7 +192,6 @@
             z-index: 1000;
             padding: 16px;
         }
-
         .modal-content {
             background: #111111;
             border: 1px solid #2a2a2a;
@@ -340,13 +200,7 @@
             width: 100%;
             max-width: 320px;
         }
-
-        .modal-content h3 {
-            color: white;
-            font-size: 18px;
-            margin-bottom: 16px;
-        }
-
+        .modal-content h3 { color: white; font-size: 18px; margin-bottom: 16px; }
         .modal-content input {
             width: 100%;
             padding: 12px;
@@ -357,13 +211,7 @@
             font-size: 14px;
             margin-bottom: 16px;
         }
-
-        .modal-buttons {
-            display: flex;
-            gap: 10px;
-            justify-content: flex-end;
-        }
-
+        .modal-buttons { display: flex; gap: 10px; justify-content: flex-end; }
         .toast {
             position: fixed;
             bottom: 16px;
@@ -380,22 +228,19 @@
             transition: transform 0.3s ease;
             z-index: 2000;
         }
-
-        .toast.show {
-            transform: translateY(0);
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 40px;
-            color: #737373;
-            font-size: 14px;
-        }
-
-        .helper-text {
-            color: #737373;
-            font-size: 10px;
-            margin-top: 4px;
+        .toast.show { transform: translateY(0); }
+        .empty-state { text-align: center; padding: 40px; color: #737373; font-size: 14px; }
+        .helper-text { color: #737373; font-size: 10px; margin-top: 4px; }
+        .contact-note {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 8px 12px;
+            margin-bottom: 12px;
+            font-size: 12px;
+            color: #fbbf24;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
     </style>
 </head>
@@ -411,12 +256,10 @@
                     <p>Fee Management</p>
                 </div>
             </div>
-            
             <div class="toggle-container">
                 <button class="toggle-option active" id="toggleRegular" onclick="setFeeType('regular')">Regular</button>
                 <button class="toggle-option" id="toggleSummer" onclick="setFeeType('summer')">Summer</button>
             </div>
-            
             <div class="total-collected">
                 <span>Collected</span>
                 <strong id="totalCollected">₹0</strong>
@@ -455,7 +298,6 @@
                         <option value="District Field Evening">District Field Evening</option>
                     </select>
                 </div>
-                
                 <div class="filter-group">
                     <label>Month</label>
                     <select id="monthSelect" onchange="loadStudents()">
@@ -473,7 +315,6 @@
                         <option value="Dec 2026">Dec 2026</option>
                     </select>
                 </div>
-                
                 <div class="filter-group">
                     <label>Status</label>
                     <select id="statusSelect" onchange="filterTable()">
@@ -482,12 +323,15 @@
                         <option value="Pending">Pending</option>
                     </select>
                 </div>
-                
                 <div class="button-group">
                     <button class="btn btn-primary" onclick="applyDefaultFees()">Apply Default</button>
                     <button class="btn" onclick="syncData()">Sync All</button>
                 </div>
             </div>
+        </div>
+
+        <div class="contact-note" id="contactNote" style="display: none;">
+            📱 <span id="contactNoteText"></span>
         </div>
 
         <div class="table-container">
@@ -506,11 +350,7 @@
                     </tr>
                 </thead>
                 <tbody id="tableBody">
-                    <tr>
-                        <td colspan="9" class="empty-state">
-                            Select a batch and month
-                        </td>
-                    </tr>
+                    <tr><td colspan="9" class="empty-state">Select a batch and month</td></tr>
                 </tbody>
             </table>
         </div>
@@ -520,7 +360,7 @@
         <div class="modal-content">
             <h3>Update WhatsApp</h3>
             <input type="text" id="whatsappInput" placeholder="Enter number (e.g., 919876543210)">
-            <div class="helper-text">Include country code without +</div>
+            <div class="helper-text">This will be saved to Master Contacts sheet for all months</div>
             <div class="modal-buttons">
                 <button class="btn btn-primary" onclick="saveWhatsApp()">Save</button>
                 <button class="btn" onclick="closeModal()">Cancel</button>
@@ -546,7 +386,6 @@
         const SHEET_ID = '1EhkGO3omreFx_cbIWM9ZMQbTtWkTT2tm4ePgN-Ii8GQ';
         const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzaNyTxkqd5cAqDi6ALwivDAkBWa79osUbVKe8OscwkELF0qGvJaQ8-1ug95rg5Ap9W/exec';
 
-        // Fee structure
         const FEES = {
             regular: {
                 'Kalyan Nagar': 1200,
@@ -561,7 +400,6 @@
             }
         };
 
-        // Student data
         const STUDENTS = {
             'Kalyan Nagar': [
                 'MOHITH.S', 'Rishanth R Shekar', 'Gahan', 'RUTVIK', 'Sohan R Prasad',
@@ -595,22 +433,40 @@
             'District Field Evening': ['Karthik', 'Suresh']
         };
 
-        // State
         let currentFeeType = 'regular';
         let currentBatch = '';
         let currentMonth = 'Jan 2026';
         let students = [];
+        let contacts = {}; // Master contacts from sheet
         let selectedStudent = null;
         let timeout;
 
         window.onload = () => {
             setFeeType('regular');
-            loadStudents();
+            loadContacts();
         };
+
+        async function loadContacts() {
+            try {
+                const url = `${WEB_APP_URL}?action=getContacts&sheetId=${SHEET_ID}`;
+                const response = await fetch(url);
+                const data = await response.json();
+                if (data.success && data.data) {
+                    contacts = {};
+                    data.data.forEach(c => {
+                        contacts[c.studentName] = c.whatsapp;
+                    });
+                    document.getElementById('contactNoteText').textContent = 
+                        `📞 ${Object.keys(contacts).length} contacts loaded from master sheet`;
+                    document.getElementById('contactNote').style.display = 'flex';
+                }
+            } catch (error) {
+                console.error('Load contacts error:', error);
+            }
+        }
 
         function setFeeType(type) {
             currentFeeType = type;
-            
             document.getElementById('toggleRegular').classList.remove('active');
             document.getElementById('toggleSummer').classList.remove('active');
             document.getElementById(`toggle${type.charAt(0).toUpperCase() + type.slice(1)}`).classList.add('active');
@@ -636,7 +492,6 @@
                 `;
                 currentMonth = 'Jan 2026';
             }
-            
             loadStudents();
         }
 
@@ -654,13 +509,12 @@
             
             const studentList = STUDENTS[batch] || [];
             
-            // Create fresh student list
             students = studentList.map(name => ({
                 studentName: name,
                 batch: batch,
                 month: month,
                 feeType: currentFeeType,
-                whatsapp: '',
+                whatsapp: contacts[name] || '', // Use from master contacts
                 totalFees: 0,
                 paid: 0,
                 pending: 0,
@@ -677,11 +531,9 @@
                 const data = await response.json();
                 
                 if (data.success && data.data && data.data.length > 0) {
-                    // Create a map of saved students by name
                     const savedMap = {};
                     data.data.forEach(saved => {
                         savedMap[saved.studentName] = {
-                            whatsapp: saved.whatsapp || '',
                             totalFees: saved.totalFees || 0,
                             paid: saved.paid || 0,
                             pending: saved.pending || 0,
@@ -689,13 +541,11 @@
                         };
                     });
                     
-                    // MERGE saved data with fresh students (preserve WhatsApp numbers!)
                     students = students.map(student => {
                         const saved = savedMap[student.studentName];
                         if (saved) {
                             return {
                                 ...student,
-                                whatsapp: saved.whatsapp,
                                 totalFees: saved.totalFees,
                                 paid: saved.paid,
                                 pending: saved.pending,
@@ -708,7 +558,6 @@
                 
                 renderTable();
                 calculateStats();
-                
             } catch (error) {
                 console.error('Load error:', error);
                 renderTable();
@@ -728,16 +577,16 @@
             let html = '';
             filtered.forEach(s => {
                 const statusClass = s.status === 'Paid' ? 'status-paid' : 'status-pending';
+                const whatsappDisplay = s.whatsapp ? 
+                    `<span class="whatsapp-number" onclick="editWhatsApp('${s.studentName}')">${s.whatsapp}</span>` : 
+                    `<button class="action-btn action-edit" onclick="editWhatsApp('${s.studentName}')">Add WhatsApp</button>`;
+                
                 html += `
                     <tr>
                         <td>${s.studentName}</td>
                         <td>${s.batch}</td>
                         <td>${s.month}</td>
-                        <td>
-                            ${s.whatsapp ? 
-                                `<span class="whatsapp-number" onclick="editWhatsApp('${s.studentName}')">${s.whatsapp}</span>` : 
-                                `<button class="action-btn action-edit" onclick="editWhatsApp('${s.studentName}')">Add WhatsApp</button>`}
-                        </td>
+                        <td>${whatsappDisplay}</td>
                         <td>${s.totalFees ? `₹${s.totalFees}` : `<button class="action-btn action-edit" onclick="editFees('${s.studentName}')">Set Fee</button>`}</td>
                         <td>₹${s.paid}</td>
                         <td>₹${s.pending}</td>
@@ -825,6 +674,25 @@
             }
         }
 
+        async function updateContact(studentName, batch, whatsapp) {
+            try {
+                await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        action: 'updateContact', 
+                        sheetId: SHEET_ID, 
+                        contact: { studentName, batch, whatsapp }
+                    })
+                });
+                // Update local contacts cache
+                contacts[studentName] = whatsapp;
+            } catch (error) {
+                console.error('Update contact error:', error);
+            }
+        }
+
         function editWhatsApp(name) {
             selectedStudent = students.find(s => s.studentName === name);
             document.getElementById('whatsappInput').value = selectedStudent?.whatsapp || '';
@@ -835,10 +703,12 @@
             const whatsapp = document.getElementById('whatsappInput').value.trim();
             if (selectedStudent) {
                 selectedStudent.whatsapp = whatsapp;
+                // Save to master contacts sheet
+                await updateContact(selectedStudent.studentName, selectedStudent.batch, whatsapp);
                 await saveStudent(selectedStudent);
                 renderTable();
                 closeModal();
-                showToast('📱 WhatsApp saved! It will stay after refresh.', 'success');
+                showToast('📱 WhatsApp saved to master contacts! Works for all months.', 'success');
             }
         }
 
