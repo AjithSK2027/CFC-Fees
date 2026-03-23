@@ -197,11 +197,11 @@
             border: 1px solid #2a2a2a;
             border-radius: 24px;
             padding: 24px;
-            width: 100%;
-            max-width: 320px;
+            width: 90%;
+            max-width: 400px;
         }
         .modal-content h3 { color: white; font-size: 18px; margin-bottom: 16px; }
-        .modal-content input {
+        .modal-content input, .modal-content select {
             width: 100%;
             padding: 12px;
             background: #1a1a1a;
@@ -231,6 +231,14 @@
         .toast.show { transform: translateY(0); }
         .empty-state { text-align: center; padding: 40px; color: #737373; font-size: 14px; }
         .helper-text { color: #737373; font-size: 10px; margin-top: 4px; }
+        .custom-fee-badge {
+            background: #fbbf2420;
+            color: #fbbf24;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 12px;
+            margin-left: 6px;
+        }
     </style>
 </head>
 <body>
@@ -345,6 +353,20 @@
         </div>
     </div>
 
+    <!-- Custom Fee Modal -->
+    <div class="modal" id="customFeeModal">
+        <div class="modal-content">
+            <h3>💰 Customize Fee Amount</h3>
+            <input type="number" id="customFeeAmount" placeholder="Enter custom fee amount" min="1">
+            <div class="helper-text">This will override default batch fee for this student</div>
+            <div class="modal-buttons">
+                <button class="btn btn-primary" onclick="saveCustomFee()">Apply</button>
+                <button class="btn" onclick="closeCustomFeeModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- WhatsApp Modal -->
     <div class="modal" id="whatsappModal">
         <div class="modal-content">
             <h3>Update WhatsApp</h3>
@@ -357,6 +379,7 @@
         </div>
     </div>
 
+    <!-- Fees Modal -->
     <div class="modal" id="feesModal">
         <div class="modal-content">
             <h3>Set Total Fees</h3>
@@ -373,7 +396,7 @@
     <script>
         // Configuration
         const SHEET_ID = '1EhkGO3omreFx_cbIWM9ZMQbTtWkTT2tm4ePgN-Ii8GQ';
-        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzFbDEm7voYiy9EFGL9e83ETVkQRA6MH4_RA1Hi19j3hOU-QLJsPly-tRFvkNwK8nAN/exec';
+        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzvalBcKoiYuBgYmZi2Zego_3_UJicNTfH-WYsXQkM6atpOtuEiAIZAp1Z9jHqSMi4b/exec';
 
         // Fee structure
         const FEES = {
@@ -492,7 +515,7 @@
             students = studentList.map(name => ({
                 studentName: name, batch: batch, month: month, feeType: currentFeeType,
                 whatsapp: contacts[name] || '', totalFees: 0, paid: 0, pending: 0, status: 'Pending',
-                reminderCount: 0
+                reminderCount: 0, customFee: null
             }));
             
             await loadFromSheet();
@@ -510,14 +533,21 @@
                     data.data.forEach(saved => {
                         savedMap[saved.studentName] = {
                             totalFees: saved.totalFees || 0, paid: saved.paid || 0,
-                            pending: saved.pending || 0, status: saved.status || 'Pending'
+                            pending: saved.pending || 0, status: saved.status || 'Pending',
+                            customFee: saved.customFee || null
                         };
                     });
                     students = students.map(student => {
                         const saved = savedMap[student.studentName];
-                        return saved ? { ...student, totalFees: saved.totalFees, paid: saved.paid, pending: saved.pending, status: saved.status } : student;
+                        return saved ? { ...student, totalFees: saved.totalFees, paid: saved.paid, pending: saved.pending, status: saved.status, customFee: saved.customFee } : student;
                     });
                 }
+                // Sort: Pending students on top
+                students.sort((a, b) => {
+                    if (a.status === 'Pending' && b.status !== 'Pending') return -1;
+                    if (a.status !== 'Pending' && b.status === 'Pending') return 1;
+                    return a.studentName.localeCompare(b.studentName);
+                });
                 renderTable();
                 calculateStats();
             } catch (error) {
@@ -542,7 +572,9 @@
                     `<span class="whatsapp-number" onclick="editWhatsApp('${s.studentName}')">📱 ${s.whatsapp}</span>` : 
                     `<button class="action-btn action-edit" onclick="editWhatsApp('${s.studentName}')">+ Add WhatsApp</button>`;
                 
-                // Professional reminder button
+                const customFeeBadge = s.customFee ? `<span class="custom-fee-badge">custom</span>` : '';
+                
+                // Reminder button based on status
                 let reminderBtn = '';
                 if (s.status === 'Paid') {
                     reminderBtn = `<button class="action-btn" style="background:#1a1a1a; color:#737373;" disabled>✓ Paid</button>`;
@@ -556,11 +588,13 @@
                 
                 html += `
                     <tr>
-                        <td style="font-weight: 500;">${s.studentName}</td>
+                        <td style="font-weight: 500;">${s.studentName}${customFeeBadge}</td>
                         <td>${s.batch}</td>
                         <td>${s.month}</td>
                         <td>${whatsappDisplay}</td>
-                        <td>${s.totalFees ? `₹${s.totalFees}` : `<button class="action-btn action-edit" onclick="editFees('${s.studentName}')">Set Fee</button>`}</td>
+                        <td>${s.totalFees ? `₹${s.totalFees}` : `<button class="action-btn action-edit" onclick="editFees('${s.studentName}')">Set Fee</button>`}
+                            <button class="action-btn" style="background:#3b82f620; color:#3b82f6; margin-left:4px;" onclick="showCustomFeeModal('${s.studentName}')">✎</button>
+                        </td>
                         <td style="color: #10b981;">₹${s.paid}</td>
                         <td style="color: ${s.status === 'Paid' ? '#10b981' : '#f59e0b'}; font-weight: 600;">₹${s.pending}</td>
                         <td><span class="status-badge ${statusClass}">${s.status}</span></td>
@@ -595,10 +629,65 @@
             const amount = FEES[currentFeeType]?.[currentBatch];
             if (amount) {
                 let count = 0;
-                students.forEach(s => { if (!s.totalFees) { s.totalFees = amount; s.pending = amount - s.paid; count++; } });
+                students.forEach(s => { 
+                    if (!s.totalFees && !s.customFee) { 
+                        s.totalFees = amount; 
+                        s.pending = amount - s.paid; 
+                        count++; 
+                    } 
+                });
                 renderTable(); calculateStats();
                 showToast(`✨ Applied ${currentFeeType === 'regular' ? 'Regular' : 'Summer'} fees: ₹${amount} to ${count} students ✨`, 'success');
             } else { showToast(`No default ${currentFeeType} fee for this batch`, 'error'); }
+        }
+
+        // Custom Fee Feature
+        let customFeeStudent = null;
+        
+        function showCustomFeeModal(name) {
+            customFeeStudent = students.find(s => s.studentName === name);
+            document.getElementById('customFeeAmount').value = customFeeStudent?.totalFees || '';
+            document.getElementById('customFeeModal').style.display = 'flex';
+        }
+        
+        function closeCustomFeeModal() {
+            document.getElementById('customFeeModal').style.display = 'none';
+            customFeeStudent = null;
+        }
+        
+        async function saveCustomFee() {
+            const amount = parseFloat(document.getElementById('customFeeAmount').value);
+            if (amount && customFeeStudent) {
+                customFeeStudent.totalFees = amount;
+                customFeeStudent.pending = amount - (customFeeStudent.paid || 0);
+                customFeeStudent.status = customFeeStudent.pending <= 0 ? 'Paid' : 'Pending';
+                customFeeStudent.customFee = amount;
+                
+                await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        action: 'saveFees', 
+                        sheetId: SHEET_ID, 
+                        student: {
+                            studentName: customFeeStudent.studentName,
+                            batch: customFeeStudent.batch,
+                            month: customFeeStudent.month,
+                            feeType: customFeeStudent.feeType,
+                            whatsapp: customFeeStudent.whatsapp || '',
+                            totalFees: customFeeStudent.totalFees,
+                            paid: customFeeStudent.paid,
+                            pending: customFeeStudent.pending,
+                            status: customFeeStudent.status,
+                            customFee: customFeeStudent.customFee
+                        }
+                    })
+                });
+                
+                renderTable(); calculateStats(); closeCustomFeeModal();
+                showToast(`💰 Custom fee ₹${amount} set for ${customFeeStudent.studentName}!`, 'success');
+            }
         }
 
         async function markPaid(name) {
@@ -606,10 +695,33 @@
             if (!student?.totalFees) { showToast('Set total fees first', 'error'); return; }
             if (!confirm(`🎉 Mark ${name} as paid for ${student.month}?`)) return;
             
-            student.paid = student.totalFees; student.pending = 0; student.status = 'Paid';
-            await fetch(WEB_APP_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'saveFees', sheetId: SHEET_ID, student }) });
+            student.paid = student.totalFees;
+            student.pending = 0;
+            student.status = 'Paid';
+            
+            await fetch(WEB_APP_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'saveFees', sheetId: SHEET_ID, student })
+            });
+            
+            // Send WhatsApp confirmation to parent
+            if (student.whatsapp) {
+                let phone = student.whatsapp.toString().replace(/\D/g, '');
+                if (phone.length === 10) phone = '91' + phone;
+                const message = `🎉 *Payment Confirmation* 🎉%0a%0a` +
+                                `Dear Parent,%0a` +
+                                `Payment of ₹${student.totalFees} for ${student.studentName} (${student.batch}) has been successfully recorded.%0a%0a` +
+                                `📅 Month: ${student.month}%0a` +
+                                `✅ Status: PAID%0a%0a` +
+                                `Thank you for your timely payment!%0a%0a` +
+                                `– Coffeeland FC Team 💛🖤`;
+                window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
+            }
+            
             renderTable(); calculateStats();
-            showToast(`🎉 ${name} marked as paid!`, 'success');
+            showToast(`🎉 ${name} marked as paid! WhatsApp confirmation sent!`, 'success');
         }
 
         async function updateContact(studentName, batch, whatsapp) {
