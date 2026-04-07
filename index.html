@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CFC Fees Management</title>
+    <title>CFC Premium Fees</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -15,10 +15,11 @@
                     fontFamily: { sans: ['Outfit', 'sans-serif'] },
                     colors: {
                         coffee: {
+                            950: '#0D0907',
                             900: '#150E0A',
                             800: '#1E140F',
-                            700: '#2C1D16',
-                            accent: '#D4AF37',
+                            accent: '#D4AF37', /* Gold */
+                            goldHover: '#F1D375',
                             light: '#F5E6D3'
                         }
                     }
@@ -28,235 +29,271 @@
     </script>
     <style>
         body {
-            background-color: #150E0A;
+            background-color: #0D0907;
             color: #F5E6D3;
-            background-image: radial-gradient(circle at 15% 50%, rgba(212, 175, 55, 0.03) 0%, transparent 50%);
+            background-image: radial-gradient(circle at top right, rgba(212, 175, 55, 0.05) 0%, transparent 40%),
+                              radial-gradient(circle at bottom left, rgba(212, 175, 55, 0.03) 0%, transparent 40%);
             background-attachment: fixed;
-            -webkit-tap-highlight-color: transparent;
+            -webkit-user-select: none;
+            touch-action: manipulation;
         }
-        .glass-panel {
-            background: linear-gradient(145deg, rgba(30, 20, 15, 0.9) 0%, rgba(44, 29, 22, 0.6) 100%);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(212, 175, 55, 0.15);
+
+        .glass-card {
+            background: linear-gradient(160deg, rgba(30, 20, 15, 0.95) 0%, rgba(21, 14, 10, 0.8) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(212, 175, 55, 0.12);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
-        .btn-premium {
-            background: linear-gradient(135deg, #D4AF37 0%, #B89328 100%);
-            color: #150E0A;
+
+        .input-premium {
+            background: rgba(13, 9, 7, 0.6);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            color: white;
             transition: all 0.3s ease;
         }
-        /* Status Toggle Styles */
-        .status-toggle input:checked + .status-track { background-color: rgba(16, 185, 129, 0.2); border-color: #10B981; }
-        .status-toggle input:checked + .status-track .status-thumb { transform: translateX(24px); background-color: #10B981; }
-        .status-track {
-            width: 48px; height: 24px; background-color: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.4); border-radius: 99px; position: relative; cursor: pointer;
+
+        .input-premium:focus {
+            border-color: #D4AF37;
+            box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.1);
+            outline: none;
         }
-        .status-thumb {
-            width: 18px; height: 18px; background-color: #EF4444; border-radius: 50%;
-            position: absolute; left: 3px; top: 2px; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+        .btn-gold {
+            background: linear-gradient(135deg, #D4AF37 0%, #B89328 100%);
+            color: #0D0907;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+            transition: all 0.2s active;
         }
+
+        .btn-gold:active {
+            transform: scale(0.97);
+            opacity: 0.9;
+        }
+
+        /* Modern Toggle */
+        .premium-switch input:checked + .slider { background: #D4AF37; }
+        .premium-switch input:checked + .slider:before { transform: translateX(20px); background: #0D0907; }
+        .slider {
+            width: 44px; height: 24px; background: rgba(255,255,255,0.1);
+            border-radius: 30px; position: relative; transition: .4s; cursor: pointer;
+        }
+        .slider:before {
+            content: ""; position: absolute; height: 18px; width: 18px; left: 3px; bottom: 3px;
+            background: white; border-radius: 50%; transition: .4s;
+        }
+
+        .paid-glow { border-left: 4px solid #D4AF37 !important; background: rgba(212, 175, 55, 0.05) !important; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-list { animation: fadeIn 0.4s ease forwards; }
     </style>
 </head>
-<body class="min-h-screen pb-20">
+<body class="min-h-screen pb-32">
 
-    <div class="max-w-md mx-auto px-4 pt-8 space-y-6">
-        <header class="text-center">
-            <h1 class="text-3xl font-bold text-white tracking-tight">Fee Collection</h1>
-            <p class="text-coffee-accent text-sm font-medium uppercase tracking-widest mt-1">Finance Portal</p>
+    <div class="max-w-xl mx-auto px-5 pt-10 space-y-8">
+        
+        <header class="flex justify-between items-center">
+            <div>
+                <h1 class="text-3xl font-extrabold tracking-tighter text-white">COFFEELAND <span class="text-coffee-accent">FC</span></h1>
+                <p class="text-[10px] font-bold text-coffee-accent uppercase tracking-[0.2em] opacity-80">Fee Collection Portal</p>
+            </div>
+            <div class="h-12 w-12 rounded-full border border-coffee-accent/30 p-1 bg-coffee-800/40">
+                <img src="https://i.ibb.co/KjC62kc0/1000287652-0b4cd8d123cf04f03fc322309c337390-11-18-2025-1-04-51-PM.png" class="rounded-full">
+            </div>
         </header>
 
-        <div class="grid grid-cols-2 gap-3">
-            <div class="glass-panel p-4 rounded-2xl text-center">
-                <p class="text-[10px] uppercase text-coffee-light/50 font-bold mb-1">Total Expected</p>
-                <p class="text-xl font-bold text-white" id="totalExpected">₹0</p>
+        <div class="glass-card rounded-[2rem] p-6 flex justify-around items-center border-t-2 border-t-coffee-accent/20">
+            <div class="text-center">
+                <p class="text-[9px] uppercase font-black text-coffee-light/40 tracking-widest mb-1">Expected</p>
+                <p class="text-xl font-bold" id="ui-expected">₹0</p>
             </div>
-            <div class="glass-panel p-4 rounded-2xl text-center border-l-2 border-l-coffee-accent">
-                <p class="text-[10px] uppercase text-coffee-light/50 font-bold mb-1">Collected</p>
-                <p class="text-xl font-bold text-coffee-accent" id="totalCollected">₹0</p>
-            </div>
-        </div>
-
-        <div class="glass-panel p-5 rounded-2xl space-y-4">
-            <div>
-                <label class="text-[10px] font-bold text-coffee-accent uppercase tracking-wider">Select Batch</label>
-                <select id="batchFilter" onchange="filterRoster()" class="w-full bg-coffee-900/50 border border-coffee-accent/20 rounded-xl p-3 mt-1 text-white focus:outline-none focus:border-coffee-accent">
-                    <option value="All">All Batches</option>
-                    <option value="Xavier's School">Xavier's School</option>
-                    <option value="District Field">District Field</option>
-                </select>
-            </div>
-            <div class="flex gap-2">
-                <input type="month" id="feeMonth" class="flex-1 bg-coffee-900/50 border border-coffee-accent/20 rounded-xl p-3 text-white text-sm">
-                <button onclick="loadStudentData()" class="btn-premium px-5 rounded-xl font-bold text-sm">Sync</button>
+            <div class="h-8 w-[1px] bg-white/10"></div>
+            <div class="text-center">
+                <p class="text-[9px] uppercase font-black text-coffee-accent tracking-widest mb-1">Collected</p>
+                <p class="text-xl font-bold text-coffee-accent" id="ui-collected">₹0</p>
             </div>
         </div>
 
-        <div id="loading" class="hidden text-center py-10">
-            <div class="inline-block w-8 h-8 border-4 border-coffee-accent/20 border-t-coffee-accent rounded-full animate-spin"></div>
-            <p class="text-xs mt-2 text-coffee-light/40 italic">Accessing Ledger...</p>
+        <div class="space-y-4">
+            <div class="flex gap-3">
+                <div class="flex-1">
+                    <select id="batchFilter" onchange="filterRoster()" class="input-premium w-full rounded-2xl p-4 text-sm font-medium appearance-none">
+                        <option value="Loading">Loading Batches...</option>
+                    </select>
+                </div>
+                <div class="w-1/3">
+                    <input type="month" id="feeMonth" class="input-premium w-full rounded-2xl p-4 text-sm font-medium">
+                </div>
+            </div>
+            <div class="relative">
+                <span class="absolute inset-y-0 left-4 flex items-center text-coffee-accent/50">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                </span>
+                <input type="text" id="searchInput" oninput="filterRoster()" placeholder="Search Athlete Name..." class="input-premium w-full rounded-2xl py-4 pl-12 pr-4 text-sm">
+            </div>
         </div>
 
-        <div id="studentList" class="space-y-3">
+        <div id="roster" class="space-y-3">
+            <div class="py-20 text-center space-y-3 opacity-50">
+                <div class="inline-block w-6 h-6 border-2 border-coffee-accent/20 border-t-coffee-accent rounded-full animate-spin"></div>
+                <p class="text-xs font-medium tracking-widest uppercase">Syncing Ledger...</p>
             </div>
+        </div>
 
-        <div class="fixed bottom-0 left-0 right-0 p-4 bg-coffee-900/80 backdrop-blur-md border-t border-coffee-accent/20 z-50">
-            <button onclick="saveFees()" id="saveBtn" class="btn-premium w-full max-w-md mx-auto py-4 rounded-2xl font-bold text-lg shadow-lg flex items-center justify-center gap-2">
-                <span>Update Sheet</span>
+    </div>
+
+    <div class="fixed bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-coffee-950 via-coffee-950 to-transparent z-50">
+        <div class="max-w-xl mx-auto">
+            <button onclick="commitTransactions()" id="submitBtn" class="btn-gold w-full py-5 rounded-[1.5rem] text-sm uppercase flex items-center justify-center gap-3 active:scale-95 transition-transform">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                Commit to Fees Sheet
             </button>
         </div>
     </div>
 
     <script>
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyM1oMVxGic2m1St4ve9iJSF5lPYjh5cC0yi9FG9gK6_U99JrJzQytGtoUZeSdnWcfUAg/exec"; // Replace with your deployed URL
-        let allStudents = [];
+        const WEB_APP_URL = "YOUR_NEW_DEPLOYED_URL_HERE"; // <--- UPDATE THIS
+        let masterData = [];
 
+        // Set Default Month
         document.getElementById('feeMonth').value = new Date().toISOString().slice(0, 7);
 
-        async function loadStudentData() {
-            const list = document.getElementById('studentList');
-            const loader = document.getElementById('loading');
-            
-            list.innerHTML = '';
-            loader.classList.remove('hidden');
-
+        // 1. Initial Load: Batches & Students
+        window.onload = async () => {
             try {
-                // We fetch from the 'Students' sheet as requested
-                const response = await fetch(`${WEB_APP_URL}?action=getStudents`);
-                const data = await response.json();
-                allStudents = data.students;
-                filterRoster();
-            } catch (err) {
-                alert("Connection failed. Check Script URL.");
-            } finally {
-                loader.classList.add('hidden');
-            }
-        }
+                // Load Batches
+                const bResp = await fetch(`${WEB_APP_URL}?action=getBatches`);
+                const bData = await bResp.json();
+                const select = document.getElementById('batchFilter');
+                select.innerHTML = '<option value="All">All Active Batches</option>';
+                bData.batches.forEach(b => {
+                    select.innerHTML += `<option value="${b.name}">${b.name}</option>`;
+                });
 
+                // Load Students
+                const sResp = await fetch(`${WEB_APP_URL}?action=getStudents`);
+                const sData = await sResp.json();
+                masterData = sData.students;
+                filterRoster();
+            } catch (e) {
+                document.getElementById('roster').innerHTML = `<p class="text-center text-red-400 py-10">Connection Error. Verify Web App URL.</p>`;
+            }
+        };
+
+        // 2. Filter Logic (Search + Batch)
         function filterRoster() {
             const batch = document.getElementById('batchFilter').value;
-            const container = document.getElementById('studentList');
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const container = document.getElementById('roster');
             container.innerHTML = '';
-            
-            let expected = 0;
-            let collected = 0;
 
-            const filtered = allStudents.filter(s => batch === 'All' || s.batch === batch);
+            let filtered = masterData.filter(s => 
+                (batch === 'All' || s.batch === batch) && 
+                (s.name.toLowerCase().includes(search))
+            );
 
-            filtered.forEach((s, idx) => {
-                const feeAmount = parseInt(s.fees.replace(/[^\d]/g, '')) || 0;
-                expected += feeAmount;
-                if(s.status === 'Paid') collected += feeAmount;
+            let expectedTotal = 0;
+            let collectedTotal = 0;
 
-                container.innerHTML += `
-                    <div class="glass-panel p-4 rounded-2xl flex items-center justify-between border-l-4 ${s.status === 'Paid' ? 'border-l-green-500' : 'border-l-red-500'} transition-all">
-                        <div class="flex-1">
-                            <h4 class="font-bold text-white text-base">${s.name}</h4>
-                            <div class="flex items-center gap-2 mt-1">
-                                <span class="text-[10px] px-2 py-0.5 bg-coffee-accent/10 text-coffee-accent rounded-md border border-coffee-accent/20">${s.batch}</span>
-                                <span class="text-sm font-semibold text-coffee-light/80">₹${feeAmount}</span>
-                            </div>
-                        </div>
-                        
-                        <div class="flex items-center gap-4">
-                            <a href="https://wa.me/${s.contact}?text=Hi ${s.name}, this is a reminder for your CFC fees for ${document.getElementById('feeMonth').value}." class="p-2 bg-green-500/10 rounded-full border border-green-500/20 text-green-500">
-                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12.012 2c-5.508 0-9.987 4.479-9.987 9.988 0 1.757.459 3.404 1.258 4.838l-1.341 4.903 5.034-1.321c1.408.767 3.013 1.207 4.72 1.207 5.508 0 9.988-4.479 9.988-9.988 0-5.509-4.48-9.988-9.988-9.988zm4.847 14.125c-.215.604-1.231 1.154-1.688 1.21-.456.056-.897.272-2.923-.526-2.438-.962-4.004-3.438-4.125-3.601-.121-.162-1.021-1.356-1.021-2.585 0-1.23.645-1.834.872-2.087.227-.254.495-.317.659-.317.164 0 .328.001.47.009.15.007.351-.057.549.421.199.479.68 1.659.739 1.779.059.121.099.261.019.421-.079.16-.12.261-.24.4-.12.14-.251.312-.359.419-.12.12-.244.251-.106.489.138.238.613 1.011 1.315 1.636.903.805 1.666 1.053 1.904 1.173.238.12.378.1.517-.059.14-.16.598-.696.758-.935.16-.24.32-.201.539-.12.22.08 1.396.658 1.636.777.24.12.399.18.459.28.06.1.06.579-.155 1.183z"/></svg>
-                            </a>
-                            <label class="status-toggle">
-                                <input type="checkbox" class="hidden" ${s.status === 'Active' || s.status === 'Paid' ? 'checked' : ''} onchange="updateRowColor(this)">
-                                <div class="status-track"><div class="status-thumb"></div></div>
-                            </label>
+            filtered.forEach((s, i) => {
+                const feeInt = parseInt(s.fees.replace(/[^\d]/g, '')) || 0;
+                expectedTotal += feeInt;
+
+                const card = document.createElement('div');
+                card.className = `glass-card p-5 rounded-3xl flex items-center justify-between border-l-4 border-l-transparent transition-all duration-300 animate-list`;
+                card.style.animationDelay = `${i * 0.03}s`;
+                card.id = `card-${i}`;
+
+                card.innerHTML = `
+                    <div class="flex-1 pr-4">
+                        <h3 class="font-bold text-white tracking-wide">${s.name}</h3>
+                        <div class="flex items-center gap-3 mt-1.5">
+                            <span class="batch-text text-[9px] font-bold text-coffee-accent uppercase tracking-tighter bg-coffee-accent/5 px-2 py-0.5 rounded border border-coffee-accent/10">${s.batch}</span>
+                            <span class="fee-text text-sm font-bold text-coffee-light/60">₹${feeInt}</span>
                         </div>
                     </div>
+                    <div class="flex items-center gap-4">
+                        <a href="https://wa.me/${s.contact.replace(/\s+/g, '')}?text=Hi ${s.name}, your CFC Fees for ${document.getElementById('feeMonth').value} is pending." class="text-green-500/80 active:scale-90 transition-transform">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12.012 2c-5.508 0-9.987 4.479-9.987 9.988 0 1.757.459 3.404 1.258 4.838l-1.341 4.903 5.034-1.321c1.408.767 3.013 1.207 4.72 1.207 5.508 0 9.988-4.479 9.988-9.988 0-5.509-4.48-9.988-9.988-9.988zm4.847 14.125c-.215.604-1.231 1.154-1.688 1.21-.456.056-.897.272-2.923-.526-2.438-.962-4.004-3.438-4.125-3.601-.121-.162-1.021-1.356-1.021-2.585 0-1.23.645-1.834.872-2.087.227-.254.495-.317.659-.317.164 0 .328.001.47.009.15.007.351-.057.549.421.199.479.68 1.659.739 1.779.059.121.099.261.019.421-.079.16-.12.261-.24.4-.12.14-.251.312-.359.419-.12.12-.244.251-.106.489.138.238.613 1.011 1.315 1.636.903.805 1.666 1.053 1.904 1.173.238.12.378.1.517-.059.14-.16.598-.696.758-.935.16-.24.32-.201.539-.12.22.08 1.396.658 1.636.777.24.12.399.18.459.28.06.1.06.579-.155 1.183z"/></svg>
+                        </a>
+                        <label class="premium-switch">
+                            <input type="checkbox" class="hidden" onchange="togglePayment(this, ${feeInt}, 'card-${i}')">
+                            <div class="slider"></div>
+                        </label>
+                    </div>
                 `;
+                container.appendChild(card);
             });
 
-            document.getElementById('totalExpected').innerText = `₹${expected}`;
-            document.getElementById('totalCollected').innerText = `₹${collected}`;
+            document.getElementById('ui-expected').innerText = `₹${expectedTotal}`;
+            updateCollected(0);
         }
 
-        function updateRowColor(cb) {
-            const row = cb.closest('.glass-panel');
-            if(cb.checked) {
-                row.classList.remove('border-l-red-500');
-                row.classList.add('border-l-green-500');
+        // 3. UI Helpers
+        let currentCollected = 0;
+        function togglePayment(cb, amount, cardId) {
+            const card = document.getElementById(cardId);
+            if (cb.checked) {
+                currentCollected += amount;
+                card.classList.add('paid-glow');
             } else {
-                row.classList.remove('border-l-green-500');
-                row.classList.add('border-l-red-500');
+                currentCollected -= amount;
+                card.classList.remove('paid-glow');
+            }
+            updateCollected(currentCollected);
+        }
+
+        function updateCollected(val) {
+            document.getElementById('ui-collected').innerText = `₹${val}`;
+        }
+
+        // 4. Submit to Fees Sheet
+        async function commitTransactions() {
+            const btn = document.getElementById('submitBtn');
+            const month = document.getElementById('feeMonth').value;
+            const checks = document.querySelectorAll('input[type="checkbox"]:checked');
+            
+            if (checks.length === 0) {
+                alert("Gold Rule: Select at least one paid athlete first.");
+                return;
+            }
+
+            const originalBtn = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = `<span class="animate-pulse">Syncing Gold...</span>`;
+
+            const dataToLog = [];
+            checks.forEach(cb => {
+                const parent = cb.closest('.glass-card');
+                dataToLog.push({
+                    name: parent.querySelector('h3').innerText,
+                    batch: parent.querySelector('.batch-text').innerText,
+                    amount: parent.querySelector('.fee-text').innerText.replace('₹', ''),
+                    status: 'Paid'
+                });
+            });
+
+            try {
+                const formData = new URLSearchParams();
+                formData.append('payload', JSON.stringify({ month, data: dataToLog }));
+
+                // Using POST to append rows to Fees sheet
+                await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: formData
+                });
+
+                alert(`Ledger Updated. ${dataToLog.length} payments logged for ${month}.`);
+                location.reload(); // Refresh to clear session
+            } catch (e) {
+                alert("Comm-link failed.");
+                btn.disabled = false;
+                btn.innerHTML = originalBtn;
             }
         }
-
-       async function saveFees() {
-    const btn = document.getElementById('saveBtn');
-    const month = document.getElementById('feeMonth').value;
-    
-    // UI Feedback
-    btn.disabled = true;
-    btn.innerHTML = 'Logging Transactions...';
-
-    const records = [];
-    document.querySelectorAll('#studentList .glass-panel').forEach(row => {
-        const isPaid = row.querySelector('input[type="checkbox"]').checked;
-        // We only log if checked (Paid)
-        if (isPaid) {
-            records.push({
-                name: row.querySelector('h4').innerText,
-                batch: row.querySelector('.batch-label').innerText,
-                amount: row.querySelector('.amount-label').innerText.replace('₹', ''),
-                status: 'Paid'
-            });
-        }
-    });
-
-    if (records.length === 0) {
-        alert("No payments selected to log.");
-        btn.disabled = false;
-        btn.innerHTML = 'Update Sheet';
-        return;
-    }
-
-    const formData = new URLSearchParams();
-    formData.append('payload', JSON.stringify({ month, data: records }));
-
-    try {
-        await fetch(WEB_APP_URL, {
-            method: 'POST',
-            mode: 'no-cors', 
-            body: formData
-        });
-        alert(`Successfully logged ${records.length} payments for ${month}`);
-        // Refresh to clear toggles
-        loadStudentData(); 
-    } catch (err) {
-        alert("Sync Failed.");
-    } finally {
-        btn.disabled = false;
-        btn.innerHTML = 'Update Sheet';
-    }
-}
-            // Logic to collect all checkbox states and send to "Fees" sheet
-            setTimeout(() => {
-                alert("Success: Ledger Updated for " + document.getElementById('feeMonth').value);
-                btn.disabled = false;
-                btn.innerHTML = 'Update Sheet';
-            }, 1500);
-        }
-
-        // Auto-load on start
-       window.onload = async () => {
-    const batchSelect = document.getElementById('batchFilter');
-    try {
-        const response = await fetch(`${WEB_APP_URL}?action=getBatches`);
-        const data = await response.json();
-        batchSelect.innerHTML = '<option value="All">All Batches</option>';
-        data.batches.forEach(b => {
-            batchSelect.innerHTML += `<option value="${b.name}">${b.name}</option>`;
-        });
-        // After batches load, get the students
-        loadStudentData();
-    } catch (err) {
-        console.error("Batch load failed", err);
-    }
-};
     </script>
 </body>
 </html>
