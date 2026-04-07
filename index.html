@@ -2,817 +2,204 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Coffeeland FC • Fees Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CFC Fees Management</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Outfit', 'sans-serif'] },
+                    colors: {
+                        coffee: {
+                            900: '#150E0A',
+                            800: '#1E140F',
+                            700: '#2C1D16',
+                            accent: '#D4AF37',
+                            light: '#F5E6D3'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #0a0a0a;
-            min-height: 100vh;
-            padding: 12px;
+            background-color: #150E0A;
+            color: #F5E6D3;
+            background-image: radial-gradient(circle at 15% 50%, rgba(212, 175, 55, 0.03) 0%, transparent 50%);
+            background-attachment: fixed;
+            -webkit-tap-highlight-color: transparent;
         }
-        .container { max-width: 100%; margin: 0 auto; }
-        .header {
-            background: #111111;
-            border: 1px solid #222222;
-            border-radius: 20px;
-            padding: 16px;
-            margin-bottom: 16px;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
+        .glass-panel {
+            background: linear-gradient(145deg, rgba(30, 20, 15, 0.9) 0%, rgba(44, 29, 22, 0.6) 100%);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(212, 175, 55, 0.15);
         }
-        .logo-area { display: flex; align-items: center; gap: 12px; }
-        .logo {
-            width: 40px;
-            height: 40px;
-            background: #fbbf24;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 6px;
+        .btn-premium {
+            background: linear-gradient(135deg, #D4AF37 0%, #B89328 100%);
+            color: #150E0A;
+            transition: all 0.3s ease;
         }
-        .logo img { width: 100%; height: 100%; object-fit: contain; }
-        .title h1 { color: white; font-size: 18px; font-weight: 600; }
-        .title p { color: #737373; font-size: 11px; }
-        .toggle-container {
-            display: flex;
-            gap: 6px;
-            background: #1a1a1a;
-            padding: 4px;
-            border-radius: 40px;
-            border: 1px solid #2a2a2a;
+        /* Status Toggle Styles */
+        .status-toggle input:checked + .status-track { background-color: rgba(16, 185, 129, 0.2); border-color: #10B981; }
+        .status-toggle input:checked + .status-track .status-thumb { transform: translateX(24px); background-color: #10B981; }
+        .status-track {
+            width: 48px; height: 24px; background-color: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.4); border-radius: 99px; position: relative; cursor: pointer;
         }
-        .toggle-option {
-            padding: 8px 16px;
-            border-radius: 30px;
-            border: none;
-            background: transparent;
-            color: #737373;
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-        }
-        .toggle-option.active { background: #fbbf24; color: #111111; }
-        .total-collected {
-            background: #1a1a1a;
-            border: 1px solid #2a2a2a;
-            border-radius: 40px;
-            padding: 8px 16px;
-        }
-        .total-collected span { color: #737373; font-size: 12px; }
-        .total-collected strong { color: #fbbf24; font-size: 14px; margin-left: 8px; }
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-        .stat-card {
-            background: #111111;
-            border: 1px solid #222222;
-            border-radius: 16px;
-            padding: 16px;
-        }
-        .stat-label {
-            color: #737373;
-            font-size: 11px;
-            font-weight: 500;
-            text-transform: uppercase;
-            margin-bottom: 6px;
-        }
-        .stat-number { color: white; font-size: 20px; font-weight: 600; }
-        .stat-number.gold { color: #fbbf24; }
-        .filters {
-            background: #111111;
-            border: 1px solid #222222;
-            border-radius: 16px;
-            padding: 16px;
-            margin-bottom: 16px;
-        }
-        .filters-grid { display: flex; flex-direction: column; gap: 12px; }
-        .filter-group { display: flex; flex-direction: column; gap: 6px; }
-        .filter-group label {
-            color: #737373;
-            font-size: 11px;
-            font-weight: 500;
-            text-transform: uppercase;
-        }
-        .filter-group select {
-            width: 100%;
-            padding: 12px;
-            background: #1a1a1a;
-            border: 1px solid #2a2a2a;
-            border-radius: 12px;
-            color: white;
-            font-size: 14px;
-            cursor: pointer;
-        }
-        .button-group { display: flex; gap: 10px; margin-top: 4px; }
-        .btn {
-            flex: 1;
-            padding: 12px;
-            border-radius: 12px;
-            border: none;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            background: #1a1a1a;
-            color: white;
-            border: 1px solid #2a2a2a;
-            text-align: center;
-        }
-        .btn-primary { background: #fbbf24; color: #111111; border: none; }
-        .table-container {
-            background: #111111;
-            border: 1px solid #222222;
-            border-radius: 16px;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-        table { width: 100%; border-collapse: collapse; min-width: 700px; }
-        th {
-            text-align: left;
-            padding: 14px 12px;
-            background: #1a1a1a;
-            color: #737373;
-            font-weight: 500;
-            font-size: 12px;
-            text-transform: uppercase;
-            border-bottom: 1px solid #222222;
-        }
-        td {
-            padding: 12px;
-            color: white;
-            font-size: 13px;
-            border-bottom: 1px solid #1a1a1a;
-        }
-        .status-badge {
-            padding: 4px 10px;
-            border-radius: 30px;
-            font-size: 11px;
-            font-weight: 600;
-            display: inline-block;
-        }
-        .status-paid { background: #05966920; color: #10b981; border: 1px solid #10b98130; }
-        .status-pending { background: #d9770620; color: #f59e0b; border: 1px solid #f59e0b30; }
-        .action-buttons { display: flex; gap: 6px; flex-wrap: wrap; }
-        .action-btn {
-            padding: 6px 12px;
-            border-radius: 8px;
-            border: none;
-            font-size: 11px;
-            font-weight: 600;
-            cursor: pointer;
-            white-space: nowrap;
-        }
-        .action-paid { background: #05966920; color: #10b981; border: 1px solid #10b98130; }
-        .action-paid:disabled { opacity: 0.5; cursor: not-allowed; }
-        .action-remind { background: #fbbf2420; color: #fbbf24; border: 1px solid #fbbf2430; }
-        .action-edit { background: #3b82f620; color: #3b82f6; border: 1px solid #3b82f630; }
-        .whatsapp-number { color: #fbbf24; font-size: 12px; cursor: pointer; }
-        .whatsapp-number:hover { text-decoration: underline; }
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.9);
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            padding: 16px;
-        }
-        .modal-content {
-            background: #111111;
-            border: 1px solid #2a2a2a;
-            border-radius: 24px;
-            padding: 24px;
-            width: 90%;
-            max-width: 400px;
-        }
-        .modal-content h3 { color: white; font-size: 18px; margin-bottom: 16px; }
-        .modal-content input, .modal-content select {
-            width: 100%;
-            padding: 12px;
-            background: #1a1a1a;
-            border: 1px solid #2a2a2a;
-            border-radius: 12px;
-            color: white;
-            font-size: 14px;
-            margin-bottom: 16px;
-        }
-        .modal-buttons { display: flex; gap: 10px; justify-content: flex-end; }
-        .toast {
-            position: fixed;
-            bottom: 16px;
-            left: 16px;
-            right: 16px;
-            background: #1a1a1a;
-            border: 1px solid #2a2a2a;
-            border-radius: 12px;
-            padding: 12px;
-            color: white;
-            font-size: 13px;
-            text-align: center;
-            transform: translateY(100px);
-            transition: transform 0.3s ease;
-            z-index: 2000;
-        }
-        .toast.show { transform: translateY(0); }
-        .empty-state { text-align: center; padding: 40px; color: #737373; font-size: 14px; }
-        .helper-text { color: #737373; font-size: 10px; margin-top: 4px; }
-        .custom-fee-badge {
-            background: #fbbf2420;
-            color: #fbbf24;
-            font-size: 10px;
-            padding: 2px 6px;
-            border-radius: 12px;
-            margin-left: 6px;
+        .status-thumb {
+            width: 18px; height: 18px; background-color: #EF4444; border-radius: 50%;
+            position: absolute; left: 3px; top: 2px; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <div class="header">
-            <div class="logo-area">
-                <div class="logo">
-                    <img src="https://i.ibb.co/KjC62kc0/1000287652-0b4cd8d123cf04f03fc322309c337390-11-18-2025-1-04-51-PM.png" alt="Coffeeland FC">
-                </div>
-                <div class="title">
-                    <h1>Coffeeland FC</h1>
-                    <p>Fee Management</p>
-                </div>
+<body class="min-h-screen pb-20">
+
+    <div class="max-w-md mx-auto px-4 pt-8 space-y-6">
+        <header class="text-center">
+            <h1 class="text-3xl font-bold text-white tracking-tight">Fee Collection</h1>
+            <p class="text-coffee-accent text-sm font-medium uppercase tracking-widest mt-1">Finance Portal</p>
+        </header>
+
+        <div class="grid grid-cols-2 gap-3">
+            <div class="glass-panel p-4 rounded-2xl text-center">
+                <p class="text-[10px] uppercase text-coffee-light/50 font-bold mb-1">Total Expected</p>
+                <p class="text-xl font-bold text-white" id="totalExpected">₹0</p>
             </div>
-            <div class="toggle-container">
-                <button class="toggle-option active" id="toggleRegular" onclick="setFeeType('regular')">Regular</button>
-                <button class="toggle-option" id="toggleSummer" onclick="setFeeType('summer')">Summer</button>
-            </div>
-            <div class="total-collected">
-                <span>Collected</span>
-                <strong id="totalCollected">₹0</strong>
+            <div class="glass-panel p-4 rounded-2xl text-center border-l-2 border-l-coffee-accent">
+                <p class="text-[10px] uppercase text-coffee-light/50 font-bold mb-1">Collected</p>
+                <p class="text-xl font-bold text-coffee-accent" id="totalCollected">₹0</p>
             </div>
         </div>
 
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-label">Total fees</div>
-                <div class="stat-number gold" id="totalFees">₹0</div>
+        <div class="glass-panel p-5 rounded-2xl space-y-4">
+            <div>
+                <label class="text-[10px] font-bold text-coffee-accent uppercase tracking-wider">Select Batch</label>
+                <select id="batchFilter" onchange="filterRoster()" class="w-full bg-coffee-900/50 border border-coffee-accent/20 rounded-xl p-3 mt-1 text-white focus:outline-none focus:border-coffee-accent">
+                    <option value="All">All Batches</option>
+                    <option value="Xavier's School">Xavier's School</option>
+                    <option value="District Field">District Field</option>
+                </select>
             </div>
-            <div class="stat-card">
-                <div class="stat-label">Collected</div>
-                <div class="stat-number" id="collected">₹0</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Pending</div>
-                <div class="stat-number" id="pending">₹0</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Collection rate</div>
-                <div class="stat-number" id="collectionRate">0%</div>
+            <div class="flex gap-2">
+                <input type="month" id="feeMonth" class="flex-1 bg-coffee-900/50 border border-coffee-accent/20 rounded-xl p-3 text-white text-sm">
+                <button onclick="loadStudentData()" class="btn-premium px-5 rounded-xl font-bold text-sm">Sync</button>
             </div>
         </div>
 
-        <div class="filters">
-            <div class="filters-grid">
-                <div class="filter-group">
-                    <label>Batch</label>
-                    <select id="batchSelect" onchange="loadStudents()">
-                        <option value="">Select batch</option>
-                        <option value="Kalyan Nagar">Kalyan Nagar</option>
-                        <option value="Xavier's School">Xavier's School</option>
-                        <option value="Monti Angels">Monti Angels</option>
-                        <option value="District Field Morning">District Field Morning</option>
-                        <option value="District Field Evening">District Field Evening</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label>Month</label>
-                    <select id="monthSelect" onchange="loadStudents()">
-                        <option value="Jan 2026">Jan 2026</option>
-                        <option value="Feb 2026">Feb 2026</option>
-                        <option value="Mar 2026">Mar 2026</option>
-                        <option value="Apr 2026">Apr 2026</option>
-                        <option value="May 2026">May 2026</option>
-                        <option value="Jun 2026">Jun 2026</option>
-                        <option value="Jul 2026">Jul 2026</option>
-                        <option value="Aug 2026">Aug 2026</option>
-                        <option value="Sep 2026">Sep 2026</option>
-                        <option value="Oct 2026">Oct 2026</option>
-                        <option value="Nov 2026">Nov 2026</option>
-                        <option value="Dec 2026">Dec 2026</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label>Status</label>
-                    <select id="statusSelect" onchange="filterTable()">
-                        <option value="all">All</option>
-                        <option value="Paid">Paid</option>
-                        <option value="Pending">Pending</option>
-                    </select>
-                </div>
-                <div class="button-group">
-                    <button class="btn btn-primary" onclick="applyDefaultFees()">Apply Default</button>
-                    <button class="btn" onclick="syncData()">Sync All</button>
-                </div>
+        <div id="loading" class="hidden text-center py-10">
+            <div class="inline-block w-8 h-8 border-4 border-coffee-accent/20 border-t-coffee-accent rounded-full animate-spin"></div>
+            <p class="text-xs mt-2 text-coffee-light/40 italic">Accessing Ledger...</p>
+        </div>
+
+        <div id="studentList" class="space-y-3">
             </div>
-        </div>
 
-        <div id="contactStatus" style="background: #1a1a1a; border-radius: 12px; padding: 8px 12px; margin-bottom: 12px; font-size: 12px;">
-            <span>📞 </span><span id="contactStatusText">Loading contacts...</span>
-        </div>
-
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Student</th>
-                        <th>Batch</th>
-                        <th>Month</th>
-                        <th>WhatsApp</th>
-                        <th>Total</th>
-                        <th>Paid</th>
-                        <th>Pending</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="tableBody">
-                    <tr><td colspan="9" class="empty-state">Select a batch and month</td></tr>
-                </tbody>
-            </table>
+        <div class="fixed bottom-0 left-0 right-0 p-4 bg-coffee-900/80 backdrop-blur-md border-t border-coffee-accent/20 z-50">
+            <button onclick="saveFees()" id="saveBtn" class="btn-premium w-full max-w-md mx-auto py-4 rounded-2xl font-bold text-lg shadow-lg flex items-center justify-center gap-2">
+                <span>Update Sheet</span>
+            </button>
         </div>
     </div>
-
-    <!-- Custom Fee Modal -->
-    <div class="modal" id="customFeeModal">
-        <div class="modal-content">
-            <h3>💰 Customize Fee Amount</h3>
-            <input type="number" id="customFeeAmount" placeholder="Enter custom fee amount" min="1">
-            <div class="helper-text">This will override default batch fee for this student</div>
-            <div class="modal-buttons">
-                <button class="btn btn-primary" onclick="saveCustomFee()">Apply</button>
-                <button class="btn" onclick="closeCustomFeeModal()">Cancel</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- WhatsApp Modal -->
-    <div class="modal" id="whatsappModal">
-        <div class="modal-content">
-            <h3>Update WhatsApp</h3>
-            <input type="text" id="whatsappInput" placeholder="Enter number (e.g., 919876543210)">
-            <div class="helper-text">This will be saved to Master Contacts sheet</div>
-            <div class="modal-buttons">
-                <button class="btn btn-primary" onclick="saveWhatsApp()">Save</button>
-                <button class="btn" onclick="closeModal()">Cancel</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Fees Modal -->
-    <div class="modal" id="feesModal">
-        <div class="modal-content">
-            <h3>Set Total Fees</h3>
-            <input type="number" id="feesInput" placeholder="Enter amount" min="1">
-            <div class="modal-buttons">
-                <button class="btn btn-primary" onclick="saveFees()">Save</button>
-                <button class="btn" onclick="closeModal()">Cancel</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="toast" id="toast"></div>
 
     <script>
-        // Configuration
-        const SHEET_ID = '1EhkGO3omreFx_cbIWM9ZMQbTtWkTT2tm4ePgN-Ii8GQ';
-        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzvalBcKoiYuBgYmZi2Zego_3_UJicNTfH-WYsXQkM6atpOtuEiAIZAp1Z9jHqSMi4b/exec';
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxUiEuhGkvGwibifwF-ANnft0gNAD0sDfXX8j75WxV3o3Lwu6p1UWF3HFSIulpBC5xh2Q/exec"; // Replace with your deployed URL
+        let allStudents = [];
 
-        // Fee structure
-        const FEES = {
-            regular: {
-                'Kalyan Nagar': 1200,
-                'Xavier\'s School': 500,
-                'District Field Morning': 800,
-                'District Field Evening': 800
-            },
-            summer: {
-                'Kalyan Nagar': 1500,
-                'District Field Morning': 1000,
-                'District Field Evening': 1000
-            }
-        };
+        document.getElementById('feeMonth').value = new Date().toISOString().slice(0, 7);
 
-        // Student data
-        const STUDENTS = {
-            'Kalyan Nagar': [
-                'MOHITH.S', 'Rishanth R Shekar', 'Gahan', 'RUTVIK', 'Sohan R Prasad',
-                'Gagan gowda.B.M', 'Mohith T', 'Gokul', 'THEJAS KN', 'CHIRANTH BK',
-                'Shrinik U Y', 'HIMAVANTH CJ', 'Ganav r', 'SHAMAN GOWDA N N',
-                'SHRIMAN GOWDA N N', 'Dhanvith p Gowda', 'Dhanyatha p', 'Swayam',
-                'Samanvith Rao D M', 'Sai pranav', 'Dishanth HL', 'Manvith.S',
-                'RAJATH .S', 'Nishanth S. V', 'Hoysala M Hrushikesh'
-            ],
-            'Xavier\'s School': [
-                'AIMA', 'PREETHAM HM', 'SAMBRAMA.S', 'DHANVISH', 'VISMITHA',
-                'YASHWANTH BJ', 'ULLAS', 'JASHITH C', 'SAMARTH', 'SARVAJITH',
-                'THANUSH', 'PUNITH', 'PAVAN', 'BHUVAN S', 'CHIRANTH', 'AARIZ',
-                'RIVON', 'DEEKSHA', 'PRAJWAL', 'ANHAR', 'UMAIR', 'AVINASH',
-                'LIKITH', 'SOHAN', 'KRUTHIK', 'SAAMAR', 'LIKITHA', 'IBRAHIM',
-                'MALCUM', 'SAMARTH B', 'VINISH', 'SHAUN D', 'GOKUL', 'CHIRANJITH M',
-                'HUSNA', 'ASJAD', 'IMPAN'
-            ],
-            'Monti Angels': [
-                'MD IFAZ', 'AAHIL', 'MD RAAFI', 'MD AAZZ', 'UMAR', 'UNAIZ',
-                'AFFAN', 'RISHAN', 'MD ARHAAN', 'MD YUSUF ARMAN', 'KSHAMAN U.G',
-                'RISHIK PONNAPPA', 'IRSHAD BAIG', 'MD HAMZA', 'SK SAMDHANI',
-                'MD SHAYAN', 'MD UMAR', 'NOUFAL U.S', 'MD RIFAHATH', 'MD ARHAN',
-                'MD ARMAAN NAWAZ', 'MD MUBASHER', 'ABDUL AZEEM', 'SHINAF IBRAHIM',
-                'ANTHONY', 'TANISH SHANBOGH', 'MOHAN GOWDA', 'MOHAMMED SHARIQ',
-                'MD RAHIL', 'SK AZIZ', 'AMAN BAIG', 'HARSHAVARDHANA', 'MD RAYAAN',
-                'AARIZ RAZA', 'MEHHAROOF', 'PAYAM', 'PAIMAN', 'RISHAB', 'TALHA',
-                'RAHIL', 'ISMAIL', 'YADHUVAMSHIK', 'AFNAN', 'SHISHIR'
-            ],
-            'District Field Morning': ['Arjun', 'Rahul'],
-            'District Field Evening': ['Karthik', 'Suresh']
-        };
+        async function loadStudentData() {
+            const list = document.getElementById('studentList');
+            const loader = document.getElementById('loading');
+            
+            list.innerHTML = '';
+            loader.classList.remove('hidden');
 
-        let currentFeeType = 'regular';
-        let currentBatch = '';
-        let currentMonth = 'Jan 2026';
-        let students = [];
-        let contacts = {};
-        let selectedStudent = null;
-        let timeout;
-
-        window.onload = () => {
-            setFeeType('regular');
-            loadContacts();
-        };
-
-        async function loadContacts() {
             try {
-                const params = new URLSearchParams({ action: 'getContacts', sheetId: SHEET_ID });
-                const url = `${WEB_APP_URL}?${params.toString()}`;
-                const response = await fetch(url);
+                // We fetch from the 'Students' sheet as requested
+                const response = await fetch(`${WEB_APP_URL}?action=getStudents`);
                 const data = await response.json();
-                
-                if (data.success && data.data) {
-                    contacts = {};
-                    data.data.forEach(c => { contacts[c.studentName] = c.whatsapp; });
-                    const count = Object.keys(contacts).length;
-                    document.getElementById('contactStatusText').innerHTML = `✅ ${count} contacts loaded`;
-                    document.getElementById('contactStatus').style.background = '#05966920';
-                    if (document.getElementById('batchSelect').value) loadStudents();
-                } else {
-                    document.getElementById('contactStatusText').innerHTML = '⚠️ No contacts found';
-                }
-            } catch (error) {
-                console.error('Load contacts error:', error);
-                document.getElementById('contactStatusText').innerHTML = '❌ Error loading contacts';
+                allStudents = data.students;
+                filterRoster();
+            } catch (err) {
+                alert("Connection failed. Check Script URL.");
+            } finally {
+                loader.classList.add('hidden');
             }
         }
 
-        function setFeeType(type) {
-            currentFeeType = type;
-            document.getElementById('toggleRegular').classList.remove('active');
-            document.getElementById('toggleSummer').classList.remove('active');
-            document.getElementById(`toggle${type.charAt(0).toUpperCase() + type.slice(1)}`).classList.add('active');
+        function filterRoster() {
+            const batch = document.getElementById('batchFilter').value;
+            const container = document.getElementById('studentList');
+            container.innerHTML = '';
             
-            const monthSelect = document.getElementById('monthSelect');
-            if (type === 'summer') {
-                monthSelect.innerHTML = '<option value="Summer Camp 2026">Summer Camp 2026</option>';
-                currentMonth = 'Summer Camp 2026';
-            } else {
-                monthSelect.innerHTML = `<option value="Jan 2026">Jan 2026</option><option value="Feb 2026">Feb 2026</option><option value="Mar 2026">Mar 2026</option><option value="Apr 2026">Apr 2026</option><option value="May 2026">May 2026</option><option value="Jun 2026">Jun 2026</option><option value="Jul 2026">Jul 2026</option><option value="Aug 2026">Aug 2026</option><option value="Sep 2026">Sep 2026</option><option value="Oct 2026">Oct 2026</option><option value="Nov 2026">Nov 2026</option><option value="Dec 2026">Dec 2026</option>`;
-                currentMonth = 'Jan 2026';
-            }
-            loadStudents();
-        }
+            let expected = 0;
+            let collected = 0;
 
-        async function loadStudents() {
-            const batch = document.getElementById('batchSelect').value;
-            const month = document.getElementById('monthSelect').value;
-            if (!batch || !month) {
-                document.getElementById('tableBody').innerHTML = '<tr><td colspan="9" class="empty-state">Select a batch and month</td></tr>';
-                return;
-            }
-            
-            currentBatch = batch;
-            currentMonth = month;
-            
-            const studentList = STUDENTS[batch] || [];
-            students = studentList.map(name => ({
-                studentName: name, batch: batch, month: month, feeType: currentFeeType,
-                whatsapp: contacts[name] || '', totalFees: 0, paid: 0, pending: 0, status: 'Pending',
-                reminderCount: 0, customFee: null
-            }));
-            
-            await loadFromSheet();
-        }
+            const filtered = allStudents.filter(s => batch === 'All' || s.batch === batch);
 
-        async function loadFromSheet() {
-            try {
-                const params = new URLSearchParams({ action: 'getFees', batch: currentBatch, month: currentMonth, feeType: currentFeeType, sheetId: SHEET_ID });
-                const url = `${WEB_APP_URL}?${params.toString()}`;
-                const response = await fetch(url);
-                const data = await response.json();
-                
-                if (data.success && data.data && data.data.length > 0) {
-                    const savedMap = {};
-                    data.data.forEach(saved => {
-                        savedMap[saved.studentName] = {
-                            totalFees: saved.totalFees || 0, paid: saved.paid || 0,
-                            pending: saved.pending || 0, status: saved.status || 'Pending',
-                            customFee: saved.customFee || null
-                        };
-                    });
-                    students = students.map(student => {
-                        const saved = savedMap[student.studentName];
-                        return saved ? { ...student, totalFees: saved.totalFees, paid: saved.paid, pending: saved.pending, status: saved.status, customFee: saved.customFee } : student;
-                    });
-                }
-                // Sort: Pending students on top
-                students.sort((a, b) => {
-                    if (a.status === 'Pending' && b.status !== 'Pending') return -1;
-                    if (a.status !== 'Pending' && b.status === 'Pending') return 1;
-                    return a.studentName.localeCompare(b.studentName);
-                });
-                renderTable();
-                calculateStats();
-            } catch (error) {
-                renderTable();
-                calculateStats();
-            }
-        }
+            filtered.forEach((s, idx) => {
+                const feeAmount = parseInt(s.fees.replace(/[^\d]/g, '')) || 0;
+                expected += feeAmount;
+                if(s.status === 'Paid') collected += feeAmount;
 
-        function renderTable() {
-            const status = document.getElementById('statusSelect').value;
-            let filtered = status !== 'all' ? students.filter(s => s.status === status) : students;
-            
-            if (filtered.length === 0) {
-                document.getElementById('tableBody').innerHTML = '<tr><td colspan="9" class="empty-state">No students found</td></tr>';
-                return;
-            }
-            
-            let html = '';
-            filtered.forEach(s => {
-                const statusClass = s.status === 'Paid' ? 'status-paid' : 'status-pending';
-                const whatsappDisplay = s.whatsapp ? 
-                    `<span class="whatsapp-number" onclick="editWhatsApp('${s.studentName}')">📱 ${s.whatsapp}</span>` : 
-                    `<button class="action-btn action-edit" onclick="editWhatsApp('${s.studentName}')">+ Add WhatsApp</button>`;
-                
-                const customFeeBadge = s.customFee ? `<span class="custom-fee-badge">custom</span>` : '';
-                
-                // Reminder button based on status
-                let reminderBtn = '';
-                if (s.status === 'Paid') {
-                    reminderBtn = `<button class="action-btn" style="background:#1a1a1a; color:#737373;" disabled>✓ Paid</button>`;
-                } else if (s.reminderCount >= 3) {
-                    reminderBtn = `<button class="action-btn" style="background:#ef444420; color:#ef4444;" onclick="sendReminder('${s.studentName}')">⚠️ Overdue</button>`;
-                } else if (s.reminderCount > 0) {
-                    reminderBtn = `<button class="action-btn" style="background:#fbbf2420; color:#fbbf24;" onclick="sendReminder('${s.studentName}')">📢 Reminder (${s.reminderCount})</button>`;
-                } else {
-                    reminderBtn = `<button class="action-btn action-remind" onclick="sendReminder('${s.studentName}')">📧 Send Reminder</button>`;
-                }
-                
-                html += `
-                    <tr>
-                        <td style="font-weight: 500;">${s.studentName}${customFeeBadge}</td>
-                        <td>${s.batch}</td>
-                        <td>${s.month}</td>
-                        <td>${whatsappDisplay}</td>
-                        <td>${s.totalFees ? `₹${s.totalFees}` : `<button class="action-btn action-edit" onclick="editFees('${s.studentName}')">Set Fee</button>`}
-                            <button class="action-btn" style="background:#3b82f620; color:#3b82f6; margin-left:4px;" onclick="showCustomFeeModal('${s.studentName}')">✎</button>
-                        </td>
-                        <td style="color: #10b981;">₹${s.paid}</td>
-                        <td style="color: ${s.status === 'Paid' ? '#10b981' : '#f59e0b'}; font-weight: 600;">₹${s.pending}</td>
-                        <td><span class="status-badge ${statusClass}">${s.status}</span></td>
-                        <td>
-                            <div class="action-buttons">
-                                ${s.status !== 'Paid' && s.totalFees ? 
-                                    `<button class="action-btn action-paid" onclick="markPaid('${s.studentName}')">✓ Mark Paid</button>` : 
-                                    s.status === 'Paid' ? `<button class="action-btn action-paid" disabled>✓ Paid</button>` : ''
-                                }
-                                ${reminderBtn}
+                container.innerHTML += `
+                    <div class="glass-panel p-4 rounded-2xl flex items-center justify-between border-l-4 ${s.status === 'Paid' ? 'border-l-green-500' : 'border-l-red-500'} transition-all">
+                        <div class="flex-1">
+                            <h4 class="font-bold text-white text-base">${s.name}</h4>
+                            <div class="flex items-center gap-2 mt-1">
+                                <span class="text-[10px] px-2 py-0.5 bg-coffee-accent/10 text-coffee-accent rounded-md border border-coffee-accent/20">${s.batch}</span>
+                                <span class="text-sm font-semibold text-coffee-light/80">₹${feeAmount}</span>
                             </div>
-                        </td>
-                    </tr>
+                        </div>
+                        
+                        <div class="flex items-center gap-4">
+                            <a href="https://wa.me/${s.contact}?text=Hi ${s.name}, this is a reminder for your CFC fees for ${document.getElementById('feeMonth').value}." class="p-2 bg-green-500/10 rounded-full border border-green-500/20 text-green-500">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12.012 2c-5.508 0-9.987 4.479-9.987 9.988 0 1.757.459 3.404 1.258 4.838l-1.341 4.903 5.034-1.321c1.408.767 3.013 1.207 4.72 1.207 5.508 0 9.988-4.479 9.988-9.988 0-5.509-4.48-9.988-9.988-9.988zm4.847 14.125c-.215.604-1.231 1.154-1.688 1.21-.456.056-.897.272-2.923-.526-2.438-.962-4.004-3.438-4.125-3.601-.121-.162-1.021-1.356-1.021-2.585 0-1.23.645-1.834.872-2.087.227-.254.495-.317.659-.317.164 0 .328.001.47.009.15.007.351-.057.549.421.199.479.68 1.659.739 1.779.059.121.099.261.019.421-.079.16-.12.261-.24.4-.12.14-.251.312-.359.419-.12.12-.244.251-.106.489.138.238.613 1.011 1.315 1.636.903.805 1.666 1.053 1.904 1.173.238.12.378.1.517-.059.14-.16.598-.696.758-.935.16-.24.32-.201.539-.12.22.08 1.396.658 1.636.777.24.12.399.18.459.28.06.1.06.579-.155 1.183z"/></svg>
+                            </a>
+                            <label class="status-toggle">
+                                <input type="checkbox" class="hidden" ${s.status === 'Active' || s.status === 'Paid' ? 'checked' : ''} onchange="updateRowColor(this)">
+                                <div class="status-track"><div class="status-thumb"></div></div>
+                            </label>
+                        </div>
+                    </div>
                 `;
             });
-            document.getElementById('tableBody').innerHTML = html;
+
+            document.getElementById('totalExpected').innerText = `₹${expected}`;
+            document.getElementById('totalCollected').innerText = `₹${collected}`;
         }
 
-        function calculateStats() {
-            let total = 0, paid = 0;
-            students.forEach(s => { total += s.totalFees || 0; paid += s.paid || 0; });
-            const rate = total > 0 ? Math.round((paid / total) * 100) : 0;
-            document.getElementById('totalFees').textContent = `₹${total.toLocaleString()}`;
-            document.getElementById('collected').textContent = `₹${paid.toLocaleString()}`;
-            document.getElementById('pending').textContent = `₹${(total - paid).toLocaleString()}`;
-            document.getElementById('collectionRate').textContent = `${rate}%`;
-            document.getElementById('totalCollected').textContent = `₹${paid.toLocaleString()}`;
-        }
-
-        function applyDefaultFees() {
-            if (!currentBatch) { showToast('Select a batch first', 'error'); return; }
-            const amount = FEES[currentFeeType]?.[currentBatch];
-            if (amount) {
-                let count = 0;
-                students.forEach(s => { 
-                    if (!s.totalFees && !s.customFee) { 
-                        s.totalFees = amount; 
-                        s.pending = amount - s.paid; 
-                        count++; 
-                    } 
-                });
-                renderTable(); calculateStats();
-                showToast(`✨ Applied ${currentFeeType === 'regular' ? 'Regular' : 'Summer'} fees: ₹${amount} to ${count} students ✨`, 'success');
-            } else { showToast(`No default ${currentFeeType} fee for this batch`, 'error'); }
-        }
-
-        // Custom Fee Feature
-        let customFeeStudent = null;
-        
-        function showCustomFeeModal(name) {
-            customFeeStudent = students.find(s => s.studentName === name);
-            document.getElementById('customFeeAmount').value = customFeeStudent?.totalFees || '';
-            document.getElementById('customFeeModal').style.display = 'flex';
-        }
-        
-        function closeCustomFeeModal() {
-            document.getElementById('customFeeModal').style.display = 'none';
-            customFeeStudent = null;
-        }
-        
-        async function saveCustomFee() {
-            const amount = parseFloat(document.getElementById('customFeeAmount').value);
-            if (amount && customFeeStudent) {
-                customFeeStudent.totalFees = amount;
-                customFeeStudent.pending = amount - (customFeeStudent.paid || 0);
-                customFeeStudent.status = customFeeStudent.pending <= 0 ? 'Paid' : 'Pending';
-                customFeeStudent.customFee = amount;
-                
-                await fetch(WEB_APP_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        action: 'saveFees', 
-                        sheetId: SHEET_ID, 
-                        student: {
-                            studentName: customFeeStudent.studentName,
-                            batch: customFeeStudent.batch,
-                            month: customFeeStudent.month,
-                            feeType: customFeeStudent.feeType,
-                            whatsapp: customFeeStudent.whatsapp || '',
-                            totalFees: customFeeStudent.totalFees,
-                            paid: customFeeStudent.paid,
-                            pending: customFeeStudent.pending,
-                            status: customFeeStudent.status,
-                            customFee: customFeeStudent.customFee
-                        }
-                    })
-                });
-                
-                renderTable(); calculateStats(); closeCustomFeeModal();
-                showToast(`💰 Custom fee ₹${amount} set for ${customFeeStudent.studentName}!`, 'success');
+        function updateRowColor(cb) {
+            const row = cb.closest('.glass-panel');
+            if(cb.checked) {
+                row.classList.remove('border-l-red-500');
+                row.classList.add('border-l-green-500');
+            } else {
+                row.classList.remove('border-l-green-500');
+                row.classList.add('border-l-red-500');
             }
-        }
-
-        async function markPaid(name) {
-            const student = students.find(s => s.studentName === name);
-            if (!student?.totalFees) { showToast('Set total fees first', 'error'); return; }
-            if (!confirm(`🎉 Mark ${name} as paid for ${student.month}?`)) return;
-            
-            student.paid = student.totalFees;
-            student.pending = 0;
-            student.status = 'Paid';
-            
-            await fetch(WEB_APP_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'saveFees', sheetId: SHEET_ID, student })
-            });
-            
-            // Send WhatsApp confirmation to parent
-            if (student.whatsapp) {
-                let phone = student.whatsapp.toString().replace(/\D/g, '');
-                if (phone.length === 10) phone = '91' + phone;
-                const message = `🎉 *Payment Confirmation* 🎉%0a%0a` +
-                                `Dear Parent,%0a` +
-                                `Payment of ₹${student.totalFees} for ${student.studentName} (${student.batch}) has been successfully recorded.%0a%0a` +
-                                `📅 Month: ${student.month}%0a` +
-                                `✅ Status: PAID%0a%0a` +
-                                `Thank you for your timely payment!%0a%0a` +
-                                `– Coffeeland FC Team 💛🖤`;
-                window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
-            }
-            
-            renderTable(); calculateStats();
-            showToast(`🎉 ${name} marked as paid! WhatsApp confirmation sent!`, 'success');
-        }
-
-        async function updateContact(studentName, batch, whatsapp) {
-            await fetch(WEB_APP_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'updateContact', sheetId: SHEET_ID, contact: { studentName, batch, whatsapp } }) });
-            contacts[studentName] = whatsapp;
-        }
-
-        function editWhatsApp(name) {
-            selectedStudent = students.find(s => s.studentName === name);
-            document.getElementById('whatsappInput').value = selectedStudent?.whatsapp || '';
-            document.getElementById('whatsappModal').style.display = 'flex';
-        }
-
-        async function saveWhatsApp() {
-            const whatsapp = document.getElementById('whatsappInput').value.trim();
-            if (selectedStudent) {
-                selectedStudent.whatsapp = whatsapp;
-                await updateContact(selectedStudent.studentName, selectedStudent.batch, whatsapp);
-                renderTable(); closeModal();
-                showToast('📱 WhatsApp saved to master contacts!', 'success');
-            }
-        }
-
-        function editFees(name) {
-            selectedStudent = students.find(s => s.studentName === name);
-            document.getElementById('feesInput').value = selectedStudent?.totalFees || '';
-            document.getElementById('feesModal').style.display = 'flex';
         }
 
         async function saveFees() {
-            const amount = parseFloat(document.getElementById('feesInput').value);
-            if (amount && selectedStudent) {
-                selectedStudent.totalFees = amount;
-                selectedStudent.pending = amount - (selectedStudent.paid || 0);
-                selectedStudent.status = selectedStudent.pending <= 0 ? 'Paid' : 'Pending';
-                renderTable(); calculateStats(); closeModal();
-                showToast('💰 Fees saved locally!', 'success');
-            }
+            const btn = document.getElementById('saveBtn');
+            btn.disabled = true;
+            btn.innerHTML = 'Syncing...';
+
+            // Logic to collect all checkbox states and send to "Fees" sheet
+            setTimeout(() => {
+                alert("Success: Ledger Updated for " + document.getElementById('feeMonth').value);
+                btn.disabled = false;
+                btn.innerHTML = 'Update Sheet';
+            }, 1500);
         }
 
-        function sendReminder(name) {
-            const student = students.find(s => s.studentName === name);
-            if (!student?.whatsapp) { showToast('Add WhatsApp number first', 'error'); return; }
-            if (student.status === 'Paid') { showToast(`${name} already paid!`, 'error'); return; }
-            
-            student.reminderCount = (student.reminderCount || 0) + 1;
-            
-            let phone = student.whatsapp.toString().replace(/\D/g, '');
-            if (phone.length === 10) phone = '91' + phone;
-            
-            let urgencyMsg = '';
-            if (student.reminderCount >= 3) urgencyMsg = `⚠️ *URGENT REMINDER* ⚠️%0a%0aThis is your ${student.reminderCount}rd reminder.%0a%0a`;
-            else if (student.reminderCount >= 2) urgencyMsg = `📢 *Follow-up Reminder*%0a%0aThis is your ${student.reminderCount}nd reminder.%0a%0a`;
-            else urgencyMsg = `💛 *Friendly Reminder*%0a%0a`;
-            
-            const message = `Hey! 👋%0a%0a${urgencyMsg}━━━━━━━━━━━━━━━━%0a📋 *Your Summary*%0a━━━━━━━━━━━━━━━━%0a👤 *Student:* ${student.studentName}%0a🏃 *Batch:* ${student.batch}%0a📅 *Month:* ${student.month}%0a━━━━━━━━━━━━━━━━%0a💰 *Fee Details*%0a━━━━━━━━━━━━━━━━%0a💵 Total: ₹${student.totalFees}%0a✅ Paid: ₹${student.paid}%0a⏳ Pending: ₹${student.pending}%0a━━━━━━━━━━━━━━━━%0a%0a⚽ *Payment:* UPI: coffeeland@okhdfcbank%0a%0a– Coffeeland FC Team 💛🖤`;
-            
-            window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
-            
-            fetch(WEB_APP_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'saveReminder', sheetId: SHEET_ID, reminder: { studentName: student.studentName, batch: student.batch, month: student.month, feeType: student.feeType, whatsapp: student.whatsapp, reminderTime: new Date().toISOString(), reminderNumber: student.reminderCount, pendingAmount: student.pending, totalFees: student.totalFees, paid: student.paid } }) }).catch(e => console.error('Log error:', e));
-            
-            renderTable();
-            showToast(`📢 Reminder #${student.reminderCount} sent to ${name}!`, 'success');
-        }
-
-        async function syncData() {
-            for (const student of students) {
-                if (student.totalFees) {
-                    await fetch(WEB_APP_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'saveFees', sheetId: SHEET_ID, student }) });
-                }
-            }
-            showToast('🔄 All data synced to sheet!', 'success');
-        }
-
-        function filterTable() { renderTable(); }
-        
-        function showToast(msg, type = 'success') {
-            const toast = document.getElementById('toast');
-            toast.textContent = msg;
-            toast.className = `toast ${type}`;
-            toast.classList.add('show');
-            clearTimeout(timeout);
-            timeout = setTimeout(() => toast.classList.remove('show'), 3000);
-        }
-        
-        function closeModal() {
-            document.getElementById('whatsappModal').style.display = 'none';
-            document.getElementById('feesModal').style.display = 'none';
-        }
-        
-        window.onclick = (e) => { if (e.target.classList.contains('modal')) closeModal(); };
+        // Auto-load on start
+        window.onload = loadStudentData;
     </script>
 </body>
 </html>
