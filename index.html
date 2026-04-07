@@ -185,11 +185,54 @@
             }
         }
 
-        async function saveFees() {
-            const btn = document.getElementById('saveBtn');
-            btn.disabled = true;
-            btn.innerHTML = 'Syncing...';
+       async function saveFees() {
+    const btn = document.getElementById('saveBtn');
+    const month = document.getElementById('feeMonth').value;
+    
+    // UI Feedback
+    btn.disabled = true;
+    btn.innerHTML = 'Logging Transactions...';
 
+    const records = [];
+    document.querySelectorAll('#studentList .glass-panel').forEach(row => {
+        const isPaid = row.querySelector('input[type="checkbox"]').checked;
+        // We only log if checked (Paid)
+        if (isPaid) {
+            records.push({
+                name: row.querySelector('h4').innerText,
+                batch: row.querySelector('.batch-label').innerText,
+                amount: row.querySelector('.amount-label').innerText.replace('₹', ''),
+                status: 'Paid'
+            });
+        }
+    });
+
+    if (records.length === 0) {
+        alert("No payments selected to log.");
+        btn.disabled = false;
+        btn.innerHTML = 'Update Sheet';
+        return;
+    }
+
+    const formData = new URLSearchParams();
+    formData.append('payload', JSON.stringify({ month, data: records }));
+
+    try {
+        await fetch(WEB_APP_URL, {
+            method: 'POST',
+            mode: 'no-cors', 
+            body: formData
+        });
+        alert(`Successfully logged ${records.length} payments for ${month}`);
+        // Refresh to clear toggles
+        loadStudentData(); 
+    } catch (err) {
+        alert("Sync Failed.");
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = 'Update Sheet';
+    }
+}
             // Logic to collect all checkbox states and send to "Fees" sheet
             setTimeout(() => {
                 alert("Success: Ledger Updated for " + document.getElementById('feeMonth').value);
@@ -199,7 +242,21 @@
         }
 
         // Auto-load on start
-        window.onload = loadStudentData;
+       window.onload = async () => {
+    const batchSelect = document.getElementById('batchFilter');
+    try {
+        const response = await fetch(`${WEB_APP_URL}?action=getBatches`);
+        const data = await response.json();
+        batchSelect.innerHTML = '<option value="All">All Batches</option>';
+        data.batches.forEach(b => {
+            batchSelect.innerHTML += `<option value="${b.name}">${b.name}</option>`;
+        });
+        // After batches load, get the students
+        loadStudentData();
+    } catch (err) {
+        console.error("Batch load failed", err);
+    }
+};
     </script>
 </body>
 </html>
