@@ -154,7 +154,7 @@
     </div>
 
     <script>
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyM1oMVxGic2m1St4ve9iJSF5lPYjh5cC0yi9FG9gK6_U99JrJzQytGtoUZeSdnWcfUAg/exec"; // <--- UPDATE THIS
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwImtFasNZE4lbtVwdZyJry3TGANAs-z6eb6GchRFaINzv8gv08JDfsdr96F2OIfiuD2g/exec"; // <--- UPDATE THIS
         let masterData = [];
 
         // Set Default Month
@@ -183,50 +183,52 @@
         };
 
         // 2. Filter Logic (Search + Batch)
-        function filterRoster() {
-            const batch = document.getElementById('batchFilter').value;
-            const search = document.getElementById('searchInput').value.toLowerCase();
-            const container = document.getElementById('roster');
-            container.innerHTML = '';
+       function filterRoster() {
+    const batchFilter = document.getElementById('batchFilter').value;
+    const searchFilter = document.getElementById('searchInput').value.toLowerCase();
+    const container = document.getElementById('roster');
+    
+    container.innerHTML = ''; // Clear current list
 
-            let filtered = masterData.filter(s => 
-                (batch === 'All' || s.batch === batch) && 
-                (s.name.toLowerCase().includes(search))
-            );
+    // 1. Filter the master data
+    let filtered = masterData.filter(s => {
+        const matchesBatch = (batchFilter === 'All' || s.batch === batchFilter);
+        const matchesSearch = s.name.toLowerCase().includes(searchFilter);
+        return matchesBatch && matchesSearch;
+    });
 
-            let expectedTotal = 0;
-            let collectedTotal = 0;
+    // 2. Update stats
+    let expectedTotal = 0;
+    filtered.forEach(s => expectedTotal += parseFloat(s.fees));
+    document.getElementById('ui-expected').innerText = `₹${expectedTotal.toLocaleString()}`;
 
-            filtered.forEach((s, i) => {
-                const feeInt = parseInt(s.fees.replace(/[^\d]/g, '')) || 0;
-                expectedTotal += feeInt;
+    // 3. Render list
+    if (filtered.length === 0) {
+        container.innerHTML = `<p class="text-center py-10 opacity-40">No athletes found in this batch.</p>`;
+        return;
+    }
 
-                const card = document.createElement('div');
-                card.className = `glass-card p-5 rounded-3xl flex items-center justify-between border-l-4 border-l-transparent transition-all duration-300 animate-list`;
-                card.style.animationDelay = `${i * 0.03}s`;
-                card.id = `card-${i}`;
-
-                card.innerHTML = `
-                    <div class="flex-1 pr-4">
-                        <h3 class="font-bold text-white tracking-wide">${s.name}</h3>
-                        <div class="flex items-center gap-3 mt-1.5">
-                            <span class="batch-text text-[9px] font-bold text-coffee-accent uppercase tracking-tighter bg-coffee-accent/5 px-2 py-0.5 rounded border border-coffee-accent/10">${s.batch}</span>
-                            <span class="fee-text text-sm font-bold text-coffee-light/60">₹${feeInt}</span>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-4">
-                        <a href="https://wa.me/${s.contact.replace(/\s+/g, '')}?text=Hi ${s.name}, your CFC Fees for ${document.getElementById('feeMonth').value} is pending." class="text-green-500/80 active:scale-90 transition-transform">
-                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12.012 2c-5.508 0-9.987 4.479-9.987 9.988 0 1.757.459 3.404 1.258 4.838l-1.341 4.903 5.034-1.321c1.408.767 3.013 1.207 4.72 1.207 5.508 0 9.988-4.479 9.988-9.988 0-5.509-4.48-9.988-9.988-9.988zm4.847 14.125c-.215.604-1.231 1.154-1.688 1.21-.456.056-.897.272-2.923-.526-2.438-.962-4.004-3.438-4.125-3.601-.121-.162-1.021-1.356-1.021-2.585 0-1.23.645-1.834.872-2.087.227-.254.495-.317.659-.317.164 0 .328.001.47.009.15.007.351-.057.549.421.199.479.68 1.659.739 1.779.059.121.099.261.019.421-.079.16-.12.261-.24.4-.12.14-.251.312-.359.419-.12.12-.244.251-.106.489.138.238.613 1.011 1.315 1.636.903.805 1.666 1.053 1.904 1.173.238.12.378.1.517-.059.14-.16.598-.696.758-.935.16-.24.32-.201.539-.12.22.08 1.396.658 1.636.777.24.12.399.18.459.28.06.1.06.579-.155 1.183z"/></svg>
-                        </a>
-                        <label class="premium-switch">
-                            <input type="checkbox" class="hidden" onchange="togglePayment(this, ${feeInt}, 'card-${i}')">
-                            <div class="slider"></div>
-                        </label>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-
+    filtered.forEach((s, i) => {
+        const card = document.createElement('div');
+        card.className = `glass-card p-5 rounded-3xl flex items-center justify-between border-l-4 border-l-transparent transition-all duration-300 animate-list`;
+        card.innerHTML = `
+            <div class="flex-1 pr-4">
+                <h3 class="font-bold text-white tracking-wide">${s.name}</h3>
+                <div class="flex items-center gap-3 mt-1.5">
+                    <span class="batch-text text-[9px] font-bold text-coffee-accent uppercase bg-coffee-accent/5 px-2 py-0.5 rounded border border-coffee-accent/10">${s.batch}</span>
+                    <span class="fee-text text-sm font-bold text-coffee-light/60">₹${s.fees}</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <a href="https://wa.me/${s.contact}?text=Hi ${s.name}, reminder for fees." class="text-green-500/80"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12.012 2c-5.508 0-9.987 4.479-9.987 9.988 0 1.757.459 3.404 1.258 4.838l-1.341 4.903 5.034-1.321c1.408.767 3.013 1.207 4.72 1.207 5.508 0 9.988-4.479 9.988-9.988 0-5.509-4.48-9.988-9.988-9.988zm4.847 14.125c-.215.604-1.231 1.154-1.688 1.21-.456.056-.897.272-2.923-.526-2.438-.962-4.004-3.438-4.125-3.601-.121-.162-1.021-1.356-1.021-2.585 0-1.23.645-1.834.872-2.087.227-.254.495-.317.659-.317.164 0 .328.001.47.009.15.007.351-.057.549.421.199.479.68 1.659.739 1.779.059.121.099.261.019.421-.079.16-.12.261-.24.4-.12.14-.251.312-.359.419-.12.12-.244.251-.106.489.138.238.613 1.011 1.315 1.636.903.805 1.666 1.053 1.904 1.173.238.12.378.1.517-.059.14-.16.598-.696.758-.935.16-.24.32-.201.539-.12.22.08 1.396.658 1.636.777.24.12.399.18.459.28.06.1.06.579-.155 1.183z"/></svg></a>
+                <label class="premium-switch">
+                    <input type="checkbox" class="hidden" onchange="togglePayment(this, ${s.fees}, 'card-${i}')">
+                    <div class="slider"></div>
+                </label>
+            </div>`;
+        container.appendChild(card);
+    });
+}
             document.getElementById('ui-expected').innerText = `₹${expectedTotal}`;
             updateCollected(0);
         }
