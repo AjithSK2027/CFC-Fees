@@ -166,12 +166,18 @@
             }
         }
 
-        function sendWA(i, type) {
+       function sendWA(i, type) {
             const s = students[i];
             const paid = document.getElementById(`paid-${i}`).value || 0;
             const pend = document.getElementById(`pend-${i}`).innerText;
             const rawMonth = document.getElementById('feeMonth').value;
             const monthName = new Date(rawMonth + "-01").toLocaleString('en-IN', { month: 'long', year: 'numeric' });
+            
+            // Format phone number to include +91 correctly
+            let cleanContact = s.contact.toString().replace(/\D/g, ''); // Remove non-digits
+            if (!cleanContact.startsWith('91')) {
+                cleanContact = '91' + cleanContact;
+            }
             
             let text = "";
 
@@ -182,21 +188,19 @@
 
                 if (s.remindCount === 1) {
                     btn.className = "remind-1 rounded-xl py-3 text-[10px] font-black uppercase transition-all";
-                    text = `⚽ *CFC GENTLE REMINDER* ⚽\n\nHi ${s.name}, just a friendly note regarding the fees for ${monthName}. \n\n*Amount Due:* ₹${s.fees}\n*Pending:* ${pend}\n\nYou can pay via UPI: https://upi.pe/8867742269@ptaxis \n\nThank you!`;
+                    text = `⚽ *COFFEELAND FC: FEE NOTICE* ⚽\n\nDear Sir/Madam,\n\nThis is a respectful reminder regarding the football training fees for *${s.name}* for the month of ${monthName}.\n\n*Total Fees:* ₹${s.fees}\n*Outstanding Balance:* ${pend}\n\nYou may kindly settle the dues via UPI: https://upi.pe/8867742269@ptaxis \n\nThank you for your continued support.\n\nRegards,\n*Management, Coffeeland FC*`;
                 } else if (s.remindCount === 2) {
                     btn.className = "remind-2 rounded-xl py-3 text-[10px] font-black uppercase transition-all";
-                    text = `⚽ *CFC PAYMENT FOLLOW-UP* ⚽\n\nHi ${s.name}, we haven't received the fees for ${monthName} yet. Requesting you to clear the balance of ${pend} to avoid any training interruptions.\n\nUPI: https://upi.pe/8867742269@ptaxis \n\nThank you!`;
+                    text = `⚽ *COFFEELAND FC: PAYMENT FOLLOW-UP* ⚽\n\nDear Sir/Madam,\n\nWe are following up regarding the pending training fees for *${s.name}* (${monthName}). We request you to kindly clear the balance of ${pend} at your earliest convenience.\n\n*UPI Link:* https://upi.pe/8867742269@ptaxis \n\nThank you,\n*Team CFC*`;
                 } else {
                     btn.className = "remind-3 rounded-xl py-3 text-[10px] font-black uppercase transition-all";
-                    text = `⚽ *CFC URGENT NOTICE* ⚽\n\nHi ${s.name}, our records show fees for ${monthName} are still outstanding (${pend}). Requesting you to settle this today.\n\nUPI: https://upi.pe/8867742269@ptaxis \n\nThank you!`;
+                    text = `⚽ *COFFEELAND FC: URGENT NOTICE* ⚽\n\nDear Sir/Madam,\n\nOur records indicate that the training fees for *${s.name}* for ${monthName} remain outstanding (${pend}). We request you to kindly prioritize this payment today.\n\n*UPI:* 8867742269@ptaxis\n\n_If already paid, please share the screenshot for our records._`;
                 }
                 document.getElementById(`last-remind-${i}`).innerText = `Last sent at ${now} (x${s.remindCount})`;
             } else {
-                // Receipt Message
-                const statusMsg = (pend === "₹0") ? "*Full Payment Received*" : `*Partial Payment Received* (Balance: ${pend})`;
-                text = `✅ *CFC FEE RECEIPT* ✅\n\nHi ${s.name},\n\nWe have received your payment of ₹${paid} for ${monthName}.\n\n*Status:* ${statusMsg}\n\nThank you for supporting Coffeeland FC! Keep training hard! ⚽`;
+                const statusMsg = (pend === "₹0") ? "*Full Payment Received*" : `*Partial Payment Received* (Remaining: ${pend})`;
+                text = `✅ *COFFEELAND FC: PAYMENT ACKNOWLEDGMENT* ✅\n\nDear Sir/Madam,\n\nWe have successfully received the payment of ₹${paid} for *${s.name}* towards ${monthName} training fees.\n\n*Current Status:* ${statusMsg}\n\nThank you for your promptness. We look forward to seeing the athlete at the next session!\n\nRegards,\n*Management, Coffeeland Football Club*`;
                 
-                // If it was full payment, lock the row to "Verified" after sending
                 if (pend === "₹0") {
                     document.getElementById(`action-area-${i}`).innerHTML = `
                         <div class="flex flex-col items-center justify-center p-2 bg-emerald-500/10 rounded-2xl border border-emerald-500/20">
@@ -205,9 +209,9 @@
                 }
             }
             
-            window.open(`https://wa.me/${s.contact}?text=${encodeURIComponent(text)}`);
+            // Using the cleaned contact with 91 prefix
+            window.open(`https://wa.me/${cleanContact}?text=${encodeURIComponent(text)}`);
         }
-
         async function submitFees() {
             const btn = document.getElementById('syncBtn');
             const logs = students.map((s, i) => ({
