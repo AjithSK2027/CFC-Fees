@@ -3,15 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CFC Fees | Elite Management</title>
+    <title>CFC Fees | Elite Hub</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <style>
         body { background-color: #080605; color: #F5E6D3; font-family: 'Outfit', sans-serif; background-attachment: fixed; }
-        .glass-card { background: rgba(20, 15, 12, 0.7); border: 1px solid rgba(212, 175, 55, 0.15); backdrop-filter: blur(12px); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-        .input-gold { background: rgba(0,0,0,0.6); border: 1px solid rgba(212, 175, 55, 0.2); color: white; border-radius: 12px; transition: all 0.3s ease; }
-        .input-gold:focus { border-color: #D4AF37; outline: none; box-shadow: 0 0 10px rgba(212, 175, 55, 0.2); }
-        .status-badge { font-size: 10px; font-weight: 800; padding: 4px 10px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .glass-card { background: rgba(20, 15, 12, 0.7); border: 1px solid rgba(212, 175, 55, 0.15); backdrop-filter: blur(12px); }
+        .input-gold { background: rgba(0,0,0,0.6); border: 1px solid rgba(212, 175, 55, 0.2); color: white; border-radius: 12px; }
+        .status-badge { font-size: 10px; font-weight: 800; padding: 4px 10px; border-radius: 6px; text-transform: uppercase; }
         .pending { background: rgba(212, 175, 55, 0.1); color: #D4AF37; border: 1px solid rgba(212, 175, 55, 0.3); }
         .paid { background: rgba(16, 185, 129, 0.1); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.3); }
         #qrModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
@@ -26,7 +25,7 @@
     <div id="qrModal" onclick="closeQR()">
         <div class="glass-card p-8 rounded-[2.5rem] text-center space-y-5 max-w-xs w-full border-[#D4AF37]/40" onclick="event.stopPropagation()">
             <h3 class="text-[#D4AF37] font-black uppercase text-xs tracking-widest">CFC Official Payment</h3>
-            <div class="bg-white p-4 rounded-3xl inline-block">
+            <div class="bg-white p-4 rounded-3xl inline-block shadow-2xl">
                 <img id="staticQR" src="https://i.ibb.co/f5dYVM1/Whats-App-Image-2026-04-08-at-12-56-51-PM.jpg" alt="CFC QR" class="w-52 h-52 object-contain">
             </div>
             <p class="text-white font-black text-3xl" id="qrPriceDisplay">₹0</p>
@@ -60,7 +59,7 @@
                             <th class="p-6">Expected</th>
                             <th class="p-6">Paid</th>
                             <th class="p-6">Balance</th>
-                            <th class="p-6 text-center">Actions</th>
+                            <th class="p-6 text-center">Status & Actions</th>
                         </tr>
                     </thead>
                     <tbody id="roster" class="divide-y divide-white/5 font-medium">
@@ -73,8 +72,8 @@
 
     <div class="sticky-footer">
         <div class="max-w-6xl mx-auto">
-            <button onclick="submitFees()" id="syncBtn" class="w-full bg-gradient-to-r from-[#D4AF37] to-[#B89328] text-black font-black rounded-2xl py-5 text-[11px] uppercase tracking-[0.2em] shadow-xl">
-                Sync Ledger & Finalize
+            <button onclick="submitFees()" id="syncBtn" class="w-full bg-gradient-to-r from-[#D4AF37] to-[#B89328] text-black font-black rounded-2xl py-5 text-[11px] uppercase tracking-[0.2em] shadow-xl transition-all active:scale-[0.98]">
+                Synchronize Cloud Ledger
             </button>
         </div>
     </div>
@@ -118,17 +117,18 @@
                             </div>
                             <input id="pst-${i}" type="text" placeholder="Paid To..." class="input-gold text-[10px] p-2 w-full font-bold">
                         </td>
-                        <td class="p-6 font-bold text-white/30">₹${fee}</td>
-                        <td class="p-6"><input type="number" id="paid-${i}" value="0" oninput="calc(${i}, ${fee})" class="input-gold w-24 p-2 font-black text-emerald-400 text-center"></td>
+                        <td class="p-6 font-bold text-white/30 text-base">₹${fee}</td>
+                        <td class="p-6"><input type="number" id="paid-${i}" value="0" oninput="calc(${i}, ${fee})" class="input-gold w-24 p-3 font-black text-emerald-400 text-center text-lg"></td>
                         <td class="p-6">
                             <div id="pend-${i}" class="font-black text-rose-500 text-lg">₹${fee}</div>
                             <span id="stat-${i}" class="status-badge pending">Pending</span>
                         </td>
                         <td class="p-6">
                             <div id="action-area-${i}" class="flex flex-col gap-2">
+                                <button onclick="sendWA(${i}, 'received')" class="bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 rounded-xl py-3 text-[10px] font-black uppercase hover:bg-emerald-500 hover:text-white transition-all">Confirm Receipt</button>
                                 <button onclick="sendWA(${i}, 'remind')" id="remind-btn-${i}" class="bg-white/5 text-white/40 border border-white/10 rounded-xl py-3 text-[10px] font-black uppercase">Send Reminder</button>
                             </div>
-                            <div id="last-remind-${i}" class="text-[9px] text-white/20 italic mt-2 text-center"></div>
+                            <div id="last-remind-${i}" class="text-[9px] text-white/20 italic mt-2 text-center font-bold"></div>
                         </td>
                     </tr>`;
             });
@@ -151,15 +151,16 @@
             if (pend <= 0) {
                 s.innerText = "Paid";
                 s.className = `status-badge paid`;
-                // Change actions to Confirmation Message only
+                // Show ONLY the Send Receipt button when fully paid
                 actionArea.innerHTML = `
-                    <button onclick="sendWA(${i}, 'received')" class="bg-emerald-500 text-black rounded-xl py-3 text-[10px] font-black uppercase shadow-lg shadow-emerald-500/20">Send Receipt ✅</button>
+                    <button onclick="sendWA(${i}, 'received')" class="bg-emerald-500 text-black rounded-xl py-3 text-[10px] font-black uppercase shadow-lg shadow-emerald-500/20 active:scale-95 transition-all">Send Receipt ✅</button>
                 `;
             } else {
                 s.innerText = "Pending";
                 s.className = `status-badge pending`;
-                // Restore Reminder button if amount cleared
+                // Restore buttons if amount is edited
                 actionArea.innerHTML = `
+                    <button onclick="sendWA(${i}, 'received')" class="bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 rounded-xl py-3 text-[10px] font-black uppercase hover:bg-emerald-500 hover:text-white transition-all">Confirm Receipt</button>
                     <button onclick="sendWA(${i}, 'remind')" id="remind-btn-${i}" class="bg-white/5 text-white/40 border border-white/10 rounded-xl py-3 text-[10px] font-black uppercase">Send Reminder</button>
                 `;
             }
@@ -177,21 +178,31 @@
             if (type === 'remind') {
                 s.remindCount = (s.remindCount || 0) + 1;
                 const btn = document.getElementById(`remind-btn-${i}`);
-                const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const now = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
 
                 if (s.remindCount === 1) {
-                    btn.className = "remind-1 rounded-xl py-3 text-[10px] font-black uppercase";
-                    text = `⚽ *CFC GENTLE REMINDER* ⚽\n\nHi ${s.name}, just checking in regarding the fees for ${monthName}. \n\n*Due:* ₹${s.fees}\n*Balance:* ${pend}\n\nYou can pay via UPI: https://upi.pe/8867742269@ptaxis \n\nThank you!`;
+                    btn.className = "remind-1 rounded-xl py-3 text-[10px] font-black uppercase transition-all";
+                    text = `⚽ *CFC GENTLE REMINDER* ⚽\n\nHi ${s.name}, just a friendly note regarding the fees for ${monthName}. \n\n*Amount Due:* ₹${s.fees}\n*Pending:* ${pend}\n\nYou can pay via UPI: https://upi.pe/8867742269@ptaxis \n\nThank you!`;
                 } else if (s.remindCount === 2) {
-                    btn.className = "remind-2 rounded-xl py-3 text-[10px] font-black uppercase";
-                    text = `⚽ *CFC PAYMENT FOLLOW-UP* ⚽\n\nHi ${s.name}, we haven't received the fees for ${monthName} yet. Requesting you to clear the outstanding of ${pend} to help us manage training sessions smoothly. \n\nUPI: 8867742269@ptaxis`;
+                    btn.className = "remind-2 rounded-xl py-3 text-[10px] font-black uppercase transition-all";
+                    text = `⚽ *CFC PAYMENT FOLLOW-UP* ⚽\n\nHi ${s.name}, we haven't received the fees for ${monthName} yet. Requesting you to clear the balance of ${pend} to avoid any training interruptions.\n\nUPI: 8867742269@ptaxis`;
                 } else {
-                    btn.className = "remind-3 rounded-xl py-3 text-[10px] font-black uppercase";
-                    text = `⚽ *CFC URGENT NOTICE* ⚽\n\nHi ${s.name}, fees for ${monthName} are still pending (${pend}). We would appreciate it if you could settle this today. \n\nUPI: 8867742269@ptaxis\n\nSkip if already paid!`;
+                    btn.className = "remind-3 rounded-xl py-3 text-[10px] font-black uppercase transition-all";
+                    text = `⚽ *CFC URGENT NOTICE* ⚽\n\nHi ${s.name}, our records show fees for ${monthName} are still outstanding (${pend}). Requesting you to settle this today.\n\nUPI: 8867742269@ptaxis`;
                 }
-                document.getElementById(`last-remind-${i}`).innerText = `Sent at ${now} (x${s.remindCount})`;
+                document.getElementById(`last-remind-${i}`).innerText = `Last sent at ${now} (x${s.remindCount})`;
             } else {
-                text = `✅ *CFC FEE RECEIPT* ✅\n\nHi ${s.name},\n\nWe have received your payment of ₹${paid} for ${monthName}. \n\n*Status:* Full Payment Received. \n\nThank you for supporting Coffeeland FC! See you on the court. ⚽`;
+                // Receipt Message
+                const statusMsg = (pend === "₹0") ? "*Full Payment Received*" : `*Partial Payment Received* (Balance: ${pend})`;
+                text = `✅ *CFC FEE RECEIPT* ✅\n\nHi ${s.name},\n\nWe have received your payment of ₹${paid} for ${monthName}.\n\n*Status:* ${statusMsg}\n\nThank you for supporting Coffeeland FC! Keep training hard! ⚽`;
+                
+                // If it was full payment, lock the row to "Verified" after sending
+                if (pend === "₹0") {
+                    document.getElementById(`action-area-${i}`).innerHTML = `
+                        <div class="flex flex-col items-center justify-center p-2 bg-emerald-500/10 rounded-2xl border border-emerald-500/20">
+                            <span class="text-emerald-500 text-[10px] font-black uppercase">✅ Verified</span>
+                        </div>`;
+                }
             }
             
             window.open(`https://wa.me/${s.contact}?text=${encodeURIComponent(text)}`);
@@ -207,246 +218,20 @@
                 pending: document.getElementById(`pend-${i}`).innerText.replace('₹', ''),
                 status: document.getElementById(`stat-${i}`).innerText,
                 lastReminded: s.lastReminded || ""
-            })).filter(r => parseFloat(r.paidAmount) > 0);
+            })).filter(r => parseFloat(r.paidAmount) > 0 || r.lastReminded !== "");
 
-            if(!logs.length) return alert("Nothing to sync.");
-            btn.innerText = "TRANSMITTING..."; btn.disabled = true;
+            if(!logs.length) return alert("Nothing new to sync.");
+            btn.innerText = "UPDATING CLOUD DATABASE..."; btn.disabled = true;
             
             const fd = new URLSearchParams();
             fd.append('payload', JSON.stringify({ action: 'sync', month: document.getElementById('feeMonth').value, data: logs }));
             
             try {
                 await fetch(SCRIPT_URL, { method: 'POST', body: fd, mode: 'no-cors' });
-                alert("Data Synced to Sheets!");
+                alert("Success! Cloud Ledger Synchronized.");
                 loadStudents();
             } catch(e) { alert("Error: " + e.message); } 
-            finally { btn.innerText = "Sync Ledger & Finalize"; btn.disabled = false; }
-        }
-    </script>
-</body>
-</html><!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CFC Fees | Elite Management</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        body { background-color: #080605; color: #F5E6D3; font-family: 'Outfit', sans-serif; background-attachment: fixed; }
-        .glass-card { background: rgba(20, 15, 12, 0.7); border: 1px solid rgba(212, 175, 55, 0.15); backdrop-filter: blur(12px); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-        .input-gold { background: rgba(0,0,0,0.6); border: 1px solid rgba(212, 175, 55, 0.2); color: white; border-radius: 12px; transition: all 0.3s ease; }
-        .input-gold:focus { border-color: #D4AF37; outline: none; box-shadow: 0 0 10px rgba(212, 175, 55, 0.2); }
-        .status-badge { font-size: 10px; font-weight: 800; padding: 4px 10px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .pending { background: rgba(212, 175, 55, 0.1); color: #D4AF37; border: 1px solid rgba(212, 175, 55, 0.3); }
-        .paid { background: rgba(16, 185, 129, 0.1); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.3); }
-        #qrModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
-        .sticky-footer { position: fixed; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, #080605 90%, transparent); padding: 25px; z-index: 50; }
-        .remind-1 { background: rgba(234, 179, 8, 0.1); color: #EAB308; border: 1px solid rgba(234, 179, 8, 0.3); }
-        .remind-2 { background: rgba(249, 115, 22, 0.1); color: #F97316; border: 1px solid rgba(249, 115, 22, 0.3); }
-        .remind-3 { background: rgba(239, 68, 68, 0.1); color: #EF4444; border: 1px solid rgba(239, 68, 68, 0.3); }
-    </style>
-</head>
-<body class="p-4 pb-40">
-
-    <div id="qrModal" onclick="closeQR()">
-        <div class="glass-card p-8 rounded-[2.5rem] text-center space-y-5 max-w-xs w-full border-[#D4AF37]/40" onclick="event.stopPropagation()">
-            <h3 class="text-[#D4AF37] font-black uppercase text-xs tracking-widest">CFC Official Payment</h3>
-            <div class="bg-white p-4 rounded-3xl inline-block">
-                <img id="staticQR" src="https://i.ibb.co/f5dYVM1/Whats-App-Image-2026-04-08-at-12-56-51-PM.jpg" alt="CFC QR" class="w-52 h-52 object-contain">
-            </div>
-            <p class="text-white font-black text-3xl" id="qrPriceDisplay">₹0</p>
-            <button onclick="closeQR()" class="w-full py-4 rounded-2xl bg-white/5 border border-white/10 text-white font-bold text-xs uppercase tracking-widest">Close</button>
-        </div>
-    </div>
-
-    <div class="max-w-6xl mx-auto space-y-8">
-        <header class="flex justify-between items-end mb-6">
-            <div>
-                <h1 class="text-4xl font-black text-white tracking-tighter uppercase leading-none">Coffeeland <span class="text-[#D4AF37]">FC</span></h1>
-                <p class="text-[#D4AF37]/50 text-[10px] font-bold uppercase tracking-[0.2em] mt-2">Elite Fee Management</p>
-            </div>
-            <img src="https://i.ibb.co/KjC62kc0/1000287652-0b4cd8d123cf04f03fc322309c337390-11-18-2025-1-04-51-PM.png" class="h-14 w-14 rounded-full border-2 border-[#D4AF37]/50 p-1">
-        </header>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <select id="batchSelect" onchange="loadStudents()" class="input-gold p-4 text-sm font-bold w-full">
-                <option value="">-- Select Batch --</option>
-            </select>
-            <input type="month" id="feeMonth" class="input-gold p-4 text-sm font-bold w-full">
-        </div>
-
-        <div class="glass-card rounded-[2.5rem] overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="w-full text-left text-sm">
-                    <thead class="bg-white/5 text-[10px] uppercase font-black text-white/30 tracking-[0.15em]">
-                        <tr>
-                            <th class="p-6">Athlete Profile</th>
-                            <th class="p-6">Method / PST</th>
-                            <th class="p-6">Expected</th>
-                            <th class="p-6">Paid</th>
-                            <th class="p-6">Balance</th>
-                            <th class="p-6 text-center">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="roster" class="divide-y divide-white/5 font-medium">
-                        <tr><td colspan="6" class="p-32 text-center text-[#D4AF37]/20 italic font-bold">SELECT BATCH TO START...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <div class="sticky-footer">
-        <div class="max-w-6xl mx-auto">
-            <button onclick="submitFees()" id="syncBtn" class="w-full bg-gradient-to-r from-[#D4AF37] to-[#B89328] text-black font-black rounded-2xl py-5 text-[11px] uppercase tracking-[0.2em] shadow-xl">
-                Sync Ledger & Finalize
-            </button>
-        </div>
-    </div>
-
-    <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxhMqGlvOjcYsMVD20whdfoXhrlH4ukCUqumBO4tcwi6d9-I4o88H3jtcoFWVbHOdYEYg/exec"; 
-        let students = [];
-
-        window.onload = async () => {
-            document.getElementById('feeMonth').value = new Date().toISOString().slice(0, 7);
-            const r = await fetch(`${SCRIPT_URL}?action=getBatches`);
-            const d = await r.json();
-            const s = document.getElementById('batchSelect');
-            d.batches.forEach(b => s.innerHTML += `<option value="${b.name}">${b.name}</option>`);
-        };
-
-        async function loadStudents() {
-            const b = document.getElementById('batchSelect').value;
-            if(!b) return;
-            const r = await fetch(`${SCRIPT_URL}?action=getStudents&batch=${encodeURIComponent(b)}`);
-            const d = await r.json();
-            students = (d.students || []).map(s => ({...s, remindCount: 0}));
-            render();
-        }
-
-        function render() {
-            const tbody = document.getElementById('roster');
-            tbody.innerHTML = '';
-            students.forEach((s, i) => {
-                const fee = parseFloat(s.fees) || 0;
-                tbody.innerHTML += `
-                    <tr class="hover:bg-white/[0.02]">
-                        <td class="p-6">
-                            <div class="font-bold text-white text-base">${s.name}</div>
-                            <div class="text-[10px] text-[#D4AF37] font-black opacity-80 mt-1">📱 ${s.contact}</div>
-                        </td>
-                        <td class="p-6 space-y-2">
-                            <div class="flex gap-2">
-                                <select id="type-${i}" class="input-gold text-[10px] p-2 flex-1 font-bold"><option>UPI</option><option>CASH</option></select>
-                                <button onclick="showQR(${fee})" class="bg-[#D4AF37] text-black rounded-lg px-3 text-[9px] font-black uppercase">QR</button>
-                            </div>
-                            <input id="pst-${i}" type="text" placeholder="Paid To..." class="input-gold text-[10px] p-2 w-full font-bold">
-                        </td>
-                        <td class="p-6 font-bold text-white/30">₹${fee}</td>
-                        <td class="p-6"><input type="number" id="paid-${i}" value="0" oninput="calc(${i}, ${fee})" class="input-gold w-24 p-2 font-black text-emerald-400 text-center"></td>
-                        <td class="p-6">
-                            <div id="pend-${i}" class="font-black text-rose-500 text-lg">₹${fee}</div>
-                            <span id="stat-${i}" class="status-badge pending">Pending</span>
-                        </td>
-                        <td class="p-6">
-                            <div id="action-area-${i}" class="flex flex-col gap-2">
-                                <button onclick="sendWA(${i}, 'remind')" id="remind-btn-${i}" class="bg-white/5 text-white/40 border border-white/10 rounded-xl py-3 text-[10px] font-black uppercase">Send Reminder</button>
-                            </div>
-                            <div id="last-remind-${i}" class="text-[9px] text-white/20 italic mt-2 text-center"></div>
-                        </td>
-                    </tr>`;
-            });
-        }
-
-        function showQR(amount) { 
-            document.getElementById('qrPriceDisplay').innerText = `₹${amount}`;
-            document.getElementById('qrModal').style.display = 'flex'; 
-        }
-
-        function closeQR() { document.getElementById('qrModal').style.display = 'none'; }
-
-        function calc(i, total) {
-            const paid = parseFloat(document.getElementById(`paid-${i}`).value) || 0;
-            const pend = total - paid;
-            document.getElementById(`pend-${i}`).innerText = `₹${pend}`;
-            const s = document.getElementById(`stat-${i}`);
-            const actionArea = document.getElementById(`action-area-${i}`);
-
-            if (pend <= 0) {
-                s.innerText = "Paid";
-                s.className = `status-badge paid`;
-                // Change actions to Confirmation Message only
-                actionArea.innerHTML = `
-                    <button onclick="sendWA(${i}, 'received')" class="bg-emerald-500 text-black rounded-xl py-3 text-[10px] font-black uppercase shadow-lg shadow-emerald-500/20">Send Receipt ✅</button>
-                `;
-            } else {
-                s.innerText = "Pending";
-                s.className = `status-badge pending`;
-                // Restore Reminder button if amount cleared
-                actionArea.innerHTML = `
-                    <button onclick="sendWA(${i}, 'remind')" id="remind-btn-${i}" class="bg-white/5 text-white/40 border border-white/10 rounded-xl py-3 text-[10px] font-black uppercase">Send Reminder</button>
-                `;
-            }
-        }
-
-        function sendWA(i, type) {
-            const s = students[i];
-            const paid = document.getElementById(`paid-${i}`).value || 0;
-            const pend = document.getElementById(`pend-${i}`).innerText;
-            const rawMonth = document.getElementById('feeMonth').value;
-            const monthName = new Date(rawMonth + "-01").toLocaleString('en-IN', { month: 'long', year: 'numeric' });
-            
-            let text = "";
-
-            if (type === 'remind') {
-                s.remindCount = (s.remindCount || 0) + 1;
-                const btn = document.getElementById(`remind-btn-${i}`);
-                const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-                if (s.remindCount === 1) {
-                    btn.className = "remind-1 rounded-xl py-3 text-[10px] font-black uppercase";
-                    text = `⚽ *CFC GENTLE REMINDER* ⚽\n\nHi ${s.name}, just checking in regarding the fees for ${monthName}. \n\n*Due:* ₹${s.fees}\n*Balance:* ${pend}\n\nYou can pay via UPI: https://upi.pe/8867742269@ptaxis \n\nThank you!`;
-                } else if (s.remindCount === 2) {
-                    btn.className = "remind-2 rounded-xl py-3 text-[10px] font-black uppercase";
-                    text = `⚽ *CFC PAYMENT FOLLOW-UP* ⚽\n\nHi ${s.name}, we haven't received the fees for ${monthName} yet. Requesting you to clear the outstanding of ${pend} to help us manage training sessions smoothly. \n\nUPI: 8867742269@ptaxis`;
-                } else {
-                    btn.className = "remind-3 rounded-xl py-3 text-[10px] font-black uppercase";
-                    text = `⚽ *CFC URGENT NOTICE* ⚽\n\nHi ${s.name}, fees for ${monthName} are still pending (${pend}). We would appreciate it if you could settle this today. \n\nUPI: 8867742269@ptaxis\n\nSkip if already paid!`;
-                }
-                document.getElementById(`last-remind-${i}`).innerText = `Sent at ${now} (x${s.remindCount})`;
-            } else {
-                text = `✅ *CFC FEE RECEIPT* ✅\n\nHi ${s.name},\n\nWe have received your payment of ₹${paid} for ${monthName}. \n\n*Status:* Full Payment Received. \n\nThank you for supporting Coffeeland FC! See you on the court. ⚽`;
-            }
-            
-            window.open(`https://wa.me/${s.contact}?text=${encodeURIComponent(text)}`);
-        }
-
-        async function submitFees() {
-            const btn = document.getElementById('syncBtn');
-            const logs = students.map((s, i) => ({
-                name: s.name, contact: s.contact, batch: s.batch, fees: s.fees,
-                feeType: document.getElementById(`type-${i}`)?.value || "N/A",
-                paidTo: document.getElementById(`pst-${i}`)?.value || "N/A",
-                paidAmount: document.getElementById(`paid-${i}`)?.value || 0,
-                pending: document.getElementById(`pend-${i}`).innerText.replace('₹', ''),
-                status: document.getElementById(`stat-${i}`).innerText,
-                lastReminded: s.lastReminded || ""
-            })).filter(r => parseFloat(r.paidAmount) > 0);
-
-            if(!logs.length) return alert("Nothing to sync.");
-            btn.innerText = "TRANSMITTING..."; btn.disabled = true;
-            
-            const fd = new URLSearchParams();
-            fd.append('payload', JSON.stringify({ action: 'sync', month: document.getElementById('feeMonth').value, data: logs }));
-            
-            try {
-                await fetch(SCRIPT_URL, { method: 'POST', body: fd, mode: 'no-cors' });
-                alert("Data Synced to Sheets!");
-                loadStudents();
-            } catch(e) { alert("Error: " + e.message); } 
-            finally { btn.innerText = "Sync Ledger & Finalize"; btn.disabled = false; }
+            finally { btn.innerText = "Synchronize Cloud Ledger"; btn.disabled = false; }
         }
     </script>
 </body>
