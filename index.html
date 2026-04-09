@@ -185,10 +185,10 @@
                     text = `⚽ *CFC GENTLE REMINDER* ⚽\n\nHi ${s.name}, just a friendly note regarding the fees for ${monthName}. \n\n*Amount Due:* ₹${s.fees}\n*Pending:* ${pend}\n\nYou can pay via UPI: https://upi.pe/8867742269@ptaxis \n\nThank you!`;
                 } else if (s.remindCount === 2) {
                     btn.className = "remind-2 rounded-xl py-3 text-[10px] font-black uppercase transition-all";
-                    text = `⚽ *CFC PAYMENT FOLLOW-UP* ⚽\n\nHi ${s.name}, we haven't received the fees for ${monthName} yet. Requesting you to clear the balance of ${pend} to avoid any training interruptions.\n\nUPI: 8867742269@ptaxis`;
+                    text = `⚽ *CFC PAYMENT FOLLOW-UP* ⚽\n\nHi ${s.name}, we haven't received the fees for ${monthName} yet. Requesting you to clear the balance of ${pend} to avoid any training interruptions.\n\nUPI: https://upi.pe/8867742269@ptaxis \n\nThank you!`;
                 } else {
                     btn.className = "remind-3 rounded-xl py-3 text-[10px] font-black uppercase transition-all";
-                    text = `⚽ *CFC URGENT NOTICE* ⚽\n\nHi ${s.name}, our records show fees for ${monthName} are still outstanding (${pend}). Requesting you to settle this today.\n\nUPI: 8867742269@ptaxis`;
+                    text = `⚽ *CFC URGENT NOTICE* ⚽\n\nHi ${s.name}, our records show fees for ${monthName} are still outstanding (${pend}). Requesting you to settle this today.\n\nUPI: https://upi.pe/8867742269@ptaxis \n\nThank you!`;
                 }
                 document.getElementById(`last-remind-${i}`).innerText = `Last sent at ${now} (x${s.remindCount})`;
             } else {
