@@ -148,30 +148,44 @@
             window.open(`https://wa.me/${ph}?text=${encodeURIComponent(txt)}`);
         }
 
-        async function submitFees() {
-            const btn = document.getElementById('syncBtn'), dVal = document.getElementById('feeDate').value;
-            const logs = students.map((s, i) => {
-                const paidAmt = s.isNewlyPaid ? s.fees - s.paidSoFar : parseFloat(document.getElementById(`paid-${i}`)?.value || 0);
-                return {
-                    name: s.name, contact: s.contact, batch: s.batch, fees: s.fees, 
-                    origTotal: s.fees, paidSoFar: s.paidSoFar,
-                    feeType: document.getElementById(`type-${i}`)?.value || "UPI", 
-                    paidTo: document.getElementById(`pst-${i}`)?.value || "Admin", 
-                    paidAmount: paidAmt, 
-                    pending: s.balance, 
-                    status: s.balance <= 0 ? "Paid" : "Pending", 
-                    lastReminded: s.lastReminded || ""
-                };
-            }).filter(r => r.paidAmount > 0 || (r.lastReminded && r.lastReminded.includes('at')));
+       async function submitFees() {
+    const btn = document.getElementById('syncBtn'), dVal = document.getElementById('feeDate').value;
+    
+    const logs = students.map((s, i) => {
+        const inputVal = parseFloat(document.getElementById(`paid-${i}`)?.value || 0);
+        const paidAmt = s.isNewlyPaid ? (s.fees - s.paidSoFar) : inputVal;
+        
+        return {
+            name: s.name,
+            contact: s.contact,
+            batch: s.batch,
+            fees: s.fees,
+            paidSoFar: s.paidSoFar, // What they had paid before today
+            feeType: document.getElementById(`type-${i}`)?.value || "UPI",
+            paidTo: document.getElementById(`pst-${i}`)?.value || "Admin",
+            paidAmount: paidAmt,     // What they are paying right now
+            lastReminded: s.lastReminded || ""
+        };
+    }).filter(r => r.paidAmount > 0 || (r.lastReminded && r.lastReminded.includes('at')));
 
-            if(!logs.length) return alert("No changes detected."); 
-            btn.innerText = "UPDATING CLOUD..."; btn.disabled = true;
-            const fd = new URLSearchParams(); fd.append('payload', JSON.stringify({ action: 'saveFees', date: dVal, data: logs }));
-            try { 
-                await fetch(SCRIPT_URL, { method: 'POST', body: fd, mode: 'no-cors' }); 
-                setTimeout(() => { alert("Sync Successful!"); loadStudents(); btn.disabled = false; btn.innerText = "Synchronize Ledger"; }, 2000);
-            } catch(e) { alert("Error"); btn.disabled = false; btn.innerText = "Synchronize Ledger"; }
+    if (!logs.length) return alert("No changes detected.");
+    
+    btn.innerText = "UPDATING CLOUD..."; btn.disabled = true;
+    const fd = new URLSearchParams();
+    fd.append('payload', JSON.stringify({ action: 'saveFees', date: dVal, data: logs }));
+    
+    try {
+        const response = await fetch(SCRIPT_URL, { method: 'POST', body: fd });
+        const res = await response.json();
+        if (res.status === 'success') {
+            alert("Sync Successful!");
+            location.reload(); 
         }
+    } catch (e) {
+        alert("Sync failed. Check connection.");
+        btn.disabled = false; btn.innerText = "Synchronize Ledger";
+    }
+}
     </script>
 </body>
 </html>
