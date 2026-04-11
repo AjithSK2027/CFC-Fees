@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>CFC Fees | Clean Hub</title>
+    <title>CFC Fees | Command V3</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -20,7 +20,10 @@
         body { background-color: #050505; color: #E5E7EB; -webkit-font-smoothing: antialiased; }
         .card-gradient { background: linear-gradient(165deg, #1A1412 0%, #0F0A08 100%); border: 1px solid rgba(255, 255, 255, 0.05); }
         .input-dark { background: #1A1412; border: 1px solid rgba(255, 255, 255, 0.1); color: white; border-radius: 12px; }
+        .hidden-view { display: none !important; }
         #qrModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
+        #batchGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+        .tile-aspect { aspect-ratio: 1 / 1; }
     </style>
 </head>
 <body class="min-h-screen pb-40">
@@ -35,26 +38,37 @@
     </div>
 
     <header class="pt-8 px-6 flex justify-between items-center">
-        <div><h1 class="text-xl font-900 text-white uppercase leading-none">CFC <span class="text-mint">Fees</span></h1><p class="text-gray-500 text-[10px] font-bold tracking-widest uppercase mt-1">Financial command V2</p></div>
+        <div onclick="goHome()" class="cursor-pointer">
+            <h1 class="text-xl font-900 text-white uppercase leading-none">CFC <span class="text-mint">Fees</span></h1>
+            <p class="text-gray-500 text-[10px] font-bold tracking-widest uppercase mt-1">Command Center</p>
+        </div>
         <img src="https://i.ibb.co/3nTMhbz/1000287652-0b4cd8d123cf04f03fc322309c337390-11-18-2025-1-04-51-PM.png" class="h-10 w-10">
     </header>
 
-    <div class="px-6 mt-8">
-        <div class="card-gradient rounded-[2rem] p-6 grid grid-cols-3 gap-2 text-center">
-            <div><p class="text-[8px] font-bold text-gray-500 uppercase">Target</p><p id="dashTarget" class="text-sm font-900">₹0</p></div>
-            <div class="border-x border-white/5"><p class="text-[8px] font-bold text-gray-500 uppercase">Received</p><p id="dashPaid" class="text-sm font-900 text-mint">₹0</p></div>
-            <div><p class="text-[8px] font-bold text-gray-500 uppercase">Pending</p><p id="dashPending" class="text-sm font-900 text-rose">₹0</p></div>
+    <div id="lobbyView" class="px-6 mt-10">
+        <h2 class="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-6">Select Active Batch</h2>
+        <div id="batchGrid">
+            </div>
+    </div>
+
+    <div id="commandView" class="hidden-view">
+        <div class="px-6 mt-8">
+            <div class="card-gradient rounded-[2rem] p-6 grid grid-cols-3 gap-2 text-center shadow-2xl shadow-mint/5">
+                <div><p class="text-[8px] font-bold text-gray-500 uppercase">Target</p><p id="dashTarget" class="text-sm font-900">₹0</p></div>
+                <div class="border-x border-white/5"><p class="text-[8px] font-bold text-gray-500 uppercase">Received</p><p id="dashPaid" class="text-sm font-900 text-mint">₹0</p></div>
+                <div><p class="text-[8px] font-bold text-gray-500 uppercase">Pending</p><p id="dashPending" class="text-sm font-900 text-rose">₹0</p></div>
+            </div>
         </div>
+
+        <div class="px-6 mt-6 flex gap-3">
+            <select id="batchSelect" onchange="loadStudents()" class="input-dark p-4 text-xs font-bold outline-none flex-1"><option value="">Select Batch</option></select>
+            <input type="date" id="feeDate" onchange="loadStudents()" class="input-dark p-4 text-xs font-bold outline-none w-1/3">
+        </div>
+
+        <main id="roster" class="px-6 mt-8 space-y-4"></main>
     </div>
 
-    <div class="px-6 mt-6 grid grid-cols-2 gap-3">
-        <select id="batchSelect" onchange="loadStudents()" class="input-dark p-4 text-xs font-bold outline-none"><option value="">Select Batch</option></select>
-        <input type="date" id="feeDate" onchange="loadStudents()" class="input-dark p-4 text-xs font-bold outline-none">
-    </div>
-
-    <main id="roster" class="px-6 mt-8 space-y-4"></main>
-
-    <div class="fixed bottom-0 left-0 right-0 p-6 bg-pitch/80 backdrop-blur-lg border-t border-white/5 z-50">
+    <div id="syncContainer" class="fixed bottom-0 left-0 right-0 p-6 bg-pitch/80 backdrop-blur-lg border-t border-white/5 hidden-view z-50">
         <button onclick="submitFees()" id="syncBtn" class="w-full bg-mint text-pitch font-900 rounded-2xl py-5 text-[11px] uppercase tracking-widest shadow-lg shadow-mint/20 active:scale-95 transition-all">Synchronize Clean Ledger</button>
     </div>
 
@@ -66,14 +80,54 @@
         document.getElementById('feeDate').value = new Date().toISOString().split('T')[0];
         const r = await fetch(`${SCRIPT_URL}?action=getBatches`);
         const d = await r.json();
+        
         const s = document.getElementById('batchSelect');
-        d.batches?.forEach(b => s.innerHTML += `<option value="${b.name}">${b.name}</option>`);
+        const grid = document.getElementById('batchGrid');
+        
+        for (const b of d.batches) {
+            s.innerHTML += `<option value="${b.name}">${b.name}</option>`;
+            
+            // Initial fetch to get student counts for the tiles
+            const countRes = await fetch(`${SCRIPT_URL}?action=getStudents&batch=${encodeURIComponent(b.name)}&date=${document.getElementById('feeDate').value}`);
+            const countData = await countRes.json();
+            const studentCount = countData.students ? countData.students.length : 0;
+
+            grid.innerHTML += `
+                <div onclick="selectBatch('${b.name}')" class="card-gradient p-5 rounded-[2.5rem] flex flex-col justify-between tile-aspect active:scale-95 transition-all border border-white/5">
+                    <div class="bg-mint/10 w-10 h-10 rounded-2xl flex items-center justify-center">
+                        <svg class="w-5 h-5 text-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-[14px] font-800 text-white leading-tight">${b.name}</h3>
+                        <p class="text-[9px] text-gray-500 font-bold uppercase tracking-widest mt-1">${studentCount} Students</p>
+                        <p class="text-[8px] text-mint font-black uppercase tracking-[0.2em] mt-3">Open Hub</p>
+                    </div>
+                </div>`;
+        }
     };
+
+    function selectBatch(name) {
+        document.getElementById('batchSelect').value = name;
+        loadStudents();
+    }
+
+    function goHome() {
+        document.getElementById('lobbyView').classList.remove('hidden-view');
+        document.getElementById('commandView').classList.add('hidden-view');
+        document.getElementById('syncContainer').classList.add('hidden-view');
+    }
 
     async function loadStudents() {
         const b = document.getElementById('batchSelect').value;
         const d = document.getElementById('feeDate').value;
         if(!b) return;
+
+        document.getElementById('lobbyView').classList.add('hidden-view');
+        document.getElementById('commandView').classList.remove('hidden-view');
+        document.getElementById('syncContainer').classList.remove('hidden-view');
+
         document.getElementById('roster').innerHTML = '<div class="py-20 text-center text-mint font-bold animate-pulse text-[10px] uppercase">Refreshing Cloud Data...</div>';
         try {
             const r = await fetch(`${SCRIPT_URL}?action=getStudents&batch=${encodeURIComponent(b)}&date=${d}`);
@@ -99,7 +153,6 @@
             const isPaid = Number(s.balance) <= 0 || s.tempPaid;
             let btnColor = (s.remindCount > 0) ? "bg-gold/20 text-gold border-gold/30" : "bg-white/5 text-white/40 border-white/10";
             
-            // Calculate Current Display Math
             const currentPaidTotal = Number(s.paidSoFar) + Number(s.manualAmt || 0);
             const currentBalance = Math.max(0, s.fees - currentPaidTotal);
 
@@ -166,12 +219,8 @@
             if (finalAmt <= 0 && !s.newRemindSent) return null;
             
             return {
-                name: s.name, 
-                contact: s.contact, 
-                batch: s.batch, 
-                fees: s.fees, 
-                paidSoFar: s.paidSoFar, 
-                feeType: document.getElementById(`type-${i}`)?.value || "UPI",
+                name: s.name, contact: s.contact, batch: s.batch, fees: s.fees, 
+                paidSoFar: s.paidSoFar, feeType: document.getElementById(`type-${i}`)?.value || "UPI",
                 paidTo: document.getElementById(`pst-${i}`)?.value || "Admin", 
                 paidAmount: finalAmt,
                 newRemindSent: s.newRemindSent || false,
