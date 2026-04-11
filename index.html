@@ -193,8 +193,11 @@
     function calc(i, b) { const v = parseFloat(document.getElementById(`paid-${i}`).value) || 0; document.getElementById(`pend-${i}`).innerText = `₹${b - v}`; }
 
     function sendWA(i, type) {
-    const s = students[i], p = document.getElementById(`paid-${i}`)?.value || 0;
+    const s = students[i];
+    const p = document.getElementById(`paid-${i}`)?.value || 0;
     const dVal = document.getElementById('feeDate').value;
+    
+    // Format date for display (e.g., 11 Apr 2026)
     const dateObj = new Date(dVal);
     const displayDate = dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
     
@@ -202,19 +205,42 @@
     if (!ph.startsWith('91')) ph = '91' + ph;
     
     if(type === 'remind') {
-        s.remindCount = (s.remindCount || 0) + 1;
+        const count = (s.remindCount || 0) + 1;
+        s.remindCount = count;
         s.newRemindSent = true; 
         
-        const msg = `Dear Sir/Madam,\n\nGreetings from *Coffeeland FC*! ⚽\n\nWe are happy to share that *${s.name}* is active and progressing well in the *${s.batch}* batch. To ensure continued training, kindly settle the pending fees.\n\n*Due:* ₹${s.balance}\n*Date:* ${displayDate}\n\n*Quick Pay Link:* upi.pe/8867742269@ptaxis\n\nYour support helps us provide the best coaching for our young athletes. Thank you!\n\n*Team Coffeeland FC*`;
+        let msg = "";
+        const payLink = "upi.pe/8867742269@ptaxis";
+
+        if (count === 1) {
+            // REMINDER 1: The Progress Focus
+            msg = `Dear Sir/Madam,\n\nGreetings from *Coffeeland FC*! ⚽\n\nWe are happy to share that *${s.name}* is active and progressing well in our *${s.batch}* batch. To ensure their training momentum continues, kindly settle the pending fees.\n\n*Due:* ₹${s.balance}\n*Date:* ${displayDate}\n*Pay Link:* ${payLink}\n\nYour support helps us provide the best coaching for our young athletes. Thank you!\n\n*Team Coffeeland FC*`;
+        } else if (count === 2) {
+            // REMINDER 2: The Journey Focus
+            msg = `Dear Sir/Madam,\n\nHope you are doing well! We love having *${s.name}* on the pitch as they continue their athletic journey in the *${s.batch}* batch. 📈\n\nThis is a gentle follow-up regarding the outstanding fees of *₹${s.balance}* for *${displayDate}*. We would appreciate it if you could settle this via the link below:\n\n*Pay Link:* ${payLink}\n\nThank you for your cooperation!\n\n*Team Coffeeland FC*`;
+        } else {
+            // REMINDER 3: The Coordination Focus
+            msg = `Dear Sir/Madam,\n\nGreetings from the Management at *Coffeeland FC*. ⚽\n\nRegarding *${s.name}* and their participation in the *${s.batch}* batch, we are reaching out to coordinate the pending fee settlement of *₹${s.balance}*.\n\nKindly use the link below to help us update our records for *${displayDate}*:\n\n*Quick Pay:* ${payLink}\n\nThank you for your immediate attention to this.\n\n*Team Coffeeland FC*`;
+        }
         
         window.open(`https://wa.me/${ph}?text=${encodeURIComponent(msg)}`);
         render();
     } else {
+        // RECEIPT LOGIC
         const settleAmt = parseFloat(p) > 0 ? parseFloat(p) : s.balance;
+        const remainingBalance = Math.max(0, s.balance - settleAmt);
         s.manualAmt = settleAmt; 
         s.tempPaid = true;
         
-        const msg = `Dear Sir/Madam,\n\n*CFC PAYMENT RECEIPT* ✅\n\nReceived *₹${settleAmt}* for *${s.name}* (${s.batch} batch) on *${displayDate}*.\n\nThank you for your payment and for supporting your child's athletic journey!\n\n*Team Coffeeland FC*`;
+        let msg = `Dear Sir/Madam,\n\n*CFC PAYMENT RECEIPT* ✅\n\nReceived *₹${settleAmt}* for *${s.name}* (${s.batch} batch) on *${displayDate}*.`;
+        
+        if (remainingBalance > 0) {
+            msg += `\n\n*Remaining Balance:* ₹${remainingBalance}\n_Kindly settle the balance at your earliest convenience._`;
+        } else {
+            msg += `\n\n*Status:* Fully Paid. All records updated!`;
+        }
+        
+        msg += `\n\nThank you for your payment and for supporting your child's athletic growth!\n\n*Team Coffeeland FC*`;
         
         window.open(`https://wa.me/${ph}?text=${encodeURIComponent(msg)}`);
         render();
