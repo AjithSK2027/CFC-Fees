@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>CFC Fees | Full Date Hub</title>
+    <title>CFC Fees | Clean Hub</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -11,181 +11,184 @@
             theme: {
                 extend: {
                     fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'] },
-                    colors: { pitch: '#050505', espresso: '#0F0A08', bean: '#1A1412', mint: '#10B981', rose: '#F43F5E', gold: '#EAB308', orange: '#F97316' }
+                    colors: { pitch: '#050505', espresso: '#0F0A08', bean: '#1A1412', mint: '#10B981', rose: '#F43F5E', gold: '#EAB308' }
                 }
             }
         }
     </script>
     <style>
         body { background-color: #050505; color: #E5E7EB; -webkit-font-smoothing: antialiased; }
-        .neo-blur { background: rgba(15, 10, 8, 0.9); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); }
         .card-gradient { background: linear-gradient(165deg, #1A1412 0%, #0F0A08 100%); border: 1px solid rgba(255, 255, 255, 0.05); }
         .input-dark { background: #1A1412; border: 1px solid rgba(255, 255, 255, 0.1); color: white; border-radius: 12px; }
-        #qrModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
-        .status-pill { font-size: 9px; font-weight: 800; padding: 2px 8px; border-radius: 6px; text-transform: uppercase; }
-        .pending { background: rgba(244, 63, 94, 0.1); color: #F43F5E; }
-        .paid { background: rgba(16, 185, 129, 0.1); color: #10B981; }
-        .remind-1 { background: rgba(234, 179, 8, 0.2) !important; color: #EAB308 !important; border: 1px solid #EAB308 !important; }
-        .remind-2 { background: rgba(249, 115, 22, 0.2) !important; color: #F97316 !important; border: 1px solid #F97316 !important; }
-        .remind-3 { background: rgba(239, 68, 68, 0.2) !important; color: #F43F5E !important; border: 1px solid #F43F5E !important; }
+        #qrModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
     </style>
 </head>
 <body class="min-h-screen pb-40">
 
     <div id="qrModal" onclick="closeQR()">
         <div class="card-gradient p-8 rounded-[2.5rem] text-center space-y-6 max-w-xs w-full">
-            <h3 class="text-mint font-900 uppercase text-[10px]">UPI Payment</h3>
-            <div class="bg-white p-4 rounded-3xl inline-block"><img src="https://i.ibb.co/f5dYVM1/Whats-App-Image-2026-04-08-at-12-56-51-PM.jpg" class="w-48 h-48"></div>
+            <h3 class="text-mint font-900 uppercase text-[10px] tracking-widest">Scan to Pay</h3>
+            <img src="https://i.ibb.co/f5dYVM1/Whats-App-Image-2026-04-08-at-12-56-51-PM.jpg" class="w-48 mx-auto rounded-3xl border-4 border-white shadow-2xl">
             <p class="text-white font-900 text-3xl" id="qrPriceDisplay">₹0</p>
-            <button onclick="closeQR()" class="w-full py-4 rounded-2xl bg-white/5 border border-white/10 text-white font-bold text-xs uppercase tracking-widest">Close</button>
+            <button onclick="closeQR()" class="w-full py-4 rounded-2xl bg-white/5 border border-white/10 text-white font-bold text-xs uppercase">Close</button>
         </div>
     </div>
 
     <header class="pt-8 px-6 flex justify-between items-center">
-        <div><h1 class="text-xl font-900 text-white uppercase leading-none">CFC <span class="text-mint">Fees</span></h1><p class="text-gray-500 text-[10px] font-bold tracking-widest uppercase mt-1">Financial Command</p></div>
-        <img src="https://i.ibb.co/3nTMhbz/1000287652-0b4cd8d123cf04f03fc322309c337390-11-18-2025-1-04-51-PM.png" class="h-12 w-12 rounded-full border border-white/10 bg-espresso">
+        <div><h1 class="text-xl font-900 text-white uppercase leading-none">CFC <span class="text-mint">Fees</span></h1><p class="text-gray-500 text-[10px] font-bold tracking-widest uppercase mt-1">Financial command V2</p></div>
+        <img src="https://i.ibb.co/3nTMhbz/1000287652-0b4cd8d123cf04f03fc322309c337390-11-18-2025-1-04-51-PM.png" class="h-10 w-10">
     </header>
 
-    <div class="px-6 mt-8 grid grid-cols-2 gap-3">
+    <div class="px-6 mt-8">
+        <div class="card-gradient rounded-[2rem] p-6 grid grid-cols-3 gap-2 text-center">
+            <div><p class="text-[8px] font-bold text-gray-500 uppercase">Target</p><p id="dashTarget" class="text-sm font-900">₹0</p></div>
+            <div class="border-x border-white/5"><p class="text-[8px] font-bold text-gray-500 uppercase">Received</p><p id="dashPaid" class="text-sm font-900 text-mint">₹0</p></div>
+            <div><p class="text-[8px] font-bold text-gray-500 uppercase">Pending</p><p id="dashPending" class="text-sm font-900 text-rose">₹0</p></div>
+        </div>
+    </div>
+
+    <div class="px-6 mt-6 grid grid-cols-2 gap-3">
         <select id="batchSelect" onchange="loadStudents()" class="input-dark p-4 text-xs font-bold outline-none"><option value="">Select Batch</option></select>
         <input type="date" id="feeDate" onchange="loadStudents()" class="input-dark p-4 text-xs font-bold outline-none">
     </div>
 
     <main id="roster" class="px-6 mt-8 space-y-4"></main>
 
-    <div class="fixed bottom-0 left-0 right-0 p-6 neo-blur border-t border-white/5 z-50">
-        <button onclick="submitFees()" id="syncBtn" class="w-full bg-white text-pitch font-900 rounded-2xl py-5 text-[11px] uppercase tracking-widest active:scale-95 transition-all">Synchronize Ledger</button>
+    <div class="fixed bottom-0 left-0 right-0 p-6 bg-pitch/80 backdrop-blur-lg border-t border-white/5 z-50">
+        <button onclick="submitFees()" id="syncBtn" class="w-full bg-mint text-pitch font-900 rounded-2xl py-5 text-[11px] uppercase tracking-widest shadow-lg shadow-mint/20 active:scale-95 transition-all">Synchronize Clean Ledger</button>
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxB0OsPMC-sCSyzE9Rd76vFsJGhyQY7Gi9CoGBTSxvnJs76npLCG_MWQoM5BFLxlaWORw/exec"; 
-        let students = [];
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwltOjQ8Y6H9SYAS8IGW2Z1ETWrCgn6Vjm-sIOUzzTF4hmatr76OVlaerqWNyRASZhrMg/exec"; 
+    let students = [];
 
-        window.onload = async () => {
-            // Set Today's Full Date as Default
-            document.getElementById('feeDate').value = new Date().toISOString().split('T')[0];
-            const r = await fetch(`${SCRIPT_URL}?action=getBatches`);
-            const d = await r.json();
-            const s = document.getElementById('batchSelect');
-            d.batches?.forEach(b => s.innerHTML += `<option value="${b.name}">${b.name}</option>`);
-        };
+    window.onload = async () => {
+        document.getElementById('feeDate').value = new Date().toISOString().split('T')[0];
+        const r = await fetch(`${SCRIPT_URL}?action=getBatches`);
+        const d = await r.json();
+        const s = document.getElementById('batchSelect');
+        d.batches?.forEach(b => s.innerHTML += `<option value="${b.name}">${b.name}</option>`);
+    };
 
-        async function loadStudents() {
-            const b = document.getElementById('batchSelect').value;
-            const d = document.getElementById('feeDate').value;
-            if(!b || !d) return;
-            document.getElementById('roster').innerHTML = '<div class="py-20 text-center text-mint font-bold uppercase text-[10px] animate-pulse">Syncing...</div>';
-            try {
-                const r = await fetch(`${SCRIPT_URL}?action=getStudents&batch=${encodeURIComponent(b)}&date=${d}`);
-                const data = await r.json();
-                students = data.students || []; render();
-            } catch(e) { alert("Error"); }
-        }
-
-        function render() {
-            const container = document.getElementById('roster');
-            container.innerHTML = ''; 
-
-            students.forEach((s, i) => {
-                const isPaid = s.balance <= 0;
-                let bS = "bg-white/5 text-white/40 border-white/10";
-                if (s.remindCount === 1) bS = "remind-1";
-                else if (s.remindCount === 2) bS = "remind-2";
-                else if (s.remindCount >= 3) bS = "remind-3";
-                
-                let content = isPaid ? `
-                    <div class="bg-mint/10 border border-mint/30 rounded-2xl p-5 flex items-center justify-between animate-in zoom-in-95 duration-300">
-                        <div class="space-y-1">
-                            <p class="text-[9px] font-black text-mint uppercase tracking-[0.2em]">Full Payment Verified</p>
-                            <p class="text-sm font-bold text-white">${s.payDate || 'Recorded'} via ${s.payMode || 'UPI'}</p>
-                        </div>
-                        <button onclick="sendWA(${i}, 'received')" class="bg-mint text-pitch px-4 py-2 rounded-lg text-[10px] font-black uppercase">Resend</button>
-                    </div>` : `
-                    <div class="grid grid-cols-3 gap-2 py-3 border-y border-white/5 text-center">
-                        <div><p class="text-[8px] font-bold text-gray-500 uppercase">Monthly</p><p class="text-sm font-800 text-white/40">₹${s.fees}</p></div>
-                        <div class="border-x border-white/5"><p class="text-[8px] font-bold text-gray-500 uppercase">Pay Now</p><input type="number" id="paid-${i}" value="0" oninput="calc(${i}, ${s.balance})" class="bg-transparent text-mint text-sm font-900 w-full text-center outline-none"></div>
-                        <div><p class="text-[8px] font-bold text-gray-500 uppercase">Balance</p><p id="pend-${i}" class="text-sm font-900 text-rose">₹${s.balance}</p></div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-3">
-                        <div class="space-y-1"><p class="text-[8px] font-bold text-gray-500 uppercase ml-1">Method</p>
-                            <div class="flex gap-2"><select id="type-${i}" class="bg-bean text-[10px] p-3 flex-1 font-bold rounded-xl outline-none"><option>UPI</option><option>CASH</option></select><button onclick="showQR(${i})" class="bg-mint/10 text-mint rounded-xl px-3 border border-mint/20 active:scale-90"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg></button></div>
-                        </div>
-                        <div class="space-y-1"><p class="text-[8px] font-bold text-gray-500 uppercase ml-1">PST</p><input id="pst-${i}" type="text" placeholder="Coach" class="bg-bean text-[10px] p-3 w-full font-bold rounded-xl border border-white/5 outline-none"></div>
-                    </div>
-                    <div id="action-area-${i}" class="flex gap-2 pt-2">
-                        <button onclick="sendWA(${i}, 'received')" class="flex-1 bg-mint/10 text-mint border border-mint/20 rounded-xl py-4 text-[10px] font-black uppercase active:scale-95 transition-all">Confirm Receipt</button>
-                        <button onclick="sendWA(${i}, 'remind')" id="remind-btn-${i}" class="flex-1 ${bS} border rounded-xl py-4 text-[10px] font-black uppercase active:scale-95 transition-all">${s.remindCount > 0 ? `Reminder x${s.remindCount}` : 'Send Reminder'}</button>
-                    </div>`;
-
-                container.innerHTML += `<div class="card-gradient rounded-[2rem] p-5 space-y-5 animate-in fade-in">
-                    <div class="flex justify-between items-start"><div><h3 class="text-base font-800 text-white">${s.name}</h3><p class="text-[10px] text-mint font-bold uppercase mt-0.5">${s.contact}</p></div><span class="status-pill ${isPaid ? 'paid' : 'pending'}">${isPaid ? 'Paid' : 'Pending'}</span></div>
-                    ${content}</div>`;
-            });
-        }
-
-        function showQR(i) { document.getElementById('qrPriceDisplay').innerText = `₹${document.getElementById(`paid-${i}`).value || 0}`; document.getElementById('qrModal').style.display = 'flex'; }
-        function closeQR() { document.getElementById('qrModal').style.display = 'none'; }
-        function calc(i, b) { const p = parseFloat(document.getElementById(`paid-${i}`).value) || 0, nB = b - p, bE = document.getElementById(`pend-${i}`); bE.innerText = `₹${nB}`; bE.className = nB <= 0 ? "text-sm font-900 text-mint" : "text-sm font-900 text-rose"; }
-
-        function sendWA(i, type) {
-            const s = students[i], p = document.getElementById(`paid-${i}`)?.value || 0, b = document.getElementById(`pend-${i}`)?.innerText || "₹0";
-            let ph = s.contact.replace(/\D/g, ''); if (!ph.startsWith('91')) ph = '91' + ph;
-            let txt = "";
-            if (type === 'remind') {
-                s.remindCount++; 
-                const n = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
-                s.lastReminded = `${n} at ${new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })} x${s.remindCount}`;
-                txt = `⚽ *CFC: FEE NOTICE* ⚽\nReminder for *${s.name}*.\n\n*Due:* ${b}\nUPI: 8867742269@ptaxis`;
-                render();
-            } else {
-                txt = `✅ *CFC: PAYMENT RECEIVED* ✅\nReceived ₹${p} for *${s.name}*.\n\nThank you!`;
-                if (parseFloat(p) >= s.balance) {
-                    s.isNewlyPaid = true; // Flag to tell submitFees to log this
-                    s.balance = 0; s.payDate = 'Just Now'; s.payMode = document.getElementById(`type-${i}`).value;
-                    render();
-                }
-            }
-            window.open(`https://wa.me/${ph}?text=${encodeURIComponent(txt)}`);
-        }
-
-       async function submitFees() {
-    const btn = document.getElementById('syncBtn'), dVal = document.getElementById('feeDate').value;
-    
-    const logs = students.map((s, i) => {
-        const inputVal = parseFloat(document.getElementById(`paid-${i}`)?.value || 0);
-        const paidAmt = s.isNewlyPaid ? (s.fees - s.paidSoFar) : inputVal;
-        
-        return {
-            name: s.name,
-            contact: s.contact,
-            batch: s.batch,
-            fees: s.fees,
-            paidSoFar: s.paidSoFar, // What they had paid before today
-            feeType: document.getElementById(`type-${i}`)?.value || "UPI",
-            paidTo: document.getElementById(`pst-${i}`)?.value || "Admin",
-            paidAmount: paidAmt,     // What they are paying right now
-            lastReminded: s.lastReminded || ""
-        };
-    }).filter(r => r.paidAmount > 0 || (r.lastReminded && r.lastReminded.includes('at')));
-
-    if (!logs.length) return alert("No changes detected.");
-    
-    btn.innerText = "UPDATING CLOUD..."; btn.disabled = true;
-    const fd = new URLSearchParams();
-    fd.append('payload', JSON.stringify({ action: 'saveFees', date: dVal, data: logs }));
-    
-    try {
-        const response = await fetch(SCRIPT_URL, { method: 'POST', body: fd });
-        const res = await response.json();
-        if (res.status === 'success') {
-            alert("Sync Successful!");
-            location.reload(); 
-        }
-    } catch (e) {
-        alert("Sync failed. Check connection.");
-        btn.disabled = false; btn.innerText = "Synchronize Ledger";
+    async function loadStudents() {
+        const b = document.getElementById('batchSelect').value;
+        const d = document.getElementById('feeDate').value;
+        if(!b) return;
+        document.getElementById('roster').innerHTML = '<div class="py-20 text-center text-mint font-bold animate-pulse text-[10px] uppercase">Refreshing Cloud Data...</div>';
+        try {
+            const r = await fetch(`${SCRIPT_URL}?action=getStudents&batch=${encodeURIComponent(b)}&date=${d}`);
+            const data = await r.json();
+            students = data.students || []; 
+            updateDashboard();
+            render();
+        } catch(e) { alert("Data Fetch Error"); }
     }
-}
+
+    function updateDashboard() {
+        let t = 0, p = 0, b = 0;
+        students.forEach(s => { t += Number(s.fees); p += Number(s.paidSoFar); b += Number(s.balance); });
+        document.getElementById('dashTarget').innerText = `₹${t}`;
+        document.getElementById('dashPaid').innerText = `₹${p}`;
+        document.getElementById('dashPending').innerText = `₹${b}`;
+    }
+
+    function render() {
+        const container = document.getElementById('roster');
+        container.innerHTML = ''; 
+        students.forEach((s, i) => {
+            const isPaid = Number(s.balance) <= 0 || s.tempPaid;
+            let btnColor = (s.remindCount > 0) ? "bg-gold/20 text-gold border-gold/30" : "bg-white/5 text-white/40 border-white/10";
+            
+            // Calculate Current Display Math
+            const currentPaidTotal = Number(s.paidSoFar) + Number(s.manualAmt || 0);
+            const currentBalance = Math.max(0, s.fees - currentPaidTotal);
+
+            let content = isPaid ? `
+                <div class="bg-mint/10 border border-mint/20 rounded-2xl p-4 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <p class="text-[9px] font-black text-mint uppercase tracking-widest">₹${s.manualAmt || (s.fees - s.paidSoFar)} Settle Recorded</p>
+                        <button onclick="sendWA(${i}, 'receipt')" class="bg-mint text-pitch px-4 py-2 rounded-lg text-[10px] font-black uppercase">Receipt</button>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2 pt-2 border-t border-mint/10 text-center">
+                        <div><p class="text-[7px] font-bold text-gray-500 uppercase">Target</p><p class="text-[10px] font-bold text-white/60">₹${s.fees}</p></div>
+                        <div class="border-x border-mint/10"><p class="text-[7px] font-bold text-gray-500 uppercase">Paid</p><p class="text-[10px] font-bold text-mint">₹${currentPaidTotal}</p></div>
+                        <div><p class="text-[7px] font-bold text-gray-500 uppercase">Balance</p><p class="text-[10px] font-bold ${currentBalance <= 0 ? 'text-mint' : 'text-rose'}">₹${currentBalance}</p></div>
+                    </div>
+                </div>` : `
+                <div class="grid grid-cols-2 gap-4 py-3 border-y border-white/5 text-center">
+                    <div><p class="text-[8px] font-bold text-gray-500 uppercase">Collect</p><input type="number" id="paid-${i}" placeholder="₹0" oninput="calc(${i}, ${s.balance})" class="bg-transparent text-mint text-lg font-900 w-full text-center outline-none"></div>
+                    <div><p class="text-[8px] font-bold text-gray-500 uppercase">Pending</p><p id="pend-${i}" class="text-lg font-900 text-rose">₹${s.balance}</p></div>
+                </div>
+                <div class="grid grid-cols-2 gap-3 pt-2">
+                    <select id="type-${i}" class="bg-bean text-[10px] p-3 font-bold rounded-xl border border-white/5 outline-none"><option>UPI</option><option>CASH</option></select>
+                    <input id="pst-${i}" type="text" placeholder="Paid To" class="bg-bean text-[10px] p-3 w-full font-bold rounded-xl border border-white/5 outline-none">
+                </div>
+                <div class="flex gap-2 pt-2">
+                    <button onclick="showQR(${i})" class="bg-white/5 text-white px-4 rounded-xl border border-white/10">QR</button>
+                    <button onclick="sendWA(${i}, 'receipt')" class="flex-1 bg-mint text-pitch rounded-xl py-4 text-[10px] font-black uppercase">Settle</button>
+                    <button onclick="sendWA(${i}, 'remind')" class="flex-1 ${btnColor} border rounded-xl py-4 text-[10px] font-black uppercase">${s.remindCount > 0 ? `Remind x${s.remindCount}` : 'Remind'}</button>
+                </div>`;
+
+            container.innerHTML += `<div class="card-gradient rounded-[2rem] p-5 space-y-4">
+                <div class="flex justify-between items-start"><div><h3 class="text-base font-800 text-white">${s.name}</h3><p class="text-[9px] text-gray-500 font-bold uppercase">${s.contact}</p></div><span class="px-3 py-1 rounded-lg text-[9px] font-black uppercase ${isPaid ? 'bg-mint/10 text-mint' : 'bg-rose/10 text-rose'}">${isPaid ? 'Paid' : 'Pending'}</span></div>
+                ${content}</div>`;
+        });
+    }
+
+    function showQR(i) { document.getElementById('qrPriceDisplay').innerText = `₹${document.getElementById(`paid-${i}`).value || 0}`; document.getElementById('qrModal').style.display = 'flex'; }
+    function closeQR() { document.getElementById('qrModal').style.display = 'none'; }
+    function calc(i, b) { const v = parseFloat(document.getElementById(`paid-${i}`).value) || 0; document.getElementById(`pend-${i}`).innerText = `₹${b - v}`; }
+
+    function sendWA(i, type) {
+        const s = students[i], p = document.getElementById(`paid-${i}`)?.value || 0;
+        let ph = s.contact.replace(/\D/g, ''); if (!ph.startsWith('91')) ph = '91' + ph;
+        
+        if(type === 'remind') {
+            s.remindCount = (s.remindCount || 0) + 1;
+            s.newRemindSent = true; 
+            window.open(`https://wa.me/${ph}?text=${encodeURIComponent('⚽ *CFC NOTICE*\nReminder for *'+s.name+'*.\nBalance: *₹'+s.balance+'*')}`);
+            render();
+        } else {
+            const settleAmt = parseFloat(p) > 0 ? parseFloat(p) : s.balance;
+            s.manualAmt = settleAmt; 
+            s.tempPaid = true;
+            window.open(`https://wa.me/${ph}?text=${encodeURIComponent('✅ *CFC RECEIPT*\nReceived ₹'+settleAmt+' for *'+s.name+'*.\n\nThank you!')}`);
+            render();
+        }
+    }
+
+    async function submitFees() {
+        const btn = document.getElementById('syncBtn'), dVal = document.getElementById('feeDate').value;
+        const logs = students.map((s, i) => {
+            const inputVal = parseFloat(document.getElementById(`paid-${i}`)?.value || 0);
+            const finalAmt = s.tempPaid ? (s.manualAmt || s.balance) : inputVal;
+
+            if (finalAmt <= 0 && !s.newRemindSent) return null;
+            
+            return {
+                name: s.name, 
+                contact: s.contact, 
+                batch: s.batch, 
+                fees: s.fees, 
+                paidSoFar: s.paidSoFar, 
+                feeType: document.getElementById(`type-${i}`)?.value || "UPI",
+                paidTo: document.getElementById(`pst-${i}`)?.value || "Admin", 
+                paidAmount: finalAmt,
+                newRemindSent: s.newRemindSent || false,
+                remindCount: s.remindCount || 0
+            };
+        }).filter(x => x !== null);
+
+        if (!logs.length) return alert("Nothing to sync");
+        btn.innerText = "UPDATING CLOUD..."; btn.disabled = true;
+        const fd = new URLSearchParams();
+        fd.append('payload', JSON.stringify({ action: 'saveFees', date: dVal, data: logs }));
+        try {
+            const response = await fetch(SCRIPT_URL, { method: 'POST', body: fd });
+            const res = await response.json();
+            if (res.status === 'success') { alert("Cloud Synced!"); location.reload(); }
+        } catch (e) { alert("Error"); btn.disabled = false; }
+    }
     </script>
 </body>
 </html>
