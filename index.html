@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>CFC Fees | Command V3.2 Adaptive</title>
+    
     <link rel="apple-touch-icon" href="https://i.ibb.co/3nTMhbz/1000287652-0b4cd8d123cf04f03fc322309c337390-11-18-2025-1-04-51-PM.png">
+    <link rel="icon" type="image/png" href="https://i.ibb.co/3nTMhbz/1000287652-0b4cd8d123cf04f03fc322309c337390-11-18-2025-1-04-51-PM.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="CFC Fees">
 
-<link rel="icon" type="image/png" href="https://i.ibb.co/3nTMhbz/1000287652-0b4cd8d123cf04f03fc322309c337390-11-18-2025-1-04-51-PM.png">
-
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="CFC Fees">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -25,10 +25,9 @@
         }
     </script>
     <style>
-        /* CSS Variables for Adaptive Theme */
         :root {
             --bg-body: #F9FAFB;
-            --bg-header: rgba(249, 250, 251, 0.7);
+            --bg-header: rgba(249, 250, 251, 0.85);
             --bg-card: #FFFFFF;
             --text-main: #111827;
             --text-gray: #6B7280;
@@ -39,7 +38,7 @@
         @media (prefers-color-scheme: dark) {
             :root {
                 --bg-body: #050505;
-                --bg-header: rgba(5, 5, 5, 0.5);
+                --bg-header: rgba(5, 5, 5, 0.6);
                 --bg-card: linear-gradient(165deg, #1A1412 0%, #0F0A08 100%);
                 --text-main: #E5E7EB;
                 --text-gray: #9CA3AF;
@@ -49,12 +48,20 @@
         }
 
         body { background-color: var(--bg-body); color: var(--text-main); -webkit-font-smoothing: antialiased; transition: all 0.3s ease; }
-        header { background-color: var(--bg-header); }
+        
+        /* THE NOTCH FIX */
+        header { 
+            background-color: var(--bg-header); 
+            padding-top: calc(env(safe-area-inset-top) + 1.2rem) !important;
+            padding-bottom: 1rem;
+        }
+
         .card-gradient { background: var(--bg-card); border: 1px solid var(--border); box-shadow: var(--card-shadow); }
         .input-dark { background-color: var(--bg-card); border: 1px solid var(--border); color: var(--text-main); border-radius: 12px; }
-        .text-adaptive-main { color: var(--text-main); }
-        .text-adaptive-gray { color: var(--text-gray); }
         
+        /* ADJUST VIEW TOP MARGINS */
+        #lobbyView, #commandView { margin-top: 1.5rem; }
+
         .hidden-view { display: none !important; }
         #qrModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
         #batchGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
@@ -67,21 +74,21 @@
         <div class="card-gradient p-8 rounded-[2.5rem] text-center space-y-6 max-w-xs w-full">
             <h3 class="text-mint font-900 uppercase text-[10px] tracking-widest">Scan to Pay</h3>
             <img src="https://i.ibb.co/f5dYVM1/Whats-App-Image-2026-04-08-at-12-56-51-PM.jpg" class="w-48 mx-auto rounded-3xl border-4 border-white shadow-2xl">
-            <p class="font-900 text-3xl text-adaptive-main" id="qrPriceDisplay">₹0</p>
-            <button onclick="closeQR()" class="w-full py-4 rounded-2xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-adaptive-main font-bold text-xs uppercase">Close</button>
+            <p class="font-900 text-3xl text-current" id="qrPriceDisplay">₹0</p>
+            <button onclick="closeQR()" class="w-full py-4 rounded-2xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-current font-bold text-xs uppercase">Close</button>
         </div>
     </div>
 
-    <header class="pt-8 px-6 flex justify-between items-center sticky top-0 backdrop-blur-md z-40 pb-2">
+    <header class="px-6 flex justify-between items-center sticky top-0 backdrop-blur-md z-40">
         <div onclick="goHome()" class="cursor-pointer">
-            <h1 class="text-xl font-900 text-adaptive-main uppercase leading-none">CFC <span class="text-mint">Fees</span></h1>
-            <p class="text-adaptive-gray text-[10px] font-bold tracking-widest uppercase mt-1">Command Center</p>
+            <h1 class="text-xl font-900 text-current uppercase leading-none">CFC <span class="text-mint">Fees</span></h1>
+            <p class="text-gray-500 text-[10px] font-bold tracking-widest uppercase mt-1">Command Center</p>
         </div>
         <img src="https://i.ibb.co/3nTMhbz/1000287652-0b4cd8d123cf04f03fc322309c337390-11-18-2025-1-04-51-PM.png" class="h-10 w-10">
     </header>
 
-    <div id="lobbyView" class="px-6 mt-10 transition-all duration-300">
-        <h2 class="text-[10px] font-black text-adaptive-gray uppercase tracking-[0.2em] mb-4 text-center">Select Hub</h2>
+    <div id="lobbyView" class="px-6 transition-all duration-300">
+        <h2 class="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-4 text-center">Select Hub</h2>
         <div class="mb-8">
             <select id="homeBatchSelect" onchange="selectBatch(this.value)" class="input-dark p-4 text-xs font-bold outline-none w-full shadow-lg">
                 <option value="">Quick Jump to Batch...</option>
@@ -91,20 +98,20 @@
     </div>
 
     <div id="commandView" class="hidden-view">
-        <div class="px-6 mt-8">
+        <div class="px-6 space-y-6">
             <div class="card-gradient rounded-[2rem] p-6 grid grid-cols-3 gap-2 text-center">
-                <div><p class="text-[8px] font-bold text-adaptive-gray uppercase">Target</p><p id="dashTarget" class="text-sm font-900 text-adaptive-main">₹0</p></div>
-                <div class="border-x border-black/5 dark:border-white/5"><p class="text-[8px] font-bold text-adaptive-gray uppercase">Received</p><p id="dashPaid" class="text-sm font-900 text-mint">₹0</p></div>
-                <div><p class="text-[8px] font-bold text-adaptive-gray uppercase">Pending</p><p id="dashPending" class="text-sm font-900 text-rose">₹0</p></div>
+                <div><p class="text-[8px] font-bold text-gray-500 uppercase">Target</p><p id="dashTarget" class="text-sm font-900 text-current">₹0</p></div>
+                <div class="border-x border-black/5 dark:border-white/5"><p class="text-[8px] font-bold text-gray-500 uppercase">Received</p><p id="dashPaid" class="text-sm font-900 text-mint">₹0</p></div>
+                <div><p class="text-[8px] font-bold text-gray-500 uppercase">Pending</p><p id="dashPending" class="text-sm font-900 text-rose">₹0</p></div>
             </div>
-        </div>
 
-        <div class="px-6 mt-6 flex gap-3">
-            <select id="batchSelect" onchange="loadStudents()" class="input-dark p-4 text-xs font-bold outline-none flex-1"></select>
-            <input type="date" id="feeDate" onchange="loadStudents()" class="input-dark p-4 text-xs font-bold outline-none w-1/3">
-        </div>
+            <div class="flex gap-3">
+                <select id="batchSelect" onchange="loadStudents()" class="input-dark p-4 text-xs font-bold outline-none flex-1"></select>
+                <input type="date" id="feeDate" onchange="loadStudents()" class="input-dark p-4 text-xs font-bold outline-none w-1/3">
+            </div>
 
-        <main id="roster" class="px-6 mt-8 space-y-4"></main>
+            <main id="roster" class="mt-4 space-y-4"></main>
+        </div>
     </div>
 
     <div id="syncContainer" class="fixed bottom-0 left-0 right-0 p-6 bg-white/80 dark:bg-pitch/80 backdrop-blur-lg border-t border-black/5 dark:border-white/5 hidden-view z-50">
@@ -134,9 +141,9 @@
 
             grid.innerHTML += `
                 <div onclick="selectBatch('${b.name}')" class="card-gradient p-5 rounded-[2.5rem] flex flex-col justify-between tile-aspect active:scale-95 transition-all">
-                    <div class="bg-black/5 dark:bg-white/5 w-10 h-10 rounded-2xl flex items-center justify-center text-mint text-lg">⚽</div>
+                    <div class="bg-mint/10 w-10 h-10 rounded-2xl flex items-center justify-center text-mint text-lg">⚽</div>
                     <div>
-                        <h3 class="text-[13px] font-800 text-adaptive-main leading-tight mb-1">${b.name}</h3>
+                        <h3 class="text-[13px] font-800 text-current leading-tight mb-1">${b.name}</h3>
                         <p class="text-[8px] text-mint font-black uppercase tracking-widest">Enter Hub</p>
                     </div>
                 </div>`;
@@ -186,7 +193,7 @@
         container.innerHTML = ''; 
         students.forEach((s, i) => {
             const isPaid = Number(s.balance) <= 0 || s.tempPaid;
-            let btnColor = (s.remindCount > 0) ? "bg-gold/20 text-gold border-gold/30" : "bg-black/5 dark:bg-white/5 text-adaptive-gray border-black/10 dark:border-white/10";
+            let btnColor = (s.remindCount > 0) ? "bg-gold/20 text-gold border-gold/30" : "bg-black/5 dark:bg-white/5 text-gray-500 border-black/10 dark:border-white/10";
             
             const currentPaidTotal = Number(s.paidSoFar) + Number(s.manualAmt || 0);
             const currentBalance = Math.max(0, s.fees - currentPaidTotal);
@@ -198,23 +205,23 @@
                         <button onclick="sendWA(${i}, 'receipt')" class="bg-mint text-white dark:text-pitch px-4 py-2 rounded-lg text-[10px] font-black uppercase">Receipt</button>
                     </div>
                     <div class="grid grid-cols-3 gap-2 pt-2 border-t border-mint/10 text-center">
-                        <div><p class="text-[7px] font-bold text-adaptive-gray uppercase">Target</p><p class="text-[9px] font-bold text-adaptive-main">₹${s.fees}</p></div>
-                        <div class="border-x border-mint/10"><p class="text-[7px] font-bold text-adaptive-gray uppercase">Paid</p><p class="text-[9px] font-bold text-mint">₹${currentPaidTotal}</p></div>
-                        <div><p class="text-[7px] font-bold text-adaptive-gray uppercase">Balance</p><p class="text-[9px] font-bold ${currentBalance <= 0 ? 'text-mint' : 'text-rose'}">₹${currentBalance}</p></div>
+                        <div><p class="text-[7px] font-bold text-gray-500 uppercase">Target</p><p class="text-[9px] font-bold text-current">₹${s.fees}</p></div>
+                        <div class="border-x border-mint/10"><p class="text-[7px] font-bold text-gray-500 uppercase">Paid</p><p class="text-[9px] font-bold text-mint">₹${currentPaidTotal}</p></div>
+                        <div><p class="text-[7px] font-bold text-gray-500 uppercase">Balance</p><p class="text-[9px] font-bold ${currentBalance <= 0 ? 'text-mint' : 'text-rose'}">₹${currentBalance}</p></div>
                     </div>
                 </div>` : `
                 <div class="grid grid-cols-2 gap-4 py-3 border-y border-black/5 dark:border-white/5 text-center">
-                    <div><p class="text-[8px] font-bold text-adaptive-gray uppercase">Collect</p><input type="number" id="paid-${i}" placeholder="₹0" oninput="calc(${i}, ${s.balance})" class="bg-transparent text-mint text-lg font-900 w-full text-center outline-none"></div>
-                    <div><p class="text-[8px] font-bold text-adaptive-gray uppercase">Pending</p><p id="pend-${i}" class="text-lg font-900 text-rose">₹${s.balance}</p></div>
+                    <div><p class="text-[8px] font-bold text-gray-500 uppercase">Collect</p><input type="number" id="paid-${i}" placeholder="₹0" oninput="calc(${i}, ${s.balance})" class="bg-transparent text-mint text-lg font-900 w-full text-center outline-none"></div>
+                    <div><p class="text-[8px] font-bold text-gray-500 uppercase">Pending</p><p id="pend-${i}" class="text-lg font-900 text-rose">₹${s.balance}</p></div>
                 </div>
                 <div class="flex gap-2 pt-2">
-                    <button onclick="showQR(${i})" class="bg-black/5 dark:bg-white/5 text-adaptive-main px-4 rounded-xl border border-black/10 dark:border-white/10 text-[10px] font-bold">QR</button>
+                    <button onclick="showQR(${i})" class="bg-black/5 dark:bg-white/5 text-current px-4 rounded-xl border border-black/10 dark:border-white/10 text-[10px] font-bold">QR</button>
                     <button onclick="sendWA(${i}, 'receipt')" class="flex-1 bg-mint text-white dark:text-pitch rounded-xl py-4 text-[10px] font-black uppercase">Settle</button>
                     <button onclick="sendWA(${i}, 'remind')" class="flex-1 ${btnColor} border rounded-xl py-4 text-[10px] font-black uppercase">${s.remindCount > 0 ? `Remind x${s.remindCount}` : 'Remind'}</button>
                 </div>`;
 
             container.innerHTML += `<div class="card-gradient rounded-[2rem] p-5 space-y-4">
-                <div class="flex justify-between items-start"><div><h3 class="text-base font-800 text-adaptive-main">${s.name}</h3><p class="text-[9px] text-adaptive-gray font-bold uppercase">${s.contact}</p></div><span class="px-3 py-1 rounded-lg text-[9px] font-black uppercase ${isPaid ? 'bg-mint/10 text-mint' : 'bg-rose/10 text-rose'}">${isPaid ? 'Paid' : 'Pending'}</span></div>
+                <div class="flex justify-between items-start"><div><h3 class="text-base font-800 text-current">${s.name}</h3><p class="text-[9px] text-gray-500 font-bold uppercase">${s.contact}</p></div><span class="px-3 py-1 rounded-lg text-[9px] font-black uppercase ${isPaid ? 'bg-mint/10 text-mint' : 'bg-rose/10 text-rose'}">${isPaid ? 'Paid' : 'Pending'}</span></div>
                 ${content}</div>`;
         });
     }
@@ -224,8 +231,7 @@
     function calc(i, b) { const v = parseFloat(document.getElementById(`paid-${i}`).value) || 0; document.getElementById(`pend-${i}`).innerText = `₹${b - v}`; }
 
     function sendWA(i, type) {
-        const s = students[i];
-        const p = document.getElementById(`paid-${i}`)?.value || 0;
+        const s = students[i], p = document.getElementById(`paid-${i}`)?.value || 0;
         const dVal = document.getElementById('feeDate').value;
         const dateObj = new Date(dVal);
         const displayDate = dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
