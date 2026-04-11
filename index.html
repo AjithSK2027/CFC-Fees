@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>CFC Fees | Command V3</title>
+    <title>CFC Fees | Command V3.2</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -37,7 +37,7 @@
         </div>
     </div>
 
-    <header class="pt-8 px-6 flex justify-between items-center">
+    <header class="pt-8 px-6 flex justify-between items-center sticky top-0 bg-pitch/50 backdrop-blur-md z-40 pb-2">
         <div onclick="goHome()" class="cursor-pointer">
             <h1 class="text-xl font-900 text-white uppercase leading-none">CFC <span class="text-mint">Fees</span></h1>
             <p class="text-gray-500 text-[10px] font-bold tracking-widest uppercase mt-1">Command Center</p>
@@ -45,10 +45,16 @@
         <img src="https://i.ibb.co/3nTMhbz/1000287652-0b4cd8d123cf04f03fc322309c337390-11-18-2025-1-04-51-PM.png" class="h-10 w-10">
     </header>
 
-    <div id="lobbyView" class="px-6 mt-10">
-        <h2 class="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-6">Select Active Batch</h2>
-        <div id="batchGrid">
-            </div>
+    <div id="lobbyView" class="px-6 mt-10 transition-all duration-300">
+        <h2 class="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-4 text-center">Select Hub</h2>
+        
+        <div class="mb-8">
+            <select id="homeBatchSelect" onchange="selectBatch(this.value)" class="input-dark p-4 text-xs font-bold outline-none w-full border-mint/20 shadow-lg shadow-mint/5">
+                <option value="">Quick Jump to Batch...</option>
+            </select>
+        </div>
+
+        <div id="batchGrid"></div>
     </div>
 
     <div id="commandView" class="hidden-view">
@@ -61,7 +67,7 @@
         </div>
 
         <div class="px-6 mt-6 flex gap-3">
-            <select id="batchSelect" onchange="loadStudents()" class="input-dark p-4 text-xs font-bold outline-none flex-1"><option value="">Select Batch</option></select>
+            <select id="batchSelect" onchange="loadStudents()" class="input-dark p-4 text-xs font-bold outline-none flex-1"></select>
             <input type="date" id="feeDate" onchange="loadStudents()" class="input-dark p-4 text-xs font-bold outline-none w-1/3">
         </div>
 
@@ -73,49 +79,48 @@
     </div>
 
     <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxWbrlBds-CKEiqe9idgK7R92gb-8lYPxSABliKLYa_JZmdWUaQSTpU-qvnvmmNwCnDPQ/exec"; 
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwwTMVQhglZmJu76XbbRKhU_ejNxrb6bMRAkCYmpVcGj-RHxYkR-MiUqmnCB7NMv8ig0w/exec"; 
     let students = [];
 
-window.onload = async () => {
+    window.onload = async () => {
         document.getElementById('feeDate').value = new Date().toISOString().split('T')[0];
-        
-        // ONE request for everything
         const r = await fetch(`${SCRIPT_URL}?action=getBatches`);
         const d = await r.json();
         
         const s = document.getElementById('batchSelect');
+        const hs = document.getElementById('homeBatchSelect');
         const grid = document.getElementById('batchGrid');
         
+        s.innerHTML = '<option value="">Switch Batch</option>';
+        hs.innerHTML = '<option value="">Quick Jump to Batch...</option>';
+
         d.batches?.forEach(b => {
-            // Dropdown option
-            s.innerHTML += `<option value="${b.name}">${b.name}</option>`;
-            
-            // Lobby TILE - Now uses the 'count' sent from the server
+            const opt = `<option value="${b.name}">${b.name}</option>`;
+            s.innerHTML += opt;
+            hs.innerHTML += opt;
+
             grid.innerHTML += `
-                <div onclick="selectBatch('${b.name}')" class="card-gradient p-5 rounded-[2.5rem] flex flex-col justify-between tile-aspect active:scale-95 transition-all border border-white/5 shadow-xl">
-                    <div class="bg-mint/10 w-10 h-10 rounded-2xl flex items-center justify-center">
-                        <svg class="w-5 h-5 text-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
-                        </svg>
-                    </div>
+                <div onclick="selectBatch('${b.name}')" class="card-gradient p-5 rounded-[2.5rem] flex flex-col justify-between tile-aspect active:scale-95 transition-all border border-white/5">
+                    <div class="bg-white/5 w-10 h-10 rounded-2xl flex items-center justify-center text-mint text-lg shadow-inner">⚽</div>
                     <div>
-                        <h3 class="text-[14px] font-800 text-white leading-tight">${b.name}</h3>
-                        <p class="text-[9px] text-gray-500 font-bold uppercase tracking-widest mt-1">${b.count} Students</p>
-                        <p class="text-[8px] text-mint font-black uppercase tracking-[0.2em] mt-3">Open Hub</p>
+                        <h3 class="text-[13px] font-800 text-white leading-tight mb-1">${b.name}</h3>
+                        <p class="text-[8px] text-mint font-black uppercase tracking-widest">Enter Hub</p>
                     </div>
                 </div>`;
         });
     };
 
-    function selectBatch(name) {
-        document.getElementById('batchSelect').value = name;
-        loadStudents();
+    function selectBatch(n) { 
+        if(!n) return;
+        document.getElementById('batchSelect').value = n; 
+        loadStudents(); 
     }
 
-    function goHome() {
+    function goHome() { 
         document.getElementById('lobbyView').classList.remove('hidden-view');
         document.getElementById('commandView').classList.add('hidden-view');
         document.getElementById('syncContainer').classList.add('hidden-view');
+        document.getElementById('homeBatchSelect').value = ""; // Reset home dropdown
     }
 
     async function loadStudents() {
@@ -158,25 +163,21 @@ window.onload = async () => {
             let content = isPaid ? `
                 <div class="bg-mint/10 border border-mint/20 rounded-2xl p-4 space-y-3">
                     <div class="flex items-center justify-between">
-                        <p class="text-[9px] font-black text-mint uppercase tracking-widest">₹${s.manualAmt || (s.fees - s.paidSoFar)} Settle Recorded</p>
+                        <p class="text-[9px] font-black text-mint uppercase tracking-widest">₹${s.manualAmt || (s.fees - s.paidSoFar)} Recorded</p>
                         <button onclick="sendWA(${i}, 'receipt')" class="bg-mint text-pitch px-4 py-2 rounded-lg text-[10px] font-black uppercase">Receipt</button>
                     </div>
                     <div class="grid grid-cols-3 gap-2 pt-2 border-t border-mint/10 text-center">
-                        <div><p class="text-[7px] font-bold text-gray-500 uppercase">Target</p><p class="text-[10px] font-bold text-white/60">₹${s.fees}</p></div>
-                        <div class="border-x border-mint/10"><p class="text-[7px] font-bold text-gray-500 uppercase">Paid</p><p class="text-[10px] font-bold text-mint">₹${currentPaidTotal}</p></div>
-                        <div><p class="text-[7px] font-bold text-gray-500 uppercase">Balance</p><p class="text-[10px] font-bold ${currentBalance <= 0 ? 'text-mint' : 'text-rose'}">₹${currentBalance}</p></div>
+                        <div><p class="text-[7px] font-bold text-gray-500 uppercase">Target</p><p class="text-[9px] font-bold text-white/60">₹${s.fees}</p></div>
+                        <div class="border-x border-mint/10"><p class="text-[7px] font-bold text-gray-500 uppercase">Paid</p><p class="text-[9px] font-bold text-mint">₹${currentPaidTotal}</p></div>
+                        <div><p class="text-[7px] font-bold text-gray-500 uppercase">Balance</p><p class="text-[9px] font-bold ${currentBalance <= 0 ? 'text-mint' : 'text-rose'}">₹${currentBalance}</p></div>
                     </div>
                 </div>` : `
                 <div class="grid grid-cols-2 gap-4 py-3 border-y border-white/5 text-center">
                     <div><p class="text-[8px] font-bold text-gray-500 uppercase">Collect</p><input type="number" id="paid-${i}" placeholder="₹0" oninput="calc(${i}, ${s.balance})" class="bg-transparent text-mint text-lg font-900 w-full text-center outline-none"></div>
                     <div><p class="text-[8px] font-bold text-gray-500 uppercase">Pending</p><p id="pend-${i}" class="text-lg font-900 text-rose">₹${s.balance}</p></div>
                 </div>
-                <div class="grid grid-cols-2 gap-3 pt-2">
-                    <select id="type-${i}" class="bg-bean text-[10px] p-3 font-bold rounded-xl border border-white/5 outline-none"><option>UPI</option><option>CASH</option></select>
-                    <input id="pst-${i}" type="text" placeholder="Paid To" class="bg-bean text-[10px] p-3 w-full font-bold rounded-xl border border-white/5 outline-none">
-                </div>
                 <div class="flex gap-2 pt-2">
-                    <button onclick="showQR(${i})" class="bg-white/5 text-white px-4 rounded-xl border border-white/10">QR</button>
+                    <button onclick="showQR(${i})" class="bg-white/5 text-white px-4 rounded-xl border border-white/10 text-[10px] font-bold">QR</button>
                     <button onclick="sendWA(${i}, 'receipt')" class="flex-1 bg-mint text-pitch rounded-xl py-4 text-[10px] font-black uppercase">Settle</button>
                     <button onclick="sendWA(${i}, 'remind')" class="flex-1 ${btnColor} border rounded-xl py-4 text-[10px] font-black uppercase">${s.remindCount > 0 ? `Remind x${s.remindCount}` : 'Remind'}</button>
                 </div>`;
@@ -194,18 +195,13 @@ window.onload = async () => {
     function sendWA(i, type) {
         const s = students[i], p = document.getElementById(`paid-${i}`)?.value || 0;
         let ph = s.contact.replace(/\D/g, ''); if (!ph.startsWith('91')) ph = '91' + ph;
-        
         if(type === 'remind') {
-            s.remindCount = (s.remindCount || 0) + 1;
-            s.newRemindSent = true; 
-            window.open(`https://wa.me/${ph}?text=${encodeURIComponent('⚽ *CFC NOTICE*\nReminder for *'+s.name+'*.\nBalance: *₹'+s.balance+'*')}`);
-            render();
+            s.remindCount = (s.remindCount || 0) + 1; s.newRemindSent = true; 
+            window.open(`https://wa.me/${ph}?text=${encodeURIComponent('⚽ *CFC NOTICE*\nReminder for *'+s.name+'*.\nBalance: *₹'+s.balance+'*')}`); render();
         } else {
             const settleAmt = parseFloat(p) > 0 ? parseFloat(p) : s.balance;
-            s.manualAmt = settleAmt; 
-            s.tempPaid = true;
-            window.open(`https://wa.me/${ph}?text=${encodeURIComponent('✅ *CFC RECEIPT*\nReceived ₹'+settleAmt+' for *'+s.name+'*.\n\nThank you!')}`);
-            render();
+            s.manualAmt = settleAmt; s.tempPaid = true;
+            window.open(`https://wa.me/${ph}?text=${encodeURIComponent('✅ *CFC RECEIPT*\nReceived ₹'+settleAmt+' for *'+s.name+'*.\n\nThank you!')}`); render();
         }
     }
 
@@ -214,19 +210,13 @@ window.onload = async () => {
         const logs = students.map((s, i) => {
             const inputVal = parseFloat(document.getElementById(`paid-${i}`)?.value || 0);
             const finalAmt = s.tempPaid ? (s.manualAmt || s.balance) : inputVal;
-
             if (finalAmt <= 0 && !s.newRemindSent) return null;
-            
             return {
                 name: s.name, contact: s.contact, batch: s.batch, fees: s.fees, 
-                paidSoFar: s.paidSoFar, feeType: document.getElementById(`type-${i}`)?.value || "UPI",
-                paidTo: document.getElementById(`pst-${i}`)?.value || "Admin", 
-                paidAmount: finalAmt,
-                newRemindSent: s.newRemindSent || false,
-                remindCount: s.remindCount || 0
+                paidSoFar: s.paidSoFar, feeType: "UPI", paidTo: "Admin", 
+                paidAmount: finalAmt, newRemindSent: s.newRemindSent || false, remindCount: s.remindCount || 0
             };
         }).filter(x => x !== null);
-
         if (!logs.length) return alert("Nothing to sync");
         btn.innerText = "UPDATING CLOUD..."; btn.disabled = true;
         const fd = new URLSearchParams();
