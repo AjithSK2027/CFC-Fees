@@ -73,27 +73,26 @@
     </div>
 
     <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwltOjQ8Y6H9SYAS8IGW2Z1ETWrCgn6Vjm-sIOUzzTF4hmatr76OVlaerqWNyRASZhrMg/exec"; 
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxWbrlBds-CKEiqe9idgK7R92gb-8lYPxSABliKLYa_JZmdWUaQSTpU-qvnvmmNwCnDPQ/exec"; 
     let students = [];
 
-    window.onload = async () => {
+window.onload = async () => {
         document.getElementById('feeDate').value = new Date().toISOString().split('T')[0];
+        
+        // ONE request for everything
         const r = await fetch(`${SCRIPT_URL}?action=getBatches`);
         const d = await r.json();
         
         const s = document.getElementById('batchSelect');
         const grid = document.getElementById('batchGrid');
         
-        for (const b of d.batches) {
+        d.batches?.forEach(b => {
+            // Dropdown option
             s.innerHTML += `<option value="${b.name}">${b.name}</option>`;
             
-            // Initial fetch to get student counts for the tiles
-            const countRes = await fetch(`${SCRIPT_URL}?action=getStudents&batch=${encodeURIComponent(b.name)}&date=${document.getElementById('feeDate').value}`);
-            const countData = await countRes.json();
-            const studentCount = countData.students ? countData.students.length : 0;
-
+            // Lobby TILE - Now uses the 'count' sent from the server
             grid.innerHTML += `
-                <div onclick="selectBatch('${b.name}')" class="card-gradient p-5 rounded-[2.5rem] flex flex-col justify-between tile-aspect active:scale-95 transition-all border border-white/5">
+                <div onclick="selectBatch('${b.name}')" class="card-gradient p-5 rounded-[2.5rem] flex flex-col justify-between tile-aspect active:scale-95 transition-all border border-white/5 shadow-xl">
                     <div class="bg-mint/10 w-10 h-10 rounded-2xl flex items-center justify-center">
                         <svg class="w-5 h-5 text-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
@@ -101,11 +100,11 @@
                     </div>
                     <div>
                         <h3 class="text-[14px] font-800 text-white leading-tight">${b.name}</h3>
-                        <p class="text-[9px] text-gray-500 font-bold uppercase tracking-widest mt-1">${studentCount} Students</p>
+                        <p class="text-[9px] text-gray-500 font-bold uppercase tracking-widest mt-1">${b.count} Students</p>
                         <p class="text-[8px] text-mint font-black uppercase tracking-[0.2em] mt-3">Open Hub</p>
                     </div>
                 </div>`;
-        }
+        });
     };
 
     function selectBatch(name) {
