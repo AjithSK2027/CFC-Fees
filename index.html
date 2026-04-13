@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>CFC Fees | Command V4.0 Pro</title>
+    <title>CFC Fees | Command V4.2 Pro</title>
 
     <link rel="apple-touch-icon" href="https://i.ibb.co/3nTMhbz/1000287652-0b4cd8d123cf04f03fc322309c337390-11-18-2025-1-04-51-PM.png">
     <link rel="icon" type="image/png" href="https://i.ibb.co/3nTMhbz/1000287652-0b4cd8d123cf04f03fc322309c337390-11-18-2025-1-04-51-PM.png">
@@ -26,7 +26,8 @@
                         rose: '#F43F5E',
                         gold: '#EAB308',
                         amberx: '#F59E0B',
-                        dangerx: '#EF4444'
+                        dangerx: '#EF4444',
+                        skyx: '#0EA5E9'
                     }
                 }
             }
@@ -34,97 +35,143 @@
     </script>
     <style>
         :root {
-            --bg-body: #F9FAFB;
-            --bg-header: rgba(249, 250, 251, 0.85);
-            --bg-card: #FFFFFF;
+            --bg-body: #F6F8FB;
+            --bg-header: rgba(246, 248, 251, 0.82);
+            --bg-card: rgba(255, 255, 255, 0.88);
+            --bg-card-solid: #FFFFFF;
             --text-main: #111827;
             --text-gray: #6B7280;
-            --border: rgba(0, 0, 0, 0.08);
-            --card-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
-            --mint-soft: rgba(16, 185, 129, 0.08);
+            --border: rgba(17, 24, 39, 0.08);
+            --card-shadow: 0 18px 50px -24px rgba(17, 24, 39, 0.24);
+            --mint-soft: rgba(16, 185, 129, 0.10);
             --rose-soft: rgba(244, 63, 94, 0.08);
+            --blue-soft: rgba(14, 165, 233, 0.08);
         }
+
         @media (prefers-color-scheme: dark) {
             :root {
                 --bg-body: #050505;
-                --bg-header: rgba(5, 5, 5, 0.6);
-                --bg-card: linear-gradient(165deg, #1A1412 0%, #0F0A08 100%);
+                --bg-header: rgba(5, 5, 5, 0.68);
+                --bg-card: rgba(20, 20, 20, 0.88);
+                --bg-card-solid: #0F0A08;
                 --text-main: #E5E7EB;
                 --text-gray: #9CA3AF;
-                --border: rgba(255, 255, 255, 0.05);
-                --card-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
-                --mint-soft: rgba(16, 185, 129, 0.10);
-                --rose-soft: rgba(244, 63, 94, 0.10);
+                --border: rgba(255, 255, 255, 0.06);
+                --card-shadow: 0 24px 60px -22px rgba(0, 0, 0, 0.62);
+                --mint-soft: rgba(16, 185, 129, 0.12);
+                --rose-soft: rgba(244, 63, 94, 0.12);
+                --blue-soft: rgba(14, 165, 233, 0.12);
             }
         }
+
         body {
             background:
                 radial-gradient(circle at top left, rgba(16,185,129,0.08), transparent 24%),
-                radial-gradient(circle at top right, rgba(234,179,8,0.07), transparent 22%),
+                radial-gradient(circle at top right, rgba(234,179,8,0.06), transparent 22%),
+                radial-gradient(circle at bottom right, rgba(14,165,233,0.06), transparent 26%),
                 var(--bg-body);
             color: var(--text-main);
             -webkit-font-smoothing: antialiased;
-            transition: all 0.3s ease;
+            transition: background .3s ease, color .3s ease;
         }
+
         header {
             background-color: var(--bg-header);
-            padding-top: calc(env(safe-area-inset-top) + 1.2rem) !important;
+            padding-top: calc(env(safe-area-inset-top) + 1.1rem) !important;
             padding-bottom: 1rem;
+            backdrop-filter: blur(14px);
         }
-        #lobbyView, #commandView { margin-top: 1.5rem; }
+
+        #lobbyView, #commandView { margin-top: 1.4rem; }
+
         .card-gradient {
             background: var(--bg-card);
             border: 1px solid var(--border);
             box-shadow: var(--card-shadow);
+            backdrop-filter: blur(14px);
         }
+
         .input-dark {
-            background-color: var(--bg-card);
+            background-color: var(--bg-card-solid);
             border: 1px solid var(--border);
             color: var(--text-main);
-            border-radius: 12px;
+            border-radius: 14px;
         }
+
         .hidden-view { display: none !important; }
+
         #qrModal {
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.9);
+            background: rgba(0,0,0,0.88);
             z-index: 100;
             align-items: center;
             justify-content: center;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(12px);
         }
-        #batchGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+
+        #batchGrid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
         .tile-aspect { aspect-ratio: 1 / 1; }
+
         .search-shell {
-            background: var(--mint-soft);
+            background: linear-gradient(180deg, var(--mint-soft), rgba(255,255,255,0.02));
             border: 1px solid var(--border);
         }
+
         .filter-chip {
             border: 1px solid rgba(0,0,0,0.08);
             background: rgba(0,0,0,0.04);
             color: var(--text-gray);
+            transition: all .18s ease;
         }
+
         .filter-chip.active {
             background: #10B981;
             color: white;
             border-color: transparent;
+            box-shadow: 0 8px 22px -12px rgba(16,185,129,0.8);
         }
+
         @media (prefers-color-scheme: dark) {
             .filter-chip {
                 border-color: rgba(255,255,255,0.08);
                 background: rgba(255,255,255,0.05);
             }
         }
+
         .student-card {
-            transition: transform .18s ease, opacity .18s ease;
+            transition: transform .18s ease, opacity .18s ease, box-shadow .18s ease;
         }
+
         .student-card:hover {
-            transform: translateY(-1px);
+            transform: translateY(-2px);
         }
+
         .home-result-card {
-            background: var(--bg-card);
+            background: var(--bg-card-solid);
             border: 1px solid var(--border);
+        }
+
+        .home-result-card:hover {
+            border-color: rgba(16,185,129,0.25);
+        }
+
+        .soft-panel {
+            background: rgba(0,0,0,0.03);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .soft-panel {
+                background: rgba(255,255,255,0.04);
+                border-color: rgba(255,255,255,0.06);
+            }
         }
     </style>
 </head>
@@ -139,7 +186,7 @@
         </div>
     </div>
 
-    <header class="px-6 flex justify-between items-center sticky top-0 backdrop-blur-md z-40">
+    <header class="px-6 flex justify-between items-center sticky top-0 z-40">
         <div onclick="goHome()" class="cursor-pointer">
             <h1 class="text-xl font-black text-current uppercase leading-none">CFC <span class="text-mint">Fees</span></h1>
             <p class="text-gray-500 text-[10px] font-bold tracking-widest uppercase mt-1">Command Center</p>
@@ -175,7 +222,7 @@
     </div>
 
     <div id="commandView" class="hidden-view px-6 space-y-6">
-        <div class="card-gradient rounded-[2rem] p-6 grid grid-cols-3 gap-2 text-center">
+        <div class="card-gradient rounded-[2rem] p-6 grid grid-cols-3 gap-3 text-center">
             <div>
                 <p class="text-[8px] font-bold text-gray-500 uppercase">Target</p>
                 <p id="dashTarget" class="text-sm font-black text-current">₹0</p>
@@ -221,7 +268,9 @@
     </div>
 
     <div id="syncContainer" class="fixed bottom-0 left-0 right-0 p-6 bg-white/80 dark:bg-pitch/80 backdrop-blur-lg border-t border-black/5 dark:border-white/5 hidden-view z-50">
-        <button onclick="submitFees()" id="syncBtn" class="w-full bg-mint text-white dark:text-pitch font-black rounded-2xl py-5 text-[11px] uppercase tracking-widest shadow-lg shadow-mint/20 active:scale-95 transition-all">Synchronize Clean Ledger</button>
+        <button onclick="submitFees()" id="syncBtn" class="w-full bg-mint text-white dark:text-pitch font-black rounded-2xl py-5 text-[11px] uppercase tracking-widest shadow-lg shadow-mint/20 active:scale-95 transition-all">
+            Synchronize Clean Ledger
+        </button>
     </div>
 
     <script>
@@ -370,9 +419,9 @@
     function getReminderButtonClass(remindCount) {
         const count = Number(remindCount || 0);
         if (count <= 0) return "bg-black/5 dark:bg-white/5 text-gray-500 border-black/10 dark:border-white/10";
-        if (count === 1) return "bg-yellow-400/20 text-yellow-600 dark:text-yellow-300 border-yellow-400/30";
-        if (count === 2) return "bg-orange-400/20 text-orange-600 dark:text-orange-300 border-orange-400/30";
-        return "bg-red-500/20 text-red-600 dark:text-red-300 border-red-500/30";
+        if (count === 1) return "bg-yellow-400/20 text-yellow-700 dark:text-yellow-300 border-yellow-400/30";
+        if (count === 2) return "bg-orange-400/20 text-orange-700 dark:text-orange-300 border-orange-400/30";
+        return "bg-red-500/20 text-red-700 dark:text-red-300 border-red-500/30";
     }
 
     function billingMonthFromDate(dateStr) {
@@ -384,6 +433,22 @@
         const [y, m] = monthStr.split('-');
         const date = new Date(Number(y), Number(m) - 1, 1);
         return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+    }
+
+    function subtractMonthsFromBillingMonth(baseMonth, offset) {
+        const [year, month] = String(baseMonth).split('-').map(Number);
+        const date = new Date(year, (month - 1) - offset, 1);
+        return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+    }
+
+    function formatCoveredMonthsLabel(endMonth, monthsCovered) {
+        const count = Math.max(1, Number(monthsCovered || 1));
+        const startMonth = subtractMonthsFromBillingMonth(endMonth, count - 1);
+
+        const startLabel = formatBillingMonthLabel(startMonth);
+        const endLabel = formatBillingMonthLabel(endMonth);
+
+        return count === 1 ? endLabel : `${startLabel} to ${endLabel}`;
     }
 
     function syncMonths(i) {
@@ -404,15 +469,18 @@
             const btnColor = getReminderButtonClass(s.remindCount);
             const currentPaidDisplay = Number(s.paidSoFar) + currentMonthApplied;
             const monthsSelected = Number(s.manualMonths || 1);
+            const coverageLabel = formatCoveredMonthsLabel(selectedBillingMonth, monthsSelected);
+            const previousMonthsIncluded = Math.max(0, monthsSelected - 1);
 
             let content = s.tempPaid || Number(s.balance) <= 0 ? `
                 <div class="bg-mint/10 border border-mint/20 rounded-2xl p-4 space-y-3">
                     <div class="flex items-center justify-between gap-3">
                         <p class="text-[9px] font-black text-mint uppercase tracking-widest">
-                            ₹${draftedAmount || currentPaidDisplay} Recorded
+                            ₹${draftedAmount || currentPaidDisplay} Drafted
                         </p>
                         <button onclick="sendWA(${i}, 'receipt')" class="bg-mint text-white dark:text-pitch px-4 py-2 rounded-lg text-[10px] font-black uppercase">Receipt</button>
                     </div>
+
                     <div class="grid grid-cols-3 gap-2 pt-2 border-t border-mint/10 text-center">
                         <div>
                             <p class="text-[7px] font-bold text-gray-500 uppercase">Target</p>
@@ -427,8 +495,12 @@
                             <p class="text-[9px] font-bold ${currentBalance <= 0 ? 'text-mint' : 'text-rose'}">₹${currentBalance}</p>
                         </div>
                     </div>
-                    <div class="text-[9px] font-bold uppercase tracking-widest text-gray-500">
-                        Billing End: ${formatBillingMonthLabel(selectedBillingMonth)}${s.manualMonths ? ` • ${s.manualMonths} month(s)` : ''}
+
+                    <div class="soft-panel rounded-2xl p-3 space-y-1">
+                        <p class="text-[9px] font-bold uppercase tracking-widest text-gray-500">Covered Billing Period: ${coverageLabel}</p>
+                        <p class="text-[9px] font-bold uppercase tracking-widest text-gray-500">Months Count: ${monthsSelected}</p>
+                        <p class="text-[9px] font-bold uppercase tracking-widest text-gray-500">Immediate Previous Months Included: ${previousMonthsIncluded}</p>
+                        <p class="text-[9px] font-bold uppercase tracking-widest ${currentBalance <= 0 ? 'text-mint' : 'text-rose'}">Current Month Status: ${currentBalance <= 0 ? 'Paid' : 'Partial'}</p>
                     </div>
                 </div>` : `
                 <div class="grid grid-cols-2 gap-4 py-3 border-y border-black/5 dark:border-white/5 text-center">
@@ -441,13 +513,14 @@
                         <p id="pend-${i}" class="text-lg font-black text-rose">₹${s.balance}</p>
                     </div>
                 </div>
+
                 <div class="grid grid-cols-3 gap-3">
                     <select id="type-${i}" class="bg-black/5 dark:bg-bean text-[10px] p-3 font-bold rounded-xl border border-black/5 dark:border-white/5 outline-none">
                         <option>UPI</option>
                         <option>CASH</option>
                     </select>
                     <input id="pst-${i}" type="text" placeholder="Paid To" class="bg-black/5 dark:bg-bean text-[10px] p-3 w-full font-bold rounded-xl border border-black/5 dark:border-white/5 outline-none">
-                    <select id="months-${i}" onchange="syncMonths(${i})" class="bg-black/5 dark:bg-bean text-[10px] p-3 font-bold rounded-xl border border-black/5 dark:border-white/5 outline-none">
+                    <select id="months-${i}" onchange="syncMonths(${i}); render();" class="bg-black/5 dark:bg-bean text-[10px] p-3 font-bold rounded-xl border border-black/5 dark:border-white/5 outline-none">
                         <option value="1" ${monthsSelected === 1 ? 'selected' : ''}>1 Month</option>
                         <option value="2" ${monthsSelected === 2 ? 'selected' : ''}>2 Months</option>
                         <option value="3" ${monthsSelected === 3 ? 'selected' : ''}>3 Months</option>
@@ -456,9 +529,13 @@
                         <option value="6" ${monthsSelected === 6 ? 'selected' : ''}>6 Months</option>
                     </select>
                 </div>
-                <div class="text-[9px] font-bold uppercase tracking-widest text-gray-500">
-                    Billing End: ${formatBillingMonthLabel(selectedBillingMonth)}
+
+                <div class="soft-panel rounded-2xl p-3 space-y-1">
+                    <p class="text-[9px] font-bold uppercase tracking-widest text-gray-500">Covered Billing Period: ${coverageLabel}</p>
+                    <p class="text-[9px] font-bold uppercase tracking-widest text-gray-500">Covered Through: ${formatBillingMonthLabel(selectedBillingMonth)}</p>
+                    <p class="text-[9px] font-bold uppercase tracking-widest text-gray-500">Immediate Previous Months Included: ${previousMonthsIncluded}</p>
                 </div>
+
                 <div class="flex gap-2">
                     <button onclick="showQR(${i})" class="bg-black/5 dark:bg-white/5 text-current px-4 rounded-xl border border-black/10 dark:border-white/10 text-[10px] font-bold">QR</button>
                     <button onclick="sendWA(${i}, 'receipt')" class="flex-1 bg-mint text-white dark:text-pitch rounded-xl py-4 text-[10px] font-black uppercase">Settle</button>
@@ -532,7 +609,7 @@
         const selectedDate = document.getElementById('feeDate').value;
         const billingMonth = billingMonthFromDate(selectedDate);
         const displayDate = new Date(selectedDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-        const billingLabel = formatBillingMonthLabel(billingMonth);
+        const billingLabel = formatCoveredMonthsLabel(billingMonth, monthsCovered);
         let ph = String(s.contact || '').replace(/\D/g, '');
         if (!ph.startsWith('91')) ph = '91' + ph;
         const payLink = "upi.pe/8867742269@ptaxis";
@@ -543,7 +620,7 @@
             s.newRemindSent = true;
 
             let msg = count === 1
-                ? `Dear Sir/Madam,\n\nGreetings from *Coffeeland FC*! ⚽\n\nWe are happy to share that *${s.name}* is active and progressing well in our *${s.batch}* batch. To ensure their training momentum continues, kindly settle the pending fees.\n\n*Due:* ₹${s.balance}\n*Billing Month:* ${billingLabel}\n*Date:* ${displayDate}\n*Pay Link:* ${payLink}\n\nYour support helps us provide the best coaching for our young athletes. Thank you!\n\n*Team Coffeeland FC*`
+                ? `Dear Sir/Madam,\n\nGreetings from *Coffeeland FC*! ⚽\n\nWe are happy to share that *${s.name}* is active and progressing well in our *${s.batch}* batch. To ensure their training momentum continues, kindly settle the pending fees.\n\n*Due:* ₹${s.balance}\n*Covered Billing Period:* ${billingLabel}\n*Date:* ${displayDate}\n*Pay Link:* ${payLink}\n\nYour support helps us provide the best coaching for our young athletes. Thank you!\n\n*Team Coffeeland FC*`
                 : count === 2
                 ? `Dear Sir/Madam,\n\nHope you are doing well! We love having *${s.name}* on the pitch as they continue their athletic journey in the *${s.batch}* batch. 📈\n\nThis is a gentle follow-up regarding the outstanding fees of *₹${s.balance}* for *${billingLabel}*. We would appreciate it if you could settle this via the link below:\n\n*Pay Link:* ${payLink}\n\nThank you for your cooperation!\n\n*Team Coffeeland FC*`
                 : `Dear Sir/Madam,\n\nGreetings from the Management at *Coffeeland FC*. ⚽\n\nRegarding *${s.name}* and their participation in the *${s.batch}* batch, we are reaching out to coordinate the pending fee settlement of *₹${s.balance}* for *${billingLabel}*.\n\nKindly use the link below to help us update our records:\n\n*Quick Pay:* ${payLink}\n\nThank you for your immediate attention to this.\n\n*Team Coffeeland FC*`;
@@ -573,7 +650,7 @@
 
         const remainingCurrentMonth = Math.max(0, Number(s.balance) - Math.min(Number(s.balance), settleAmt));
 
-        let msg = `Dear Sir/Madam,\n\n*CFC PAYMENT RECEIPT* ✅\n\nReceived *₹${settleAmt}* for *${s.name}* (${s.batch} batch) on *${displayDate}*.\n\n*Billing Start:* ${billingLabel}\n*Months Covered:* ${monthsCovered}`;
+        let msg = `Dear Sir/Madam,\n\n*CFC PAYMENT RECEIPT* ✅\n\nReceived *₹${settleAmt}* for *${s.name}* (${s.batch} batch) on *${displayDate}*.\n\n*Covered Billing Period:* ${billingLabel}\n*Months Count:* ${monthsCovered}`;
 
         msg += remainingCurrentMonth > 0
             ? `\n\n*Current Month Balance:* ₹${remainingCurrentMonth}\n_Kindly settle the balance at your earliest convenience._`
