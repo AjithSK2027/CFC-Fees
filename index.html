@@ -428,7 +428,7 @@
                         </div>
                     </div>
                     <div class="text-[9px] font-bold uppercase tracking-widest text-gray-500">
-                        Billing Start: ${formatBillingMonthLabel(selectedBillingMonth)}${s.manualMonths ? ` • ${s.manualMonths} month(s)` : ''}
+                        Billing End: ${formatBillingMonthLabel(selectedBillingMonth)}${s.manualMonths ? ` • ${s.manualMonths} month(s)` : ''}
                     </div>
                 </div>` : `
                 <div class="grid grid-cols-2 gap-4 py-3 border-y border-black/5 dark:border-white/5 text-center">
@@ -457,7 +457,7 @@
                     </select>
                 </div>
                 <div class="text-[9px] font-bold uppercase tracking-widest text-gray-500">
-                    Billing Start: ${formatBillingMonthLabel(selectedBillingMonth)}
+                    Billing End: ${formatBillingMonthLabel(selectedBillingMonth)}
                 </div>
                 <div class="flex gap-2">
                     <button onclick="showQR(${i})" class="bg-black/5 dark:bg-white/5 text-current px-4 rounded-xl border border-black/10 dark:border-white/10 text-[10px] font-bold">QR</button>
