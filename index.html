@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>CFC Fees | Command V4.2 Pro</title>
+    <title>CFC Fees | Command V5.7 Pro</title>
 
     <link rel="apple-touch-icon" href="https://i.ibb.co/3nTMhbz/1000287652-0b4cd8d123cf04f03fc322309c337390-11-18-2025-1-04-51-PM.png">
     <link rel="icon" type="image/png" href="https://i.ibb.co/3nTMhbz/1000287652-0b4cd8d123cf04f03fc322309c337390-11-18-2025-1-04-51-PM.png">
@@ -19,15 +19,8 @@
                 extend: {
                     fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'] },
                     colors: {
-                        pitch: '#050505',
-                        espresso: '#0F0A08',
-                        bean: '#1A1412',
-                        mint: '#10B981',
-                        rose: '#F43F5E',
-                        gold: '#EAB308',
-                        amberx: '#F59E0B',
-                        dangerx: '#EF4444',
-                        skyx: '#0EA5E9'
+                        pitch: '#050505', espresso: '#0F0A08', bean: '#1A1412',
+                        mint: '#10B981', rose: '#F43F5E', gold: '#EAB308'
                     }
                 }
             }
@@ -35,223 +28,81 @@
     </script>
     <style>
         :root {
-            --bg-body: #F6F8FB;
-            --bg-header: rgba(246, 248, 251, 0.82);
-            --bg-card: rgba(255, 255, 255, 0.88);
-            --bg-card-solid: #FFFFFF;
-            --text-main: #111827;
-            --text-gray: #6B7280;
-            --border: rgba(17, 24, 39, 0.08);
+            --bg-body: #F6F8FB; --bg-header: rgba(246, 248, 251, 0.82);
+            --bg-card: rgba(255, 255, 255, 0.88); --bg-card-solid: #FFFFFF;
+            --text-main: #111827; --border: rgba(17, 24, 39, 0.08);
             --card-shadow: 0 18px 50px -24px rgba(17, 24, 39, 0.24);
             --mint-soft: rgba(16, 185, 129, 0.10);
-            --rose-soft: rgba(244, 63, 94, 0.08);
-            --blue-soft: rgba(14, 165, 233, 0.08);
         }
-
         @media (prefers-color-scheme: dark) {
             :root {
-                --bg-body: #050505;
-                --bg-header: rgba(5, 5, 5, 0.68);
-                --bg-card: rgba(20, 20, 20, 0.88);
-                --bg-card-solid: #0F0A08;
-                --text-main: #E5E7EB;
-                --text-gray: #9CA3AF;
-                --border: rgba(255, 255, 255, 0.06);
-                --card-shadow: 0 24px 60px -22px rgba(0, 0, 0, 0.62);
-                --mint-soft: rgba(16, 185, 129, 0.12);
-                --rose-soft: rgba(244, 63, 94, 0.12);
-                --blue-soft: rgba(14, 165, 233, 0.12);
+                --bg-body: #050505; --bg-header: rgba(5, 5, 5, 0.68);
+                --bg-card: rgba(20, 20, 20, 0.88); --bg-card-solid: #0F0A08;
+                --text-main: #E5E7EB; --border: rgba(255, 255, 255, 0.06);
             }
         }
-
-        body {
-            background:
-                radial-gradient(circle at top left, rgba(16,185,129,0.08), transparent 24%),
-                radial-gradient(circle at top right, rgba(234,179,8,0.06), transparent 22%),
-                radial-gradient(circle at bottom right, rgba(14,165,233,0.06), transparent 26%),
-                var(--bg-body);
-            color: var(--text-main);
-            -webkit-font-smoothing: antialiased;
-            transition: background .3s ease, color .3s ease;
-        }
-
-        header {
-            background-color: var(--bg-header);
-            padding-top: calc(env(safe-area-inset-top) + 1.1rem) !important;
-            padding-bottom: 1rem;
-            backdrop-filter: blur(14px);
-        }
-
-        #lobbyView, #commandView { margin-top: 1.4rem; }
-
-        .card-gradient {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            box-shadow: var(--card-shadow);
-            backdrop-filter: blur(14px);
-        }
-
-        .input-dark {
-            background-color: var(--bg-card-solid);
-            border: 1px solid var(--border);
-            color: var(--text-main);
-            border-radius: 14px;
-        }
-
+        body { background: var(--bg-body); color: var(--text-main); font-family: 'Plus Jakarta Sans', sans-serif; -webkit-font-smoothing: antialiased; }
+        header { background-color: var(--bg-header); padding-top: calc(env(safe-area-inset-top) + 1.1rem) !important; padding-bottom: 1rem; backdrop-filter: blur(14px); }
+        .card-gradient { background: var(--bg-card); border: 1px solid var(--border); box-shadow: var(--card-shadow); backdrop-filter: blur(14px); border-radius: 2rem; }
         .hidden-view { display: none !important; }
-
-        #qrModal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.88);
-            z-index: 100;
-            align-items: center;
-            justify-content: center;
-            backdrop-filter: blur(12px);
-        }
-
-        #batchGrid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-        }
-
-        .tile-aspect { aspect-ratio: 1 / 1; }
-
-        .search-shell {
-            background: linear-gradient(180deg, var(--mint-soft), rgba(255,255,255,0.02));
-            border: 1px solid var(--border);
-        }
-
-        .filter-chip {
-            border: 1px solid rgba(0,0,0,0.08);
-            background: rgba(0,0,0,0.04);
-            color: var(--text-gray);
-            transition: all .18s ease;
-        }
-
-        .filter-chip.active {
-            background: #10B981;
-            color: white;
-            border-color: transparent;
-            box-shadow: 0 8px 22px -12px rgba(16,185,129,0.8);
-        }
-
-        @media (prefers-color-scheme: dark) {
-            .filter-chip {
-                border-color: rgba(255,255,255,0.08);
-                background: rgba(255,255,255,0.05);
-            }
-        }
-
-        .student-card {
-            transition: transform .18s ease, opacity .18s ease, box-shadow .18s ease;
-        }
-
-        .student-card:hover {
-            transform: translateY(-2px);
-        }
-
-        .home-result-card {
-            background: var(--bg-card-solid);
-            border: 1px solid var(--border);
-        }
-
-        .home-result-card:hover {
-            border-color: rgba(16,185,129,0.25);
-        }
-
-        .soft-panel {
-            background: rgba(0,0,0,0.03);
-            border: 1px solid rgba(0,0,0,0.05);
-        }
-
-        @media (prefers-color-scheme: dark) {
-            .soft-panel {
-                background: rgba(255,255,255,0.04);
-                border-color: rgba(255,255,255,0.06);
-            }
-        }
+        #qrModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(12px); }
+        .filter-chip { border: 1px solid var(--border); background: rgba(0,0,0,0.04); color: #6B7280; transition: all 0.2s; cursor: pointer; }
+        .filter-chip.active { background: #10B981; color: white; border-color: transparent; }
+        .month-chip { cursor: pointer; transition: all 0.2s; border: 1px solid var(--border); }
+        .month-chip.selected { background: #10B981; color: white; border-color: transparent; }
+        .search-shell { background: linear-gradient(180deg, var(--mint-soft), rgba(255,255,255,0.02)); border: 1px solid var(--border); }
     </style>
 </head>
 <body class="min-h-screen pb-40">
 
-    <div id="qrModal" onclick="closeQR()">
+    <div id="qrModal" onclick="this.style.display='none'">
         <div class="card-gradient p-8 rounded-[2.5rem] text-center space-y-6 max-w-xs w-full">
             <h3 class="text-mint font-black uppercase text-[10px] tracking-widest">Scan to Pay</h3>
             <img src="https://i.ibb.co/f5dYVM1/Whats-App-Image-2026-04-08-at-12-56-51-PM.jpg" class="w-48 mx-auto rounded-3xl border-4 border-white shadow-2xl">
             <p class="font-black text-3xl text-current" id="qrPriceDisplay">₹0</p>
-            <button onclick="closeQR()" class="w-full py-4 rounded-2xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-current font-bold text-xs uppercase">Close</button>
         </div>
     </div>
 
     <header class="px-6 flex justify-between items-center sticky top-0 z-40">
-        <div onclick="goHome()" class="cursor-pointer">
-            <h1 class="text-xl font-black text-current uppercase leading-none">CFC <span class="text-mint">Fees</span></h1>
+        <div onclick="location.reload()" class="cursor-pointer">
+            <h1 class="text-xl font-black uppercase leading-none">CFC <span class="text-mint">Fees</span></h1>
             <p class="text-gray-500 text-[10px] font-bold tracking-widest uppercase mt-1">Command Center</p>
         </div>
         <img src="https://i.ibb.co/3nTMhbz/1000287652-0b4cd8d123cf04f03fc322309c337390-11-18-2025-1-04-51-PM.png" class="h-10 w-10">
     </header>
 
-    <div id="lobbyView" class="px-6 transition-all duration-300 space-y-5">
-        <h2 class="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] text-center">Select Hub</h2>
-
+    <div id="lobbyView" class="px-6 transition-all duration-300 space-y-5 mt-6">
         <div class="space-y-3">
-            <select id="homeBatchSelect" onchange="selectBatch(this.value)" class="input-dark p-4 text-xs font-bold outline-none w-full shadow-lg">
+            <select id="homeBatchSelect" onchange="selectBatch(this.value)" class="input-dark p-4 text-xs font-bold w-full rounded-xl outline-none border-black/10 shadow-lg">
                 <option value="">Quick Jump...</option>
             </select>
-
             <div class="search-shell rounded-[1.4rem] p-3">
                 <div class="flex items-center gap-3">
                     <div class="text-lg">🔎</div>
-                    <input
-                        id="homePlayerSearch"
-                        type="text"
-                        placeholder="Search player from any batch..."
-                        oninput="searchHomePlayers()"
-                        class="bg-transparent w-full outline-none text-sm font-bold text-current placeholder:text-gray-400"
-                    >
+                    <input id="homePlayerSearch" type="text" placeholder="Search player from any batch..." oninput="searchHomePlayers()" class="bg-transparent w-full outline-none text-sm font-bold placeholder:text-gray-400">
                 </div>
             </div>
-
             <div id="homeSearchResults" class="space-y-2"></div>
         </div>
-
-        <div id="batchGrid"></div>
+        <div id="batchGrid" class="grid grid-cols-2 gap-4"></div>
     </div>
 
-    <div id="commandView" class="hidden-view px-6 space-y-6">
-        <div class="card-gradient rounded-[2rem] p-6 grid grid-cols-3 gap-3 text-center">
-            <div>
-                <p class="text-[8px] font-bold text-gray-500 uppercase">Target</p>
-                <p id="dashTarget" class="text-sm font-black text-current">₹0</p>
-            </div>
-            <div class="border-x border-black/5 dark:border-white/5">
-                <p class="text-[8px] font-bold text-gray-500 uppercase">Received</p>
-                <p id="dashPaid" class="text-sm font-black text-mint">₹0</p>
-            </div>
-            <div>
-                <p class="text-[8px] font-bold text-gray-500 uppercase">Pending</p>
-                <p id="dashPending" class="text-sm font-black text-rose">₹0</p>
-            </div>
+    <div id="commandView" class="hidden-view px-6 space-y-6 mt-6">
+        <div class="card-gradient p-6 grid grid-cols-3 gap-3 text-center">
+            <div><p class="text-[8px] font-bold text-gray-500 uppercase">Target</p><p id="dashTarget" class="text-sm font-black">₹0</p></div>
+            <div class="border-x border-black/5 dark:border-white/5"><p class="text-[8px] font-bold text-gray-500 uppercase">Received</p><p id="dashPaid" class="text-sm font-black text-mint">₹0</p></div>
+            <div><p class="text-[8px] font-bold text-gray-500 uppercase">Pending</p><p id="dashPending" class="text-sm font-black text-rose">₹0</p></div>
         </div>
 
         <div class="flex gap-3">
-            <select id="batchSelect" onchange="loadStudents()" class="input-dark p-4 text-xs font-bold outline-none flex-1"></select>
-            <input type="date" id="feeDate" onchange="loadStudents()" class="input-dark p-4 text-xs font-bold outline-none w-1/3">
+            <select id="batchSelect" onchange="loadStudents()" class="input-dark p-4 text-xs font-bold rounded-xl flex-1 outline-none border-black/10"></select>
+            <input type="date" id="feeDate" onchange="loadStudents()" class="input-dark p-4 text-xs font-bold rounded-xl w-1/3 outline-none border-black/10">
         </div>
 
         <div class="search-shell rounded-[1.4rem] p-3">
             <div class="flex items-center gap-3">
                 <div class="text-lg">🔎</div>
-                <input
-                    id="studentSearch"
-                    type="text"
-                    placeholder="Search player by name or contact..."
-                    oninput="applyStudentFilters()"
-                    class="bg-transparent w-full outline-none text-sm font-bold text-current placeholder:text-gray-400"
-                >
+                <input id="studentSearch" type="text" placeholder="Search in batch..." oninput="applyFilters()" class="bg-transparent w-full outline-none text-sm font-bold">
             </div>
         </div>
 
@@ -264,480 +115,250 @@
             <p id="searchMeta" class="text-[10px] font-bold text-mint whitespace-nowrap">0 shown</p>
         </div>
 
-        <main id="roster" class="space-y-4"></main>
-    </div>
-
-    <div id="syncContainer" class="fixed bottom-0 left-0 right-0 p-6 bg-white/80 dark:bg-pitch/80 backdrop-blur-lg border-t border-black/5 dark:border-white/5 hidden-view z-50">
-        <button onclick="submitFees()" id="syncBtn" class="w-full bg-mint text-white dark:text-pitch font-black rounded-2xl py-5 text-[11px] uppercase tracking-widest shadow-lg shadow-mint/20 active:scale-95 transition-all">
-            Synchronize Clean Ledger
-        </button>
+        <main id="roster" class="space-y-4 pb-20"></main>
     </div>
 
     <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyDjO_-iV-fTnnkaL4HoYroe3jDJF8bkJf2GZ9CufZbj90BzxUcwV-JwvVkaPeQgFLZ5A/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyy-8Tb03kaD-_dTPXeaGZ_vpF63fNAOZZPRN3SHFxGnma5PgLOa5pD3jNolQj2e8Cg6g/exec";
     let students = [];
     let currentStatusFilter = 'all';
     let homeSearchTimer = null;
-    let pendingRosterSearch = '';
 
     window.onload = async () => {
         document.getElementById('feeDate').value = new Date().toISOString().split('T')[0];
         try {
             const r = await fetch(`${SCRIPT_URL}?action=getBatches`);
             const d = await r.json();
-            const s = document.getElementById('batchSelect');
-            const hs = document.getElementById('homeBatchSelect');
             const grid = document.getElementById('batchGrid');
-
-            s.innerHTML = '<option value="">Switch Batch</option>';
-            hs.innerHTML = '<option value="">Quick Jump...</option>';
-            grid.innerHTML = '';
-
+            const hSelect = document.getElementById('homeBatchSelect');
+            const bSelect = document.getElementById('batchSelect');
             d.batches?.forEach(b => {
-                const name = String(b.name || '').trim();
-                const opt = `<option value="${escapeHtmlAttr(name)}">${escapeHtmlText(name)}</option>`;
-                s.innerHTML += opt;
-                hs.innerHTML += opt;
-                grid.innerHTML += `
-                    <button onclick='selectBatch(${JSON.stringify(name)})'
-                            class="card-gradient p-5 rounded-[2.5rem] flex flex-col justify-between tile-aspect active:scale-95 transition-all text-left">
-                        <div class="bg-mint/10 w-10 h-10 rounded-2xl flex items-center justify-center text-mint text-lg">⚽</div>
-                        <div>
-                            <h3 class="text-[13px] font-extrabold text-current leading-tight mb-1">${escapeHtmlText(name)}</h3>
-                            <p class="text-[8px] text-mint font-black uppercase tracking-widest">Enter Hub</p>
-                        </div>
-                    </button>`;
+                const opt = `<option value="${b.name}">${b.name}</option>`;
+                hSelect.innerHTML += opt; bSelect.innerHTML += opt;
+                grid.innerHTML += `<button onclick="selectBatch('${b.name}')" class="card-gradient p-5 flex flex-col justify-between aspect-square text-left active:scale-95 transition-all"><div class="text-xl">⚽</div><div><h3 class="text-[13px] font-extrabold uppercase">${b.name}</h3><p class="text-[8px] text-mint font-black uppercase tracking-widest">Enter Hub</p></div></button>`;
             });
-        } catch (e) {
-            alert("Unable to load hubs");
-        }
+        } catch (e) { alert("Unable to load hubs"); }
     };
 
-    function selectBatch(n) {
-        if (!n) return;
-        document.getElementById('batchSelect').value = n;
-        loadStudents();
-    }
+    function selectBatch(n) { document.getElementById('batchSelect').value = n; loadStudents(); }
 
-    function jumpToStudent(batchName, playerName) {
-        pendingRosterSearch = playerName || '';
-        selectBatch(batchName);
-    }
-
-    function goHome() {
-        document.getElementById('lobbyView').classList.remove('hidden-view');
-        document.getElementById('commandView').classList.add('hidden-view');
-        document.getElementById('syncContainer').classList.add('hidden-view');
-    }
-
-    function searchHomePlayers() {
+    async function searchHomePlayers() {
         clearTimeout(homeSearchTimer);
-        homeSearchTimer = setTimeout(runHomePlayerSearch, 220);
-    }
-
-    async function runHomePlayerSearch() {
-        const query = (document.getElementById('homePlayerSearch').value || '').trim();
-        const container = document.getElementById('homeSearchResults');
-
-        if (query.length < 2) {
-            container.innerHTML = '';
-            return;
-        }
-
-        container.innerHTML = '<div class="text-[10px] font-bold text-mint px-1 uppercase tracking-widest">Searching players...</div>';
-
-        try {
+        homeSearchTimer = setTimeout(async () => {
+            const query = document.getElementById('homePlayerSearch').value.trim();
+            const container = document.getElementById('homeSearchResults');
+            if (query.length < 2) { container.innerHTML = ''; return; }
             const r = await fetch(`${SCRIPT_URL}?action=searchStudents&q=${encodeURIComponent(query)}`);
             const data = await r.json();
-            const results = data.students || [];
-
-            if (!results.length) {
-                container.innerHTML = '<div class="text-[10px] text-gray-500 font-bold px-1 uppercase tracking-widest">No players found</div>';
-                return;
-            }
-
-            container.innerHTML = results.map(s => `
-                <button onclick='jumpToStudent(${JSON.stringify(s.batch)}, ${JSON.stringify(s.name)})' class="home-result-card w-full rounded-2xl p-4 text-left">
-                    <div class="flex items-center justify-between gap-3">
-                        <div>
-                            <h3 class="text-sm font-extrabold text-current">${escapeHtmlText(s.name)}</h3>
-                            <p class="text-[10px] font-bold text-gray-500 uppercase">${escapeHtmlText(s.batch)}</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-[10px] font-bold text-mint uppercase">Open</p>
-                            <p class="text-[10px] font-bold text-gray-500">${escapeHtmlText(s.contact || '')}</p>
-                        </div>
-                    </div>
-                </button>
-            `).join('');
-        } catch (e) {
-            container.innerHTML = '<div class="text-[10px] text-rose-500 font-bold px-1 uppercase tracking-widest">Search failed</div>';
-        }
+            container.innerHTML = data.students.map(s => `
+                <button onclick="jumpToStudent('${s.batch}', '${s.name}')" class="bg-white dark:bg-zinc-900 w-full p-4 rounded-2xl text-left border border-black/5 shadow-sm">
+                    <h4 class="text-sm font-bold">${s.name}</h4><p class="text-[10px] text-gray-500">${s.batch}</p>
+                </button>`).join('');
+        }, 300);
     }
+
+    function jumpToStudent(b, n) { document.getElementById('homePlayerSearch').value = n; selectBatch(b); }
 
     async function loadStudents() {
         const b = document.getElementById('batchSelect').value;
-        const d = document.getElementById('feeDate').value;
         if (!b) return;
-
         document.getElementById('lobbyView').classList.add('hidden-view');
         document.getElementById('commandView').classList.remove('hidden-view');
-        document.getElementById('syncContainer').classList.remove('hidden-view');
-        document.getElementById('roster').innerHTML = '<div class="py-20 text-center text-mint font-bold animate-pulse text-[10px] uppercase">Refreshing Cloud Data...</div>';
-        document.getElementById('studentSearch').value = '';
-        setStatusFilter('all', true);
+        document.getElementById('roster').innerHTML = '<p class="py-20 text-center text-mint font-bold animate-pulse text-[10px] uppercase">Cloud Syncing...</p>';
+        const r = await fetch(`${SCRIPT_URL}?action=getStudents&batch=${encodeURIComponent(b)}`);
+        const data = await r.json();
+        students = data.students || [];
+        updateDashboard(); render();
+    }
 
-        try {
-            const r = await fetch(`${SCRIPT_URL}?action=getStudents&batch=${encodeURIComponent(b)}&date=${d}`);
-            const data = await r.json();
-            students = data.students || [];
-            updateDashboard();
-            render();
-
-            if (pendingRosterSearch) {
-                document.getElementById('studentSearch').value = pendingRosterSearch;
-                pendingRosterSearch = '';
-                applyStudentFilters();
-            }
-        } catch(e) {
-            alert("Error");
+    function generateMonthChips(i) {
+        const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        const curDate = new Date();
+        const curMonth = curDate.getMonth();
+        let html = '';
+        for (let j = 0; j <= 3; j++) {
+            let mIdx = curMonth - j; if (mIdx < 0) mIdx += 12;
+            html += `<div onclick="toggleMonth(${i}, ${j})" id="mchip-${i}-${j}" class="month-chip ${j === 0 ? 'selected' : ''} px-3 py-1.5 rounded-lg text-[9px] font-bold uppercase">${months[mIdx]}</div>`;
         }
+        return html;
     }
 
-    function updateDashboard() {
-        let t = 0, p = 0, b = 0;
-        students.forEach(s => {
-            t += Number(s.fees);
-            p += Number(s.paidSoFar);
-            b += Number(s.balance);
-        });
-        document.getElementById('dashTarget').innerText = `₹${t}`;
-        document.getElementById('dashPaid').innerText = `₹${p}`;
-        document.getElementById('dashPending').innerText = `₹${b}`;
-    }
+    function toggleMonth(i, j) { document.getElementById(`mchip-${i}-${j}`).classList.toggle('selected'); calcBalance(i); }
 
-    function getReminderButtonClass(remindCount) {
-        const count = Number(remindCount || 0);
-        if (count <= 0) return "bg-black/5 dark:bg-white/5 text-gray-500 border-black/10 dark:border-white/10";
-        if (count === 1) return "bg-yellow-400/20 text-yellow-700 dark:text-yellow-300 border-yellow-400/30";
-        if (count === 2) return "bg-orange-400/20 text-orange-700 dark:text-orange-300 border-orange-400/30";
-        return "bg-red-500/20 text-red-700 dark:text-red-300 border-red-500/30";
-    }
-
-    function billingMonthFromDate(dateStr) {
-        return String(dateStr || '').slice(0, 7);
-    }
-
-    function formatBillingMonthLabel(monthStr) {
-        if (!monthStr) return '--';
-        const [y, m] = monthStr.split('-');
-        const date = new Date(Number(y), Number(m) - 1, 1);
-        return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
-    }
-
-    function subtractMonthsFromBillingMonth(baseMonth, offset) {
-        const [year, month] = String(baseMonth).split('-').map(Number);
-        const date = new Date(year, (month - 1) - offset, 1);
-        return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-    }
-
-    function formatCoveredMonthsLabel(endMonth, monthsCovered) {
-        const count = Math.max(1, Number(monthsCovered || 1));
-        const startMonth = subtractMonthsFromBillingMonth(endMonth, count - 1);
-
-        const startLabel = formatBillingMonthLabel(startMonth);
-        const endLabel = formatBillingMonthLabel(endMonth);
-
-        return count === 1 ? endLabel : `${startLabel} to ${endLabel}`;
-    }
-
-    function syncMonths(i) {
-        students[i].manualMonths = Number(document.getElementById(`months-${i}`)?.value || 1);
+    function calcBalance(i) {
+        const s = students[i];
+        const months = document.querySelectorAll(`[id^="mchip-${i}-"].selected`).length;
+        const paidInput = parseFloat(document.getElementById(`paid-${i}`).value || 0);
+        const newPend = Math.max(0, (s.fees * months) - (s.paidSoFar + paidInput));
+        document.getElementById(`pend-${i}`).innerText = `₹${newPend}`;
     }
 
     function render() {
-        const container = document.getElementById('roster');
-        const selectedBillingMonth = billingMonthFromDate(document.getElementById('feeDate').value);
-        container.innerHTML = '';
+    const container = document.getElementById('roster');
+    container.innerHTML = '';
+    students.forEach((s, i) => {
+        const isPaid = s.tempPaid || s.balance <= 0;
+        const currentStatus = isPaid ? 'paid' : 'pending';
+        
+        // --- FIX: BUTTON COLOR LOGIC ---
+        const rCount = Number(s.remindCount || 0);
+        let btnColor = "bg-black/5 text-gray-500 border-black/10"; // Default
+        if (rCount === 1) btnColor = "bg-yellow-400/20 text-yellow-700 border-yellow-400/30";
+        if (rCount === 2) btnColor = "bg-orange-400/20 text-orange-700 border-orange-400/30";
+        if (rCount >= 3) btnColor = "bg-red-500/20 text-red-700 border-red-500/30";
 
-        students.forEach((s, i) => {
-            const draftedAmount = Number(s.manualAmt || 0);
-            const currentMonthApplied = s.tempPaid ? Math.min(Number(s.balance), draftedAmount) : 0;
-            const currentBalance = Math.max(0, Number(s.balance) - currentMonthApplied);
-            const isPaid = currentBalance <= 0;
-            const status = isPaid ? 'paid' : 'pending';
-            const btnColor = getReminderButtonClass(s.remindCount);
-            const currentPaidDisplay = Number(s.paidSoFar) + currentMonthApplied;
-            const monthsSelected = Number(s.manualMonths || 1);
-            const coverageLabel = formatCoveredMonthsLabel(selectedBillingMonth, monthsSelected);
-            const previousMonthsIncluded = Math.max(0, monthsSelected - 1);
-
-            let content = s.tempPaid || Number(s.balance) <= 0 ? `
-                <div class="bg-mint/10 border border-mint/20 rounded-2xl p-4 space-y-3">
-                    <div class="flex items-center justify-between gap-3">
-                        <p class="text-[9px] font-black text-mint uppercase tracking-widest">
-                            ₹${draftedAmount || currentPaidDisplay} Drafted
-                        </p>
-                        <button onclick="sendWA(${i}, 'receipt')" class="bg-mint text-white dark:text-pitch px-4 py-2 rounded-lg text-[10px] font-black uppercase">Receipt</button>
-                    </div>
-
-                    <div class="grid grid-cols-3 gap-2 pt-2 border-t border-mint/10 text-center">
-                        <div>
-                            <p class="text-[7px] font-bold text-gray-500 uppercase">Target</p>
-                            <p class="text-[9px] font-bold text-current">₹${s.fees}</p>
-                        </div>
-                        <div class="border-x border-mint/10">
-                            <p class="text-[7px] font-bold text-gray-500 uppercase">Paid</p>
-                            <p class="text-[9px] font-bold text-mint">₹${currentPaidDisplay}</p>
-                        </div>
-                        <div>
-                            <p class="text-[7px] font-bold text-gray-500 uppercase">Balance</p>
-                            <p class="text-[9px] font-bold ${currentBalance <= 0 ? 'text-mint' : 'text-rose'}">₹${currentBalance}</p>
-                        </div>
-                    </div>
-
-                    <div class="soft-panel rounded-2xl p-3 space-y-1">
-                        <p class="text-[9px] font-bold uppercase tracking-widest text-gray-500">Covered Billing Period: ${coverageLabel}</p>
-                        <p class="text-[9px] font-bold uppercase tracking-widest text-gray-500">Months Count: ${monthsSelected}</p>
-                        <p class="text-[9px] font-bold uppercase tracking-widest text-gray-500">Immediate Previous Months Included: ${previousMonthsIncluded}</p>
-                        <p class="text-[9px] font-bold uppercase tracking-widest ${currentBalance <= 0 ? 'text-mint' : 'text-rose'}">Current Month Status: ${currentBalance <= 0 ? 'Paid' : 'Partial'}</p>
-                    </div>
-                </div>` : `
-                <div class="grid grid-cols-2 gap-4 py-3 border-y border-black/5 dark:border-white/5 text-center">
-                    <div>
-                        <p class="text-[8px] font-bold text-gray-500 uppercase">Collect</p>
-                        <input type="number" id="paid-${i}" placeholder="₹0" oninput="calc(${i}, ${s.balance})" class="bg-transparent text-mint text-lg font-black w-full text-center outline-none">
-                    </div>
-                    <div>
-                        <p class="text-[8px] font-bold text-gray-500 uppercase">Pending</p>
-                        <p id="pend-${i}" class="text-lg font-black text-rose">₹${s.balance}</p>
-                    </div>
+        container.innerHTML += `
+            <div class="student-card card-gradient p-5 space-y-4" 
+                 data-name="${s.name.toLowerCase()}" 
+                 data-status="${currentStatus}">
+                <div class="flex justify-between items-start">
+                    <div><h3 class="text-base font-extrabold">${s.name}</h3><p class="text-[9px] text-gray-500 font-bold uppercase">${s.contact}</p></div>
+                    <span class="px-3 py-1 rounded-lg text-[9px] font-black uppercase ${isPaid ? 'bg-mint/10 text-mint' : 'bg-rose/10 text-rose'}">
+                        ${isPaid ? 'Paid' : 'Pending'}
+                    </span>
                 </div>
-
-                <div class="grid grid-cols-3 gap-3">
-                    <select id="type-${i}" class="bg-black/5 dark:bg-bean text-[10px] p-3 font-bold rounded-xl border border-black/5 dark:border-white/5 outline-none">
-                        <option>UPI</option>
-                        <option>CASH</option>
-                    </select>
-                    <input id="pst-${i}" type="text" placeholder="Paid To" class="bg-black/5 dark:bg-bean text-[10px] p-3 w-full font-bold rounded-xl border border-black/5 dark:border-white/5 outline-none">
-                    <select id="months-${i}" onchange="syncMonths(${i}); render();" class="bg-black/5 dark:bg-bean text-[10px] p-3 font-bold rounded-xl border border-black/5 dark:border-white/5 outline-none">
-                        <option value="1" ${monthsSelected === 1 ? 'selected' : ''}>1 Month</option>
-                        <option value="2" ${monthsSelected === 2 ? 'selected' : ''}>2 Months</option>
-                        <option value="3" ${monthsSelected === 3 ? 'selected' : ''}>3 Months</option>
-                        <option value="4" ${monthsSelected === 4 ? 'selected' : ''}>4 Months</option>
-                        <option value="5" ${monthsSelected === 5 ? 'selected' : ''}>5 Months</option>
-                        <option value="6" ${monthsSelected === 6 ? 'selected' : ''}>6 Months</option>
-                    </select>
-                </div>
-
-                <div class="soft-panel rounded-2xl p-3 space-y-1">
-                    <p class="text-[9px] font-bold uppercase tracking-widest text-gray-500">Covered Billing Period: ${coverageLabel}</p>
-                    <p class="text-[9px] font-bold uppercase tracking-widest text-gray-500">Covered Through: ${formatBillingMonthLabel(selectedBillingMonth)}</p>
-                    <p class="text-[9px] font-bold uppercase tracking-widest text-gray-500">Immediate Previous Months Included: ${previousMonthsIncluded}</p>
-                </div>
-
-                <div class="flex gap-2">
-                    <button onclick="showQR(${i})" class="bg-black/5 dark:bg-white/5 text-current px-4 rounded-xl border border-black/10 dark:border-white/10 text-[10px] font-bold">QR</button>
-                    <button onclick="sendWA(${i}, 'receipt')" class="flex-1 bg-mint text-white dark:text-pitch rounded-xl py-4 text-[10px] font-black uppercase">Settle</button>
-                    <button onclick="sendWA(${i}, 'remind')" class="flex-1 ${btnColor} border rounded-xl py-4 text-[10px] font-black uppercase">${s.remindCount > 0 ? `Rem x${s.remindCount}` : 'Remind'}</button>
-                </div>`;
-
-            container.innerHTML += `
-                <div class="student-card card-gradient rounded-[2rem] p-5 space-y-4"
-                     data-search="${escapeHtmlAttr(`${s.name || ''} ${s.contact || ''}`.toLowerCase())}"
-                     data-status="${status}">
-                    <div class="flex justify-between items-start gap-3">
-                        <div>
-                            <h3 class="text-base font-extrabold text-current">${escapeHtmlText(s.name)}</h3>
-                            <p class="text-[9px] text-gray-500 font-bold uppercase">${escapeHtmlText(s.contact)}</p>
+                ${isPaid ? `
+                    <div class="bg-mint/10 border border-mint/20 rounded-2xl p-4 space-y-2">
+                        <div class="flex justify-between items-center">
+                            <p class="text-[9px] font-black text-mint uppercase">DRAFTED SUCCESS</p>
+                            <button onclick="sendWA(${i}, 'receipt')" class="w-10 bg-mint/20 text-mint flex items-center justify-center rounded-xl p-2">💬</button>
                         </div>
-                        <span class="px-3 py-1 rounded-lg text-[9px] font-black uppercase ${isPaid ? 'bg-mint/10 text-mint' : 'bg-rose/10 text-rose'}">
-                            ${isPaid ? 'Paid' : 'Pending'}
-                        </span>
+                        <div class="space-y-1 pt-2 border-t border-mint/10">
+                            <p class="text-[9px] font-bold text-gray-600">Amount Paid: <span class="text-mint">₹${s.lastPaidAmt || s.paidSoFar}</span></p>
+                            <p class="text-[9px] font-bold text-gray-600">Months Covered: <span class="text-mint">${s.lastMonthsCount || 'Current'}</span></p>
+                            <p class="text-[9px] font-bold text-gray-600">Recorded Balance: <span class="${s.balance > 0 ? 'text-rose' : 'text-mint'}">₹${s.balance}</span></p>
+                            ${s.note ? `<p class="text-[9px] italic text-gray-500 pt-1">Note: ${s.note}</p>` : ''}
+                        </div>
                     </div>
-                    ${content}
-                </div>`;
-        });
+                ` : `
+                    <div class="grid grid-cols-2 gap-4 py-3 border-y border-black/5 text-center">
+                        <div><p class="text-[8px] font-bold text-gray-500 uppercase">Collect</p><input type="number" id="paid-${i}" placeholder="₹0" oninput="calcBalance(${i})" class="bg-transparent text-mint text-lg font-black w-full text-center outline-none"></div>
+                        <div><p class="text-[8px] font-bold text-gray-500 uppercase">Pending</p><p id="pend-${i}" class="text-lg font-black text-rose">₹${s.balance}</p></div>
+                    </div>
+                    <div class="space-y-2"><p class="text-[7px] font-black text-gray-400 uppercase">Select Months</p><div class="flex gap-2">${generateMonthChips(i)}</div></div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <select id="type-${i}" class="bg-black/5 dark:bg-zinc-800 text-[10px] p-3 font-bold rounded-xl outline-none"><option>UPI</option><option>CASH</option></select>
+                        <input id="pst-${i}" type="text" placeholder="Paid To" class="bg-black/5 dark:bg-zinc-800 text-[10px] p-3 w-full font-bold rounded-xl outline-none">
+                    </div>
+                    <input id="note-${i}" type="text" placeholder="Add Note..." class="bg-black/5 dark:bg-zinc-800 text-[10px] p-3 w-full font-bold rounded-xl outline-none">
+                    <div class="flex gap-2">
+                        <button onclick="showQR(${i})" class="bg-black/5 px-4 rounded-xl text-[10px] font-bold border border-black/10">QR</button>
+                        <button id="settle-btn-${i}" onclick="liveSettle(${i})" class="flex-1 bg-mint text-white rounded-xl py-4 text-[10px] font-black uppercase shadow-lg shadow-mint/20">Settle Only</button>
+                        <button onclick="sendWA(${i}, 'receipt')" class="w-12 bg-emerald-500/10 text-emerald-500 flex items-center justify-center rounded-xl text-lg border border-emerald-500/10">💬</button>
+                        
+                        <button id="rem-btn-${i}" onclick="liveRemind(${i})" class="flex-1 ${btnColor} border border-black/10 rounded-xl py-4 text-[10px] font-black uppercase">
+                            ${rCount > 0 ? `Remind x${rCount}` : 'Remind'}
+                        </button>
+                    </div>
+                `}
+            </div>`;
+    });
+    applyFilters();
+}
 
-        applyStudentFilters();
+    function setStatusFilter(f) { 
+        currentStatusFilter = f; 
+        document.querySelectorAll('.filter-chip').forEach(c => c.classList.toggle('active', c.id === `filter-${f}`)); 
+        applyFilters(); 
     }
 
-    function setStatusFilter(filter, silent = false) {
-        currentStatusFilter = filter;
-        ['all', 'pending', 'paid'].forEach(key => {
-            document.getElementById(`filter-${key}`).classList.toggle('active', key === filter);
-        });
-        if (!silent) applyStudentFilters();
-    }
-
-    function applyStudentFilters() {
-        const query = (document.getElementById('studentSearch').value || '').trim().toLowerCase();
-        const cards = document.querySelectorAll('.student-card');
+    function applyFilters() {
+        const query = document.getElementById('studentSearch').value.toLowerCase();
         let visible = 0;
-
-        cards.forEach(card => {
-            const searchText = card.dataset.search || '';
-            const status = card.dataset.status || 'all';
-            const searchMatch = !query || searchText.includes(query);
-            const statusMatch = currentStatusFilter === 'all' || currentStatusFilter === status;
-            const show = searchMatch && statusMatch;
-            card.style.display = show ? '' : 'none';
-            if (show) visible++;
+        document.querySelectorAll('.student-card').forEach(card => {
+            const matchName = card.dataset.name.includes(query);
+            const matchStatus = currentStatusFilter === 'all' || card.dataset.status === currentStatusFilter;
+            const isVisible = matchName && matchStatus;
+            card.style.display = isVisible ? '' : 'none'; 
+            if (isVisible) visible++;
         });
-
         document.getElementById('searchMeta').innerText = `${visible} shown`;
     }
 
-    function showQR(i) {
-        document.getElementById('qrPriceDisplay').innerText = `₹${document.getElementById(`paid-${i}`)?.value || 0}`;
-        document.getElementById('qrModal').style.display = 'flex';
-    }
+    async function liveSettle(i) {
+        const s = students[i]; const btn = document.getElementById(`settle-btn-${i}`);
+        const amt = parseFloat(document.getElementById(`paid-${i}`).value || 0);
+        const months = document.querySelectorAll(`[id^="mchip-${i}-"].selected`).length;
+        if (amt <= 0) return alert("Enter amount");
+        btn.innerText = "SAVING..."; btn.disabled = true;
 
-    function closeQR() {
-        document.getElementById('qrModal').style.display = 'none';
-    }
-
-    function calc(i, b) {
-        const v = parseFloat(document.getElementById(`paid-${i}`)?.value || 0);
-        document.getElementById(`pend-${i}`).innerText = `₹${Math.max(0, b - v)}`;
-    }
-
-    function sendWA(i, type) {
-        const s = students[i];
-        const paidInput = parseFloat(document.getElementById(`paid-${i}`)?.value || 0);
-        const monthsCovered = Number(document.getElementById(`months-${i}`)?.value || s.manualMonths || 1);
-        const selectedDate = document.getElementById('feeDate').value;
-        const billingMonth = billingMonthFromDate(selectedDate);
-        const displayDate = new Date(selectedDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-        const billingLabel = formatCoveredMonthsLabel(billingMonth, monthsCovered);
-        let ph = String(s.contact || '').replace(/\D/g, '');
-        if (!ph.startsWith('91')) ph = '91' + ph;
-        const payLink = "upi.pe/8867742269@ptaxis";
-
-        if (type === 'remind') {
-            const count = (s.remindCount || 0) + 1;
-            s.remindCount = count;
-            s.newRemindSent = true;
-
-            let msg = count === 1
-                ? `Dear Sir/Madam,\n\nGreetings from *Coffeeland FC*! ⚽\n\nWe are happy to share that *${s.name}* is active and progressing well in our *${s.batch}* batch. To ensure their training momentum continues, kindly settle the pending fees.\n\n*Due:* ₹${s.balance}\n*Covered Billing Period:* ${billingLabel}\n*Date:* ${displayDate}\n*Pay Link:* ${payLink}\n\nYour support helps us provide the best coaching for our young athletes. Thank you!\n\n*Team Coffeeland FC*`
-                : count === 2
-                ? `Dear Sir/Madam,\n\nHope you are doing well! We love having *${s.name}* on the pitch as they continue their athletic journey in the *${s.batch}* batch. 📈\n\nThis is a gentle follow-up regarding the outstanding fees of *₹${s.balance}* for *${billingLabel}*. We would appreciate it if you could settle this via the link below:\n\n*Pay Link:* ${payLink}\n\nThank you for your cooperation!\n\n*Team Coffeeland FC*`
-                : `Dear Sir/Madam,\n\nGreetings from the Management at *Coffeeland FC*. ⚽\n\nRegarding *${s.name}* and their participation in the *${s.batch}* batch, we are reaching out to coordinate the pending fee settlement of *₹${s.balance}* for *${billingLabel}*.\n\nKindly use the link below to help us update our records:\n\n*Quick Pay:* ${payLink}\n\nThank you for your immediate attention to this.\n\n*Team Coffeeland FC*`;
-
-            window.open(`https://wa.me/${ph}?text=${encodeURIComponent(msg)}`);
-            render();
-            return;
-        }
-
-        const defaultAmount = Number(s.fees) * monthsCovered;
-        const settleAmt = paidInput > 0 ? paidInput : defaultAmount;
-        const maxAllowed = Number(s.fees) * monthsCovered;
-
-        if (settleAmt <= 0) {
-            alert("Enter a payment amount or select months to settle.");
-            return;
-        }
-
-        if (settleAmt > maxAllowed) {
-            alert(`Amount exceeds ${monthsCovered} month(s) total of ₹${maxAllowed}.`);
-            return;
-        }
-
-        s.manualAmt = settleAmt;
-        s.manualMonths = monthsCovered;
-        s.tempPaid = true;
-
-        const remainingCurrentMonth = Math.max(0, Number(s.balance) - Math.min(Number(s.balance), settleAmt));
-
-        let msg = `Dear Sir/Madam,\n\n*CFC PAYMENT RECEIPT* ✅\n\nReceived *₹${settleAmt}* for *${s.name}* (${s.batch} batch) on *${displayDate}*.\n\n*Covered Billing Period:* ${billingLabel}\n*Months Count:* ${monthsCovered}`;
-
-        msg += remainingCurrentMonth > 0
-            ? `\n\n*Current Month Balance:* ₹${remainingCurrentMonth}\n_Kindly settle the balance at your earliest convenience._`
-            : `\n\n*Current Month Status:* Paid`;
-
-        msg += `\n\nThank you for your payment and for supporting your child's athletic growth!\n\n*Team Coffeeland FC*`;
-
-        window.open(`https://wa.me/${ph}?text=${encodeURIComponent(msg)}`);
-        render();
-    }
-
-    async function submitFees() {
-        const btn = document.getElementById('syncBtn');
-        const paymentDate = document.getElementById('feeDate').value;
-        const billingMonth = billingMonthFromDate(paymentDate);
-
-        let invalidAmount = false;
-
-        const logs = students.map((s, i) => {
-            const monthsCovered = Number(document.getElementById(`months-${i}`)?.value || s.manualMonths || 1);
-            const inputVal = parseFloat(document.getElementById(`paid-${i}`)?.value || 0);
-            const finalAmt = s.tempPaid ? Number(s.manualAmt || (Number(s.fees) * monthsCovered)) : inputVal;
-            const maxAllowed = Number(s.fees) * monthsCovered;
-
-            if (finalAmt > maxAllowed) invalidAmount = true;
-            if (finalAmt <= 0 && !s.newRemindSent) return null;
-
-            return {
-                name: s.name,
-                contact: s.contact,
-                batch: s.batch,
-                fees: s.fees,
-                paidSoFar: s.paidSoFar,
-                feeType: document.getElementById(`type-${i}`)?.value || "UPI",
-                paidTo: document.getElementById(`pst-${i}`)?.value || "Admin",
-                paidAmount: finalAmt,
-                monthsCovered,
-                billingMonth,
-                newRemindSent: s.newRemindSent || false,
-                remindCount: s.remindCount || 0
-            };
-        }).filter(x => x !== null);
-
-        if (invalidAmount) {
-            alert("One or more payments exceed the selected month coverage.");
-            return;
-        }
-
-        if (!logs.length) {
-            alert("Nothing to sync");
-            return;
-        }
-
-        btn.innerText = "UPDATING...";
-        btn.disabled = true;
-
-        const fd = new URLSearchParams();
-        fd.append('payload', JSON.stringify({ action: 'saveFees', date: paymentDate, billingMonth, data: logs }));
+        const newBalance = Math.max(0, (s.fees * months) - (s.paidSoFar + amt));
+        const record = { 
+            name: s.name, contact: s.contact, batch: s.batch, fees: s.fees, 
+            paidAmount: amt, balance: newBalance, monthsCovered: months, 
+            feeType: document.getElementById(`type-${i}`).value, 
+            paidTo: document.getElementById(`pst-${i}`).value, 
+            note: document.getElementById(`note-${i}`).value 
+        };
 
         try {
-            const response = await fetch(SCRIPT_URL, { method: 'POST', body: fd });
-            const res = await response.json();
-            if (res.status === 'success') {
-                alert("Synced!");
-                location.reload();
-            } else {
-                throw new Error(res.message || 'Sync failed');
+            const r = await fetch(SCRIPT_URL, { 
+                method: 'POST', 
+                body: new URLSearchParams({ payload: JSON.stringify({ action: 'saveFees', date: document.getElementById('feeDate').value, data: [record] }) })
+            });
+            const out = await r.json();
+            if (out.status === 'success') { 
+                // CRITICAL: Update student state locally with session data
+                s.tempPaid = true; 
+                s.lastPaidAmt = amt;
+                s.lastMonthsCount = months;
+                s.paidSoFar += amt; 
+                s.balance = newBalance; 
+                s.note = record.note;
+                updateDashboard(); 
+                render(); 
             }
-        } catch (e) {
-            alert("Error");
-            btn.disabled = false;
-            btn.innerText = "Synchronize Clean Ledger";
+        } catch (e) { 
+            alert("Sync Failed"); 
+            btn.innerText = "Settle Only"; 
+            btn.disabled = false; 
         }
     }
 
-    function escapeHtmlText(value) {
-        return String(value ?? '')
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#39;');
+   async function liveRemind(i) {
+    const s = students[i];
+    const btn = document.getElementById(`rem-btn-${i}`);
+    btn.innerText = "LOGGING...";
+    
+    // Increment local count
+    const newCount = (Number(s.remindCount) || 0) + 1;
+    
+    const record = { 
+        name: s.name, 
+        batch: s.batch, 
+        newRemindSent: true, 
+        remindCount: newCount, 
+        paidAmount: 0 
+    };
+    
+    try {
+        await fetch(SCRIPT_URL, { 
+            method: 'POST', 
+            body: new URLSearchParams({ payload: JSON.stringify({ action: 'saveFees', date: document.getElementById('feeDate').value, data: [record] }) })
+        });
+        
+        // Update local state
+        s.remindCount = newCount;
+        render(); // Re-render card to update color and text
+        sendWA(i, 'remind');
+    } catch (e) { 
+        s.remindCount = newCount;
+        render();
+        sendWA(i, 'remind'); 
+    }
+}
+    function sendWA(i, type) {
+        const s = students[i]; let ph = String(s.contact || '').replace(/\D/g, ''); if (!ph.startsWith('91')) ph = '91' + ph;
+        const msg = type === 'receipt' ? `*CFC RECEIPT* ✅\n\nPayment received for *${s.name}*.\n*Balance:* ₹${s.balance}` : `*CFC REMINDER* ⚽\n\nDear Parent, pending fees for *${s.name}* is ₹${s.balance}. Kindly settle soon.`;
+        window.open(`https://wa.me/${ph}?text=${encodeURIComponent(msg)}`);
     }
 
-    function escapeHtmlAttr(value) {
-        return escapeHtmlText(value);
+    function updateDashboard() {
+        let t = 0, p = 0, b = 0; students.forEach(s => { t += Number(s.fees); p += Number(s.paidSoFar); b += Number(s.balance); });
+        document.getElementById('dashTarget').innerText = `₹${t}`; document.getElementById('dashPaid').innerText = `₹${p}`; document.getElementById('dashPending').innerText = `₹${b}`;
     }
+
+    function showQR(i) { document.getElementById('qrPriceDisplay').innerText = `₹${document.getElementById(`paid-${i}`)?.value || 0}`; document.getElementById('qrModal').style.display = 'flex'; }
     </script>
 </body>
 </html>
