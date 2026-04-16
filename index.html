@@ -3,13 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>CFC Fees | Command V5.7 Pro</title>
+    <title>CFC Fees | Command Pro v5.9</title>
 
     <link rel="apple-touch-icon" href="https://i.ibb.co/3nTMhbz/1000287652-0b4cd8d123cf04f03fc322309c337390-11-18-2025-1-04-51-PM.png">
     <link rel="icon" type="image/png" href="https://i.ibb.co/3nTMhbz/1000287652-0b4cd8d123cf04f03fc322309c337390-11-18-2025-1-04-51-PM.png">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
+    
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -46,6 +44,25 @@
         .card-gradient { background: var(--bg-card); border: 1px solid var(--border); box-shadow: var(--card-shadow); backdrop-filter: blur(14px); border-radius: 2rem; }
         .hidden-view { display: none !important; }
         #qrModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(12px); }
+        
+        /* DARK MODE INPUT FIX */
+        .input-dark {
+            background-color: var(--bg-card-solid);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            border-radius: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        @media (prefers-color-scheme: dark) {
+            .input-dark {
+                background-color: #1A1A1A;
+                color: #FFFFFF !important;
+                border-color: rgba(255, 255, 255, 0.1);
+            }
+            input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); }
+        }
+
         .filter-chip { border: 1px solid var(--border); background: rgba(0,0,0,0.04); color: #6B7280; transition: all 0.2s; cursor: pointer; }
         .filter-chip.active { background: #10B981; color: white; border-color: transparent; }
         .month-chip { cursor: pointer; transition: all 0.2s; border: 1px solid var(--border); }
@@ -65,7 +82,7 @@
 
     <header class="px-6 flex justify-between items-center sticky top-0 z-40">
         <div onclick="location.reload()" class="cursor-pointer">
-            <h1 class="text-xl font-black uppercase leading-none">CFC <span class="text-mint">Fees</span></h1>
+            <h1 class="text-xl font-black uppercase leading-none">CFC <span class="text-mint text-emerald-500">Fees</span></h1>
             <p class="text-gray-500 text-[10px] font-bold tracking-widest uppercase mt-1">Command Center</p>
         </div>
         <img src="https://i.ibb.co/3nTMhbz/1000287652-0b4cd8d123cf04f03fc322309c337390-11-18-2025-1-04-51-PM.png" class="h-10 w-10">
@@ -73,7 +90,7 @@
 
     <div id="lobbyView" class="px-6 transition-all duration-300 space-y-5 mt-6">
         <div class="space-y-3">
-            <select id="homeBatchSelect" onchange="selectBatch(this.value)" class="input-dark p-4 text-xs font-bold w-full rounded-xl outline-none border-black/10 shadow-lg">
+            <select id="homeBatchSelect" onchange="selectBatch(this.value)" class="input-dark p-4 text-xs font-bold w-full outline-none shadow-lg">
                 <option value="">Quick Jump...</option>
             </select>
             <div class="search-shell rounded-[1.4rem] p-3">
@@ -95,8 +112,8 @@
         </div>
 
         <div class="flex gap-3">
-            <select id="batchSelect" onchange="loadStudents()" class="input-dark p-4 text-xs font-bold rounded-xl flex-1 outline-none border-black/10"></select>
-            <input type="date" id="feeDate" onchange="loadStudents()" class="input-dark p-4 text-xs font-bold rounded-xl w-1/3 outline-none border-black/10">
+            <select id="batchSelect" onchange="loadStudents()" class="input-dark p-4 text-xs font-bold flex-1 outline-none"></select>
+            <input type="date" id="feeDate" onchange="loadStudents()" class="input-dark p-4 text-xs font-bold w-1/3 outline-none">
         </div>
 
         <div class="search-shell rounded-[1.4rem] p-3">
@@ -194,67 +211,65 @@
     }
 
     function render() {
-    const container = document.getElementById('roster');
-    container.innerHTML = '';
-    students.forEach((s, i) => {
-        const isPaid = s.tempPaid || s.balance <= 0;
-        const currentStatus = isPaid ? 'paid' : 'pending';
-        
-        // --- FIX: BUTTON COLOR LOGIC ---
-        const rCount = Number(s.remindCount || 0);
-        let btnColor = "bg-black/5 text-gray-500 border-black/10"; // Default
-        if (rCount === 1) btnColor = "bg-yellow-400/20 text-yellow-700 border-yellow-400/30";
-        if (rCount === 2) btnColor = "bg-orange-400/20 text-orange-700 border-orange-400/30";
-        if (rCount >= 3) btnColor = "bg-red-500/20 text-red-700 border-red-500/30";
+        const container = document.getElementById('roster');
+        container.innerHTML = '';
+        students.forEach((s, i) => {
+            const isPaid = s.tempPaid || s.balance <= 0;
+            const currentStatus = isPaid ? 'paid' : 'pending';
+            
+            const rCount = Number(s.remindCount || 0);
+            let btnColor = "bg-black/5 text-gray-500 border-black/10";
+            if (rCount === 1) btnColor = "bg-yellow-400/20 text-yellow-700 border-yellow-400/30";
+            if (rCount === 2) btnColor = "bg-orange-400/20 text-orange-700 border-orange-400/30";
+            if (rCount >= 3) btnColor = "bg-red-500/20 text-red-700 border-red-500/30";
 
-        container.innerHTML += `
-            <div class="student-card card-gradient p-5 space-y-4" 
-                 data-name="${s.name.toLowerCase()}" 
-                 data-status="${currentStatus}">
-                <div class="flex justify-between items-start">
-                    <div><h3 class="text-base font-extrabold">${s.name}</h3><p class="text-[9px] text-gray-500 font-bold uppercase">${s.contact}</p></div>
-                    <span class="px-3 py-1 rounded-lg text-[9px] font-black uppercase ${isPaid ? 'bg-mint/10 text-mint' : 'bg-rose/10 text-rose'}">
-                        ${isPaid ? 'Paid' : 'Pending'}
-                    </span>
-                </div>
-                ${isPaid ? `
-                    <div class="bg-mint/10 border border-mint/20 rounded-2xl p-4 space-y-2">
-                        <div class="flex justify-between items-center">
-                            <p class="text-[9px] font-black text-mint uppercase">DRAFTED SUCCESS</p>
-                            <button onclick="sendWA(${i}, 'receipt')" class="w-10 bg-mint/20 text-mint flex items-center justify-center rounded-xl p-2">💬</button>
+            container.innerHTML += `
+                <div class="student-card card-gradient p-5 space-y-4" 
+                     data-name="${s.name.toLowerCase()}" 
+                     data-status="${currentStatus}">
+                    <div class="flex justify-between items-start">
+                        <div><h3 class="text-base font-extrabold">${s.name}</h3><p class="text-[9px] text-gray-500 font-bold uppercase">${s.contact}</p></div>
+                        <span class="px-3 py-1 rounded-lg text-[9px] font-black uppercase ${isPaid ? 'bg-mint/10 text-mint' : 'bg-rose/10 text-rose'}">
+                            ${isPaid ? 'Paid' : 'Pending'}
+                        </span>
+                    </div>
+                    ${isPaid ? `
+                        <div class="bg-mint/10 border border-mint/20 rounded-2xl p-4 space-y-2">
+                            <div class="flex justify-between items-center">
+                                <p class="text-[9px] font-black text-mint uppercase">DRAFTED SUCCESS</p>
+                                <button onclick="sendWA(${i}, 'receipt')" class="w-10 bg-mint/20 text-mint flex items-center justify-center rounded-xl p-2">💬</button>
+                            </div>
+                            <div class="space-y-1 pt-2 border-t border-mint/10">
+                                <p class="text-[9px] font-bold text-gray-600">Amount Paid: <span class="text-mint">₹${s.lastPaidAmt || s.paidSoFar}</span></p>
+                                <p class="text-[9px] font-bold text-gray-600">Months Covered: <span class="text-mint">${s.lastMonthsCount || 'Current'}</span></p>
+                                <p class="text-[9px] font-bold text-gray-600">Recorded Balance: <span class="${s.balance > 0 ? 'text-rose' : 'text-mint'}">₹${s.balance}</span></p>
+                                ${s.note ? `<p class="text-[9px] italic text-gray-500 pt-1">Note: ${s.note}</p>` : ''}
+                            </div>
                         </div>
-                        <div class="space-y-1 pt-2 border-t border-mint/10">
-                            <p class="text-[9px] font-bold text-gray-600">Amount Paid: <span class="text-mint">₹${s.lastPaidAmt || s.paidSoFar}</span></p>
-                            <p class="text-[9px] font-bold text-gray-600">Months Covered: <span class="text-mint">${s.lastMonthsCount || 'Current'}</span></p>
-                            <p class="text-[9px] font-bold text-gray-600">Recorded Balance: <span class="${s.balance > 0 ? 'text-rose' : 'text-mint'}">₹${s.balance}</span></p>
-                            ${s.note ? `<p class="text-[9px] italic text-gray-500 pt-1">Note: ${s.note}</p>` : ''}
+                    ` : `
+                        <div class="grid grid-cols-2 gap-4 py-3 border-y border-black/5 dark:border-white/5 text-center">
+                            <div><p class="text-[8px] font-bold text-gray-500 uppercase">Collect</p><input type="number" id="paid-${i}" placeholder="₹0" oninput="calcBalance(${i})" class="bg-transparent text-mint text-lg font-black w-full text-center outline-none"></div>
+                            <div><p class="text-[8px] font-bold text-gray-500 uppercase">Pending</p><p id="pend-${i}" class="text-lg font-black text-rose">₹${s.balance}</p></div>
                         </div>
-                    </div>
-                ` : `
-                    <div class="grid grid-cols-2 gap-4 py-3 border-y border-black/5 text-center">
-                        <div><p class="text-[8px] font-bold text-gray-500 uppercase">Collect</p><input type="number" id="paid-${i}" placeholder="₹0" oninput="calcBalance(${i})" class="bg-transparent text-mint text-lg font-black w-full text-center outline-none"></div>
-                        <div><p class="text-[8px] font-bold text-gray-500 uppercase">Pending</p><p id="pend-${i}" class="text-lg font-black text-rose">₹${s.balance}</p></div>
-                    </div>
-                    <div class="space-y-2"><p class="text-[7px] font-black text-gray-400 uppercase">Select Months</p><div class="flex gap-2">${generateMonthChips(i)}</div></div>
-                    <div class="grid grid-cols-2 gap-3">
-                        <select id="type-${i}" class="bg-black/5 dark:bg-zinc-800 text-[10px] p-3 font-bold rounded-xl outline-none"><option>UPI</option><option>CASH</option></select>
-                        <input id="pst-${i}" type="text" placeholder="Paid To" class="bg-black/5 dark:bg-zinc-800 text-[10px] p-3 w-full font-bold rounded-xl outline-none">
-                    </div>
-                    <input id="note-${i}" type="text" placeholder="Add Note..." class="bg-black/5 dark:bg-zinc-800 text-[10px] p-3 w-full font-bold rounded-xl outline-none">
-                    <div class="flex gap-2">
-                        <button onclick="showQR(${i})" class="bg-black/5 px-4 rounded-xl text-[10px] font-bold border border-black/10">QR</button>
-                        <button id="settle-btn-${i}" onclick="liveSettle(${i})" class="flex-1 bg-mint text-white rounded-xl py-4 text-[10px] font-black uppercase shadow-lg shadow-mint/20">Settle Only</button>
-                        <button onclick="sendWA(${i}, 'receipt')" class="w-12 bg-emerald-500/10 text-emerald-500 flex items-center justify-center rounded-xl text-lg border border-emerald-500/10">💬</button>
-                        
-                        <button id="rem-btn-${i}" onclick="liveRemind(${i})" class="flex-1 ${btnColor} border border-black/10 rounded-xl py-4 text-[10px] font-black uppercase">
-                            ${rCount > 0 ? `Remind x${rCount}` : 'Remind'}
-                        </button>
-                    </div>
-                `}
-            </div>`;
-    });
-    applyFilters();
-}
+                        <div class="space-y-2"><p class="text-[7px] font-black text-gray-400 uppercase">Select Months</p><div class="flex gap-2">${generateMonthChips(i)}</div></div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <select id="type-${i}" class="input-dark text-[10px] p-3 font-bold rounded-xl outline-none"><option>UPI</option><option>CASH</option></select>
+                            <input id="pst-${i}" type="text" placeholder="Paid To" class="input-dark text-[10px] p-3 w-full font-bold rounded-xl outline-none">
+                        </div>
+                        <input id="note-${i}" type="text" placeholder="Add Note..." class="input-dark text-[10px] p-3 w-full font-bold rounded-xl outline-none">
+                        <div class="flex gap-2">
+                            <button onclick="showQR(${i})" class="bg-black/5 px-4 rounded-xl text-[10px] font-bold border border-black/10">QR</button>
+                            <button id="settle-btn-${i}" onclick="liveSettle(${i})" class="flex-1 bg-mint text-white rounded-xl py-4 text-[10px] font-black uppercase shadow-lg shadow-mint/20">Settle Only</button>
+                            <button onclick="sendWA(${i}, 'receipt')" class="w-12 bg-emerald-500/10 text-emerald-500 flex items-center justify-center rounded-xl text-lg border border-emerald-500/10">💬</button>
+                            <button id="rem-btn-${i}" onclick="liveRemind(${i})" class="flex-1 ${btnColor} border border-black/10 rounded-xl py-4 text-[10px] font-black uppercase">
+                                ${rCount > 0 ? `Remind x${rCount}` : 'Remind'}
+                            </button>
+                        </div>
+                    `}
+                </div>`;
+        });
+        applyFilters();
+    }
 
     function setStatusFilter(f) { 
         currentStatusFilter = f; 
@@ -298,55 +313,35 @@
             });
             const out = await r.json();
             if (out.status === 'success') { 
-                // CRITICAL: Update student state locally with session data
                 s.tempPaid = true; 
                 s.lastPaidAmt = amt;
                 s.lastMonthsCount = months;
                 s.paidSoFar += amt; 
                 s.balance = newBalance; 
                 s.note = record.note;
-                updateDashboard(); 
-                render(); 
+                updateDashboard(); render(); 
             }
         } catch (e) { 
             alert("Sync Failed"); 
-            btn.innerText = "Settle Only"; 
-            btn.disabled = false; 
+            btn.innerText = "Settle Only"; btn.disabled = false; 
         }
     }
 
-   async function liveRemind(i) {
-    const s = students[i];
-    const btn = document.getElementById(`rem-btn-${i}`);
-    btn.innerText = "LOGGING...";
-    
-    // Increment local count
-    const newCount = (Number(s.remindCount) || 0) + 1;
-    
-    const record = { 
-        name: s.name, 
-        batch: s.batch, 
-        newRemindSent: true, 
-        remindCount: newCount, 
-        paidAmount: 0 
-    };
-    
-    try {
-        await fetch(SCRIPT_URL, { 
-            method: 'POST', 
-            body: new URLSearchParams({ payload: JSON.stringify({ action: 'saveFees', date: document.getElementById('feeDate').value, data: [record] }) })
-        });
+    async function liveRemind(i) {
+        const s = students[i];
+        const btn = document.getElementById(`rem-btn-${i}`);
+        btn.innerText = "LOGGING...";
+        const newCount = (Number(s.remindCount) || 0) + 1;
         
-        // Update local state
-        s.remindCount = newCount;
-        render(); // Re-render card to update color and text
-        sendWA(i, 'remind');
-    } catch (e) { 
-        s.remindCount = newCount;
-        render();
-        sendWA(i, 'remind'); 
+        const record = { name: s.name, batch: s.batch, newRemindSent: true, remindCount: newCount, paidAmount: 0 };
+        try {
+            await fetch(SCRIPT_URL, { method: 'POST', body: new URLSearchParams({ payload: JSON.stringify({ action: 'saveFees', date: document.getElementById('feeDate').value, data: [record] }) })});
+            s.remindCount = newCount;
+            render();
+            sendWA(i, 'remind');
+        } catch (e) { s.remindCount = newCount; render(); sendWA(i, 'remind'); }
     }
-}
+
     function sendWA(i, type) {
         const s = students[i]; let ph = String(s.contact || '').replace(/\D/g, ''); if (!ph.startsWith('91')) ph = '91' + ph;
         const msg = type === 'receipt' ? `*CFC RECEIPT* ✅\n\nPayment received for *${s.name}*.\n*Balance:* ₹${s.balance}` : `*CFC REMINDER* ⚽\n\nDear Parent, pending fees for *${s.name}* is ₹${s.balance}. Kindly settle soon.`;
