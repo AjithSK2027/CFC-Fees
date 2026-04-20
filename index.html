@@ -402,11 +402,78 @@
         } catch (e) { s.remindCount = newCount; render(); sendWA(i, 'remind'); }
     }
 
-    function sendWA(i, type) {
-        const s = students[i]; let ph = String(s.contact || '').replace(/\D/g, ''); if (!ph.startsWith('91')) ph = '91' + ph;
-        const msg = type === 'receipt' ? `*CFC RECEIPT* ✅\n\nPayment received for *${s.name}*.\n*Balance:* ₹${s.balance}` : `*CFC REMINDER* ⚽\n\nDear Parent, pending fees for *${s.name}* is ₹${s.balance}. Kindly settle soon.`;
-        window.open(`https://wa.me/${ph}?text=${encodeURIComponent(msg)}`);
+   function sendWA(i, type) {
+    const s = students[i]; 
+    // Format Phone Number
+    let ph = String(s.contact || '').replace(/\D/g, ''); 
+    if (!ph.startsWith('91')) ph = '91' + ph;
+    
+    // Logic to identify current or selected months
+    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    const curDate = new Date();
+    
+    // For Receipt: Get amount and selected months from the UI
+    const paidAmount = document.getElementById(`paid-${i}`)?.value || (s.lastPaidAmt || "0");
+    
+    // Detect which month chips are selected to list them in the message
+    const selectedMonthChips = document.querySelectorAll(`[id^="mchip-${i}-"].selected`);
+    let monthLabel = "";
+    
+    if (selectedMonthChips.length > 0) {
+        // Map indices back to month names
+        const labels = Array.from(selectedMonthChips).map(chip => {
+            const j = parseInt(chip.id.split('-').pop());
+            let mIdx = curDate.getMonth() - j;
+            if (mIdx < 0) mIdx += 12;
+            return monthNames[mIdx];
+        });
+        monthLabel = labels.join(", ");
+    } else {
+        monthLabel = monthNames[curDate.getMonth()];
     }
+
+    let msg = "";
+
+    if (type === 'receipt') {
+        msg = `Dear Sir/Madam,
+
+✅ *Payment Successful*
+
+Hi,
+We have successfully received the fee payment for *${s.name}* for the month(s) of *${monthLabel}*.
+
+*Amount Received:* ₹${paidAmount}
+*Remaining Balance:* ₹${s.balance}
+
+Thank you for the timely payment and your continued support towards the academy.
+
+Regards,
+*Coffeeland Football Academy*
+_Together Towards Tomorrow_`;
+    } else {
+        msg = `Dear Sir/Madam,
+
+⚠️ *Friendly Fee Reminder*
+
+Hi,
+Just a gentle reminder that the fee for *${s.name}* for *${monthLabel}* is pending.
+
+*Amount Due:* ₹${s.balance}
+
+*UPI:* 8867742269@ptaxis
+*PhonePe / GPay:* 8867742269
+
+We’d appreciate it if you could complete the payment at your convenience and share the confirmation.
+
+Thank you for your continued support.
+
+Regards,
+*Coffeeland Football Academy*
+_Together Towards Tomorrow_`;
+    }
+    
+    window.open(`https://wa.me/${ph}?text=${encodeURIComponent(msg)}`);
+}
 
     function updateDashboard() {
         let t = 0, p = 0, b = 0; students.forEach(s => { t += Number(s.fees); p += Number(s.paidSoFar); b += Number(s.balance); });
