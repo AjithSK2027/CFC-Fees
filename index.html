@@ -185,7 +185,7 @@
     </div>
 
     <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyy-8Tb03kaD-_dTPXeaGZ_vpF63fNAOZZPRN3SHFxGnma5PgLOa5pD3jNolQj2e8Cg6g/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz8exa8cRG8mGfoFQ3xeLYQOsoH4jHvZxUwGF7VUVxcl6nzu7Pr0GFX2uOvTxrnqBk-4g/exec";
     let students = [];
     let currentStatusFilter = 'all';
     let homeSearchTimer = null;
@@ -351,56 +351,106 @@
     }
 
     async function liveSettle(i) {
-        const s = students[i]; const btn = document.getElementById(`settle-btn-${i}`);
-        const amt = parseFloat(document.getElementById(`paid-${i}`).value || 0);
-        const months = document.querySelectorAll(`[id^="mchip-${i}-"].selected`).length;
-        if (amt <= 0) return alert("Enter amount");
-        btn.innerText = "SAVING..."; btn.disabled = true;
+    const s = students[i]; 
+    const btn = document.getElementById(`settle-btn-${i}`);
+    const amt = parseFloat(document.getElementById(`paid-${i}`).value || 0);
+    const months = document.querySelectorAll(`[id^="mchip-${i}-"].selected`).length;
 
-        const newBalance = Math.max(0, (s.fees * months) - (s.paidSoFar + amt));
-        const record = { 
-            name: s.name, contact: s.contact, batch: s.batch, fees: s.fees, 
-            paidAmount: amt, balance: newBalance, monthsCovered: months, 
-            feeType: document.getElementById(`type-${i}`).value, 
-            paidTo: document.getElementById(`pst-${i}`).value, 
-            note: document.getElementById(`note-${i}`).value 
-        };
+    if (amt <= 0) return alert("Enter amount");
 
-        try {
-            const r = await fetch(SCRIPT_URL, { 
-                method: 'POST', 
-                body: new URLSearchParams({ payload: JSON.stringify({ action: 'saveFees', date: document.getElementById('feeDate').value, data: [record] }) })
-            });
-            const out = await r.json();
-            if (out.status === 'success') { 
-                s.tempPaid = true; 
-                s.lastPaidAmt = amt;
-                s.lastMonthsCount = months;
-                s.paidSoFar += amt; 
-                s.balance = newBalance; 
-                s.note = record.note;
-                updateDashboard(); render(); 
-            }
-        } catch (e) { 
-            alert("Sync Failed"); 
-            btn.innerText = "Settle Only"; btn.disabled = false; 
+    btn.innerText = "SAVING..."; 
+    btn.disabled = true;
+
+    const newBalance = Math.max(0, (s.fees * months) - (s.paidSoFar + amt));
+
+    const record = { 
+        studentId: s.studentId,   // ✅ ADDED
+        name: s.name,
+        contact: s.contact,
+        batch: s.batch,
+        fees: s.fees,
+        paidAmount: amt,
+        balance: newBalance,
+        monthsCovered: months,
+        feeType: document.getElementById(`type-${i}`).value,
+        paidTo: document.getElementById(`pst-${i}`).value,
+        note: document.getElementById(`note-${i}`).value
+    };
+
+    try {
+        const r = await fetch(SCRIPT_URL, { 
+            method: 'POST', 
+            body: new URLSearchParams({ 
+                payload: JSON.stringify({ 
+                    action: 'saveFees', 
+                    date: document.getElementById('feeDate').value, 
+                    data: [record] 
+                }) 
+            })
+        });
+
+        const out = await r.json();
+
+        if (out.status === 'success') { 
+            s.tempPaid = true; 
+            s.lastPaidAmt = amt;
+            s.lastMonthsCount = months;
+            s.paidSoFar += amt; 
+            s.balance = newBalance; 
+            s.note = record.note;
+            updateDashboard(); 
+            render(); 
         }
+    } catch (e) { 
+        alert("Sync Failed"); 
+        btn.innerText = "Settle Only"; 
+        btn.disabled = false; 
     }
+}
 
-    async function liveRemind(i) {
-        const s = students[i];
-        const btn = document.getElementById(`rem-btn-${i}`);
-        btn.innerText = "LOGGING...";
-        const newCount = (Number(s.remindCount) || 0) + 1;
-        
-        const record = { name: s.name, batch: s.batch, newRemindSent: true, remindCount: newCount, paidAmount: 0 };
-        try {
-            await fetch(SCRIPT_URL, { method: 'POST', body: new URLSearchParams({ payload: JSON.stringify({ action: 'saveFees', date: document.getElementById('feeDate').value, data: [record] }) })});
-            s.remindCount = newCount;
-            render();
-            sendWA(i, 'remind');
-        } catch (e) { s.remindCount = newCount; render(); sendWA(i, 'remind'); }
+
+/* =========================
+   ✅ FIXED: liveRemind()
+   ========================= */
+async function liveRemind(i) {
+    const s = students[i];
+    const btn = document.getElementById(`rem-btn-${i}`);
+
+    btn.innerText = "LOGGING...";
+
+    const newCount = (Number(s.remindCount) || 0) + 1;
+
+    const record = { 
+        studentId: s.studentId,   // ✅ ADDED
+        name: s.name,
+        batch: s.batch,
+        newRemindSent: true,
+        remindCount: newCount,
+        paidAmount: 0
+    };
+
+    try {
+        await fetch(SCRIPT_URL, { 
+            method: 'POST', 
+            body: new URLSearchParams({ 
+                payload: JSON.stringify({ 
+                    action: 'saveFees', 
+                    date: document.getElementById('feeDate').value, 
+                    data: [record] 
+                }) 
+            })
+        });
+
+        s.remindCount = newCount;
+        render();
+        sendWA(i, 'remind');
+
+    } catch (e) {
+        s.remindCount = newCount;
+        render();
+        sendWA(i, 'remind');
     }
+}
 
    function sendWA(i, type) {
     const s = students[i]; 
