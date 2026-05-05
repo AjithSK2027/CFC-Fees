@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>CFC Fees | Optimized Flow</title>
+    <title>CFC Fees | Card-based History</title>
 
     <link rel="apple-touch-icon" href="https://i.ibb.co/3nTMhbz/1000287652-0b4cd8d123cf04f03fc322309c337390-11-18-2025-1-04-51-PM.png">
     <link rel="icon" type="image/png" href="https://i.ibb.co/3nTMhbz/1000287652-0b4cd8d123cf04f03fc322309c337390-11-18-2025-1-04-51-PM.png">
@@ -23,17 +23,17 @@
     </script>
     <style>
         :root {
-            --bg-body: #F6F8FB; --bg-header: rgba(246, 248, 251, 0.82);
-            --bg-card: rgba(255, 255, 255, 0.95); --bg-card-solid: #FFFFFF;
-            --text-main: #111827; --border: rgba(17, 24, 39, 0.08);
-            --card-shadow: 0 8px 30px -12px rgba(17, 24, 39, 0.2);
+            --bg-body: #F6F8FB; --bg-header: rgba(246,248,251,0.82);
+            --bg-card: rgba(255,255,255,0.96); --bg-card-solid: #FFFFFF;
+            --text-main: #111827; --border: rgba(17,24,39,0.08);
+            --card-shadow: 0 8px 30px -12px rgba(17,24,39,0.2);
             --loader-bg: #F6F8FB; --loader-text: #111827;
         }
         @media (prefers-color-scheme: dark) {
             :root {
-                --bg-body: #050505; --bg-header: rgba(5, 5, 5, 0.68);
-                --bg-card: rgba(20, 20, 20, 0.95); --bg-card-solid: #0F0A08;
-                --text-main: #E5E7EB; --border: rgba(255, 255, 255, 0.06);
+                --bg-body: #050505; --bg-header: rgba(5,5,5,0.68);
+                --bg-card: rgba(20,20,20,0.96); --bg-card-solid: #0F0A08;
+                --text-main: #E5E7EB; --border: rgba(255,255,255,0.06);
                 --loader-bg: #050505; --loader-text: #FFFFFF;
             }
         }
@@ -59,25 +59,32 @@
         .month-chip.selected { background: #10B981; color: white; border-color: transparent; }
         .search-shell { background: linear-gradient(180deg, rgba(16,185,129,0.08), rgba(255,255,255,0.02)); border: 1px solid var(--border); border-radius: 1.5rem; }
         
-        .card-pending { background: linear-gradient(135deg, rgba(244,63,94,0.06), rgba(244,63,94,0.01)); border-left: 4px solid #F43F5E; }
-        .card-partial { background: linear-gradient(135deg, rgba(234,179,8,0.06), rgba(234,179,8,0.01)); border-left: 4px solid #EAB308; }
-        .card-paid { background: linear-gradient(135deg, rgba(16,185,129,0.06), rgba(16,185,129,0.01)); border-left: 4px solid #10B981; }
-        
-        @media (prefers-color-scheme: dark) {
-            .card-pending { background: linear-gradient(135deg, rgba(244,63,94,0.12), rgba(244,63,94,0.03)); }
-            .card-partial { background: linear-gradient(135deg, rgba(234,179,8,0.1), rgba(234,179,8,0.02)); }
-            .card-paid { background: linear-gradient(135deg, rgba(16,185,129,0.1), rgba(16,185,129,0.02)); }
-        }
+        .card-pending { border-top: 5px solid #F43F5E; }
+        .card-partial { border-top: 5px solid #EAB308; }
+        .card-paid { border-top: 5px solid #10B981; }
         
         button, .month-chip, .filter-chip { cursor: pointer; -webkit-tap-highlight-color: transparent; }
         button:active { transform: scale(0.97); transition: transform 0.05s; }
+        .whatsapp-icon { width: 20px; height: 20px; display: inline-block; vertical-align: middle; }
+        .student-id { font-family: monospace; font-size: 9px; background: rgba(0,0,0,0.05); display: inline-block; padding: 2px 6px; border-radius: 20px; }
+        .fee-label { font-size: 11px; font-weight: 700; color: #6B7280; letter-spacing: 0.3px; }
+        .fee-amount { font-size: 18px; font-weight: 800; line-height: 1.2; }
+        
+        .tab { display: inline-block; padding: 8px 16px; font-weight: 800; font-size: 12px; border-radius: 30px; cursor: pointer; background: rgba(0,0,0,0.05); margin-right: 8px; }
+        .tab.active { background: #10B981; color: white; }
+        
+        .history-card { padding: 12px; margin-bottom: 12px; border-radius: 1rem; background: var(--bg-card); border: 1px solid var(--border); }
+        .history-grid { display: flex; flex-direction: column; gap: 12px; }
+        .history-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--border); }
+        .history-label { font-size: 11px; font-weight: 700; color: #6B7280; }
+        .history-value { font-size: 14px; font-weight: 800; }
     </style>
 </head>
 <body class="min-h-screen pb-32">
 
 <div class="main-fader">
     <div class="loader text-center">
-        <svg viewBox="0 0 164.83 151.5"><!-- same logo --><path class="path-0" d="M117.24,69.24A8,8,0,0,0,115.67,67c-4.88-4-9.8-7.89-14.86-11.62A4.93,4.93,0,0,0,96.93,55c-5.76,1.89-11.4,4.17-17.18,6a4.36,4.36,0,0,0-3.42,4.12c-1,6.89-2.1,13.76-3,20.66a4,4,0,0,0,1,3.07c5.12,4.36,10.39,8.61,15.68,12.76a3.62,3.62,0,0,0,2.92.75c6.29-2.66,12.52-5.47,18.71-8.36a3.49,3.49,0,0,0,1.68-2.19c1.34-7.25,2.54-14.55,3.9-22.58Z"/><path class="path-1" d="M97.55,38.68A43.76,43.76,0,0,1,98,33.44c.41-2.36-.5-3.57-2.57-4.64C91.1,26.59,87,24,82.66,21.82a6.18,6.18,0,0,0-4-.71C73.45,22.55,68.32,24.25,63.22,26c-3.63,1.21-6.08,3.35-5.76,7.69a26.67,26.67,0,0,1-.6,4.92c-1.08,8.06-1.08,8.08,5.86,11.92,3.95,2.19,7.82,5.75,11.94,6.08s8.76-2.41,13.12-3.93c9.33-3.29,9.33-3.3,9.78-14Z"/><path class="path-2" d="M66.11,126.56c5.91-.91,11.37-1.7,16.81-2.71a3.3,3.3,0,0,0,1.87-2.17c1-4.06,1.73-8.19,2.84-12.24.54-2-.11-3-1.55-4.15-5-4-9.9-8.12-15-12a6.19,6.19,0,0,0-4.15-1.1c-5.35.66-10.7,1.54-16,2.54A4,4,0,0,0,48.34,97a109.13,109.13,0,0,0-3,12.19,4.47,4.47,0,0,0,1.34,3.6c5.54,4.36,11.23,8.53,16.91,12.69a10.84,10.84,0,0,0,2.57,1.11Z"/><path class="path-3" d="M127.42,104.12c4.1-2.1,8-3.93,11.72-6a6,6,0,0,0,2.27-3,58.22,58.22,0,0,0,3.18-29.92c-.26-1.7-8-7.28-9.71-6.85A5,5,0,0,0,133,59.65c-2.81,2.49-5.71,4.88-8.33,7.56a9.46,9.46,0,0,0-2.47,4.4c-1.29,6.49-2.38,13-3.35,19.55a5.73,5.73,0,0,0,.83,3.91c2.31,3.08,5,5.88,7.7,9Z"/><path class="path-4" d="M52.58,29.89c-2.15-.36-3.78-.54-5.39-.9-2.83-.64-4.92.1-7,2.32A64.1,64.1,0,0,0,26.09,54.64c-2.64,7.92-2.62,7.84,5.15,10.87,1.76.69,2.73.45,3.93-1C39.79,59,44.54,53.65,49.22,48.2a4.2,4.2,0,0,0,1.13-2c.8-5.32,1.49-10.68,2.24-16.34Z"/><path class="path-5" d="M23,68.13c0,2.51,0,4.7,0,6.87a60.49,60.49,0,0,0,9.75,32.15c1.37,2.13,6.4,3,7,1.2,1.55-5,2.68-10.2,3.82-15.34.13-.58-.58-1.38-.94-2.06-2.51-4.77-5.47-9.38-7.45-14.37C32.94,71,28.22,69.84,23,68.13Z"/><path class="path-6" d="M83.91,12.86c-.32.36-.66.71-1,1.07.9,1.13,1.57,2.62,2.73,3.33,4.71,2.84,9.56,5.48,14.39,8.1a9.29,9.29,0,0,0,3.13.83c5.45.69,10.89,1.38,16.35,1.94a10.41,10.41,0,0,0,3.07-.71c-11.48-9.9-24.26-14.61-38.71-14.56Z"/><path class="path-7" d="M66.28,132.51c13.36,3.78,25.62,3.5,38-.9C91.68,129.59,79.36,128,66.28,132.51Z"/><path class="path-8" d="M127.2,30.66l-1.27.37a18.58,18.58,0,0,0,1,3.08c3,5.52,6.21,10.89,8.89,16.54,1.34,2.83,3.41,3.82,6.49,4.9a60.38,60.38,0,0,0-15.12-24.9Z"/></svg>
+        <svg viewBox="0 0 164.83 151.5"><!-- same paths as before --><path class="path-0" d="M117.24,69.24A8,8,0,0,0,115.67,67c-4.88-4-9.8-7.89-14.86-11.62A4.93,4.93,0,0,0,96.93,55c-5.76,1.89-11.4,4.17-17.18,6a4.36,4.36,0,0,0-3.42,4.12c-1,6.89-2.1,13.76-3,20.66a4,4,0,0,0,1,3.07c5.12,4.36,10.39,8.61,15.68,12.76a3.62,3.62,0,0,0,2.92.75c6.29-2.66,12.52-5.47,18.71-8.36a3.49,3.49,0,0,0,1.68-2.19c1.34-7.25,2.54-14.55,3.9-22.58Z"/><path class="path-1" d="M97.55,38.68A43.76,43.76,0,0,1,98,33.44c.41-2.36-.5-3.57-2.57-4.64C91.1,26.59,87,24,82.66,21.82a6.18,6.18,0,0,0-4-.71C73.45,22.55,68.32,24.25,63.22,26c-3.63,1.21-6.08,3.35-5.76,7.69a26.67,26.67,0,0,1-.6,4.92c-1.08,8.06-1.08,8.08,5.86,11.92,3.95,2.19,7.82,5.75,11.94,6.08s8.76-2.41,13.12-3.93c9.33-3.29,9.33-3.3,9.78-14Z"/><path class="path-2" d="M66.11,126.56c5.91-.91,11.37-1.7,16.81-2.71a3.3,3.3,0,0,0,1.87-2.17c1-4.06,1.73-8.19,2.84-12.24.54-2-.11-3-1.55-4.15-5-4-9.9-8.12-15-12a6.19,6.19,0,0,0-4.15-1.1c-5.35.66-10.7,1.54-16,2.54A4,4,0,0,0,48.34,97a109.13,109.13,0,0,0-3,12.19,4.47,4.47,0,0,0,1.34,3.6c5.54,4.36,11.23,8.53,16.91,12.69a10.84,10.84,0,0,0,2.57,1.11Z"/><path class="path-3" d="M127.42,104.12c4.1-2.1,8-3.93,11.72-6a6,6,0,0,0,2.27-3,58.22,58.22,0,0,0,3.18-29.92c-.26-1.7-8-7.28-9.71-6.85A5,5,0,0,0,133,59.65c-2.81,2.49-5.71,4.88-8.33,7.56a9.46,9.46,0,0,0-2.47,4.4c-1.29,6.49-2.38,13-3.35,19.55a5.73,5.73,0,0,0,.83,3.91c2.31,3.08,5,5.88,7.7,9Z"/><path class="path-4" d="M52.58,29.89c-2.15-.36-3.78-.54-5.39-.9-2.83-.64-4.92.1-7,2.32A64.1,64.1,0,0,0,26.09,54.64c-2.64,7.92-2.62,7.84,5.15,10.87,1.76.69,2.73.45,3.93-1C39.79,59,44.54,53.65,49.22,48.2a4.2,4.2,0,0,0,1.13-2c.8-5.32,1.49-10.68,2.24-16.34Z"/><path class="path-5" d="M23,68.13c0,2.51,0,4.7,0,6.87a60.49,60.49,0,0,0,9.75,32.15c1.37,2.13,6.4,3,7,1.2,1.55-5,2.68-10.2,3.82-15.34.13-.58-.58-1.38-.94-2.06-2.51-4.77-5.47-9.38-7.45-14.37C32.94,71,28.22,69.84,23,68.13Z"/><path class="path-6" d="M83.91,12.86c-.32.36-.66.71-1,1.07.9,1.13,1.57,2.62,2.73,3.33,4.71,2.84,9.56,5.48,14.39,8.1a9.29,9.29,0,0,0,3.13.83c5.45.69,10.89,1.38,16.35,1.94a10.41,10.41,0,0,0,3.07-.71c-11.48-9.9-24.26-14.61-38.71-14.56Z"/><path class="path-7" d="M66.28,132.51c13.36,3.78,25.62,3.5,38-.9C91.68,129.59,79.36,128,66.28,132.51Z"/><path class="path-8" d="M127.2,30.66l-1.27.37a18.58,18.58,0,0,0,1,3.08c3,5.52,6.21,10.89,8.89,16.54,1.34,2.83,3.41,3.82,6.49,4.9a60.38,60.38,0,0,0-15.12-24.9Z"/></svg>
         <div class="mt-4"><h2 class="text-xl font-black uppercase tracking-tighter loader-brand-text">Coffeeland <span class="text-emerald-500">FC</span></h2><p class="text-emerald-500 font-black text-[7px] tracking-[0.5em] uppercase mt-1">Fees Portal</p></div>
     </div>
 </div>
@@ -98,54 +105,66 @@
     <img src="https://i.ibb.co/3nTMhbz/1000287652-0b4cd8d123cf04f03fc322309c337390-11-18-2025-1-04-51-PM.png" class="h-8 w-8 rounded-full">
 </header>
 
+<!-- LOBBY -->
 <div id="lobbyView" class="px-5 transition-all duration-300 space-y-4 mt-5">
     <div><select id="homeBatchSelect" onchange="selectBatch(this.value)" class="input-dark p-3 text-xs font-bold w-full rounded-xl"><option value="">Quick Jump...</option></select></div>
-    <div class="search-shell rounded-xl p-3"><div class="flex gap-2 items-center"><div class="text-base">🔎</div><input id="homePlayerSearch" type="text" placeholder="Search player..." oninput="searchHomePlayers()" class="bg-transparent w-full outline-none text-sm font-bold"></div></div>
+    <div class="search-shell rounded-xl p-3"><div class="flex gap-2 items-center"><div class="text-base">🔎</div><input id="homePlayerSearch" type="text" placeholder="Search player from any batch..." oninput="searchHomePlayers()" class="bg-transparent w-full outline-none text-sm font-bold"></div></div>
     <div id="homeSearchResults" class="space-y-2"></div>
     <div id="batchGrid" class="grid grid-cols-2 gap-3"></div>
 </div>
 
+<!-- COMMAND VIEW -->
 <div id="commandView" class="hidden-view px-5 space-y-5 mt-5">
-    <!-- Dashboard -->
-    <div class="card-gradient p-4 grid grid-cols-3 gap-2 text-center rounded-xl">
-        <div><p class="text-[7px] font-bold text-gray-500 uppercase">Target</p><p id="dashTarget" class="text-sm font-black">₹0</p></div>
-        <div class="border-x border-black/5"><p class="text-[7px] font-bold text-gray-500 uppercase">Received</p><p id="dashPaid" class="text-sm font-black text-mint">₹0</p></div>
-        <div><p class="text-[7px] font-bold text-gray-500 uppercase">Pending</p><p id="dashPending" class="text-sm font-black text-rose">₹0</p></div>
+    <div class="flex">
+        <div id="tab-fees" class="tab active" onclick="switchTab('fees')">💰 Fees Collection</div>
+        <div id="tab-history" class="tab" onclick="switchTab('history')">📜 Payment History</div>
     </div>
 
-    <!-- Batch + Date -->
-    <div class="flex gap-2">
-        <select id="batchSelect" onchange="loadStudents()" class="input-dark p-3 text-xs font-bold rounded-xl flex-1"></select>
-        <input type="date" id="feeDate" class="input-dark p-3 text-xs font-bold rounded-xl w-1/3">
-    </div>
-
-    <!-- Search -->
-    <div class="search-shell rounded-xl p-3"><div class="flex gap-2 items-center"><div class="text-base">🔎</div><input id="studentSearch" type="text" placeholder="Search in batch..." oninput="applyFilters()" class="bg-transparent w-full outline-none text-sm font-bold"></div></div>
-
-    <!-- Filters + Month -->
-    <div class="flex flex-wrap items-center justify-between gap-2">
-        <div class="flex flex-wrap gap-1.5">
-            <button id="filter-all" onclick="setStatusFilter('all')" class="filter-chip active">All</button>
-            <button id="filter-pending" onclick="setStatusFilter('pending')" class="filter-chip">Pending</button>
-            <button id="filter-partial" onclick="setStatusFilter('partial')" class="filter-chip">Partial</button>
-            <button id="filter-paid" onclick="setStatusFilter('paid')" class="filter-chip">Paid</button>
+    <!-- Fees Tab -->
+    <div id="feesView">
+        <div class="card-gradient p-4 grid grid-cols-3 gap-2 text-center rounded-xl">
+            <div><p class="text-[7px] font-bold text-gray-500 uppercase">Target</p><p id="dashTarget" class="text-sm font-black">₹0</p></div>
+            <div class="border-x border-black/5"><p class="text-[7px] font-bold text-gray-500 uppercase">Received</p><p id="dashPaid" class="text-sm font-black text-mint">₹0</p></div>
+            <div><p class="text-[7px] font-bold text-gray-500 uppercase">Pending</p><p id="dashPending" class="text-sm font-black text-rose">₹0</p></div>
         </div>
-        <div class="flex items-center gap-1.5">
-            <span class="text-[7px] text-gray-400">📅</span>
-            <select id="viewMonthFilter" onchange="loadStudents()" class="input-dark px-2 py-1.5 text-[9px] font-bold rounded-lg"></select>
-        </div>
-    </div>
-    <p id="searchMeta" class="text-[9px] font-bold text-mint text-right -mt-2">0 shown</p>
 
-    <!-- Student Cards -->
-    <main id="roster" class="space-y-4 pb-24"></main>
+        <div class="flex gap-2 mt-3">
+            <select id="batchSelect" class="input-dark p-3 text-xs font-bold rounded-xl flex-1"></select>
+            <input type="date" id="feeDate" class="input-dark p-3 text-xs font-bold rounded-xl w-1/3">
+        </div>
+
+        <div class="search-shell rounded-xl p-3 mt-3"><div class="flex gap-2 items-center"><div class="text-base">🔎</div><input id="studentSearch" type="text" placeholder="Search in batch..." oninput="applyFilters()" class="bg-transparent w-full outline-none text-sm font-bold"></div></div>
+
+        <div class="flex flex-wrap items-center justify-between gap-2 mt-3">
+            <div class="flex flex-wrap gap-1.5">
+                <button id="filter-all" onclick="setStatusFilter('all')" class="filter-chip active">All</button>
+                <button id="filter-pending" onclick="setStatusFilter('pending')" class="filter-chip">Pending</button>
+                <button id="filter-partial" onclick="setStatusFilter('partial')" class="filter-chip">Partial</button>
+                <button id="filter-paid" onclick="setStatusFilter('paid')" class="filter-chip">Paid</button>
+            </div>
+            <div class="flex items-center gap-1.5">
+                <span class="text-[7px] text-gray-400">📅</span>
+                <select id="viewMonthFilter" onchange="loadStudents()" class="input-dark px-2 py-1.5 text-[9px] font-bold rounded-lg"></select>
+            </div>
+        </div>
+        <p id="searchMeta" class="text-[9px] font-bold text-mint text-right -mt-2">0 shown</p>
+
+        <main id="roster" class="space-y-4 pb-24 mt-3"></main>
+    </div>
+
+    <!-- History Tab (card-based) -->
+    <div id="historyView" class="hidden-view space-y-4">
+        <div class="search-shell rounded-xl p-3"><div class="flex gap-2 items-center"><div class="text-base">🔎</div><input id="historySearch" type="text" placeholder="Search by student name, batch, month..." oninput="filterHistory()" class="bg-transparent w-full outline-none text-sm font-bold"></div></div>
+        <div id="historyCardContainer" class="history-grid"></div>
+    </div>
 </div>
 
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxg-ris0coVz6oam8H1l_UReNEMZ6pwe0xLpX-Q5cNpy9zIXMewju6sN_sOVFeCpdnASg/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxVg806VVTZGnx1heQGlaVor6hFJIfuUq62lUkU5lq5bJaGXKmWxBzy3VKDN2oaJ-Px/exec";
 let students = [];
 let currentStatusFilter = 'all';
 let homeSearchTimer = null;
+let allPayments = [];
 
 function hideLoader() { document.querySelector('.main-fader')?.classList.add('hidden'); }
 
@@ -169,13 +188,108 @@ window.onload = async () => {
     } catch(e) { alert("Unable to load hubs"); hideLoader(); }
 };
 
+function selectBatch(batchName) {
+    document.getElementById('batchSelect').value = batchName;
+    document.getElementById('lobbyView').classList.add('hidden-view');
+    document.getElementById('commandView').classList.remove('hidden-view');
+    loadStudents();
+}
+
+function switchTab(tab) {
+    document.getElementById('feesView').classList.add('hidden-view');
+    document.getElementById('historyView').classList.add('hidden-view');
+    document.getElementById('tab-fees').classList.remove('active');
+    document.getElementById('tab-history').classList.remove('active');
+    if (tab === 'fees') {
+        document.getElementById('feesView').classList.remove('hidden-view');
+        document.getElementById('tab-fees').classList.add('active');
+    } else {
+        document.getElementById('historyView').classList.remove('hidden-view');
+        document.getElementById('tab-history').classList.add('active');
+        loadAllPayments();
+    }
+}
+
+async function loadAllPayments() {
+    const container = document.getElementById('historyCardContainer');
+    container.innerHTML = '<div class="text-center py-8 text-gray-500">Loading payments...</div>';
+    try {
+        const r = await fetch(`${SCRIPT_URL}?action=getAllPayments`);
+        const data = await r.json();
+        allPayments = data.payments || [];
+        renderHistoryCards();
+    } catch(e) { console.error(e); container.innerHTML = '<div class="text-center py-8 text-red-500">Failed to load payments</div>'; }
+}
+
+function renderHistoryCards() {
+    const searchTerm = document.getElementById('historySearch')?.value.toLowerCase() || '';
+    const filtered = allPayments.filter(p => 
+        (p.studentName?.toLowerCase().includes(searchTerm) ||
+         p.studentBatch?.toLowerCase().includes(searchTerm) ||
+         p.month?.toLowerCase().includes(searchTerm) ||
+         p.date?.includes(searchTerm))
+    );
+    const container = document.getElementById('historyCardContainer');
+    if (filtered.length === 0) { container.innerHTML = '<div class="text-center py-8 text-gray-500">No payments found</div>'; return; }
+    let html = '';
+    filtered.forEach(p => {
+        html += `
+            <div class="history-card">
+                <div class="flex justify-between items-start mb-2">
+                    <div>
+                        <h3 class="font-extrabold text-base">${escapeHtml(p.studentName || '')}</h3>
+                        <p class="text-[10px] text-gray-500">${escapeHtml(p.studentBatch || '')}</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="editPayment('${p.uuid}', '${p.month}', ${p.amount}, '${p.date || ''}', '${escapeHtml(p.note || '')}')" class="text-blue-500 text-sm px-2 py-1 bg-blue-50 rounded-lg">✏️ Edit</button>
+                        <button onclick="deletePayment('${p.uuid}')" class="text-red-500 text-sm px-2 py-1 bg-red-50 rounded-lg">🗑️ Delete</button>
+                    </div>
+                </div>
+                <div class="history-row"><span class="history-label">📅 Date</span><span class="history-value">${p.date || '-'}</span></div>
+                <div class="history-row"><span class="history-label">📆 Month</span><span class="history-value">${p.month || '-'}</span></div>
+                <div class="history-row"><span class="history-label">💰 Amount</span><span class="history-value text-mint">₹${p.amount || 0}</span></div>
+                <div class="history-row"><span class="history-label">💳 Type</span><span class="history-value">${p.feeType || '-'}</span></div>
+                <div class="history-row"><span class="history-label">👤 Paid To</span><span class="history-value">${escapeHtml(p.paidTo || '-')}</span></div>
+                <div class="history-row"><span class="history-label">📝 Note</span><span class="history-value text-gray-500">${escapeHtml(p.note || '-')}</span></div>
+            </div>
+        `;
+    });
+    container.innerHTML = html;
+}
+
+function filterHistory() { renderHistoryCards(); }
+
+async function deletePayment(uuid) {
+    if (!confirm("Delete this payment? Cannot undo.")) return;
+    try {
+        const r = await fetch(SCRIPT_URL, { method: 'POST', body: new URLSearchParams({ payload: JSON.stringify({ action: 'deletePayment', uuid: uuid }) }) });
+        const out = await r.json();
+        if (out.status === 'success') {
+            alert("Deleted.");
+            if (document.getElementById('historyView').classList.contains('hidden-view') === false) loadAllPayments();
+            if (document.getElementById('feesView').classList.contains('hidden-view') === false) loadStudents();
+        } else throw new Error();
+    } catch(e) { alert("Delete failed"); }
+}
+
+function editPayment(uuid, currentMonth, currentAmount, currentDate, currentNote) {
+    const newAmount = prompt("Enter new amount:", currentAmount);
+    if (newAmount === null) return;
+    const newMonth = prompt("Enter new month (YYYY-MM):", currentMonth);
+    if (newMonth === null) return;
+    const newNote = prompt("Enter new note:", currentNote);
+    const payload = { action: 'updatePayment', uuid: uuid, updated: { amount: parseFloat(newAmount), month: newMonth, paymentDate: currentDate, note: newNote || '' } };
+    fetch(SCRIPT_URL, { method: 'POST', body: new URLSearchParams({ payload: JSON.stringify(payload) }) })
+        .then(r => r.json()).then(out => { if (out.status === 'success') { alert("Updated."); if (document.getElementById('historyView').classList.contains('hidden-view') === false) loadAllPayments(); if (document.getElementById('feesView').classList.contains('hidden-view') === false) loadStudents(); } else alert("Update failed"); })
+        .catch(() => alert("Update failed"));
+}
+
+// ========== FEES COLLECTION FUNCTIONS (unchanged from your original working code) ==========
 function populateViewMonthFilter() {
-    let months = [];
-    let today = new Date();
+    let months = [], today = new Date();
     for (let i = 0; i <= 3; i++) {
         let d = new Date(today.getFullYear(), today.getMonth() - i, 1);
-        let yyyy = d.getFullYear();
-        let mm = String(d.getMonth() + 1).padStart(2,'0');
+        let yyyy = d.getFullYear(), mm = String(d.getMonth() + 1).padStart(2,'0');
         months.push(`${yyyy}-${mm}`);
     }
     let select = document.getElementById('viewMonthFilter');
@@ -183,37 +297,15 @@ function populateViewMonthFilter() {
     select.value = months[0];
 }
 
-function selectBatch(n) { document.getElementById('batchSelect').value = n; loadStudents(); }
-
-async function searchHomePlayers() {
-    clearTimeout(homeSearchTimer);
-    homeSearchTimer = setTimeout(async () => {
-        const query = document.getElementById('homePlayerSearch').value.trim();
-        const container = document.getElementById('homeSearchResults');
-        if (query.length < 2) { container.innerHTML = ''; return; }
-        const r = await fetch(`${SCRIPT_URL}?action=searchStudents&q=${encodeURIComponent(query)}`);
-        const data = await r.json();
-        container.innerHTML = data.students.map(s => `<button onclick="jumpToStudent('${s.batch}', '${s.name}')" class="bg-white dark:bg-zinc-900 w-full p-3 rounded-xl text-left border border-black/5 shadow-sm"><h4 class="text-sm font-bold">${escapeHtml(s.name)}</h4><p class="text-[9px] text-gray-500">${s.batch}</p></button>`).join('');
-    }, 300);
-}
-
-function jumpToStudent(b, n) { document.getElementById('homePlayerSearch').value = n; selectBatch(b); }
-
 async function loadStudents() {
-    const b = document.getElementById('batchSelect').value;
-    const viewMonth = document.getElementById('viewMonthFilter').value;
+    const b = document.getElementById('batchSelect').value, viewMonth = document.getElementById('viewMonthFilter').value;
     if (!b) return;
-    document.getElementById('lobbyView').classList.add('hidden-view');
-    document.getElementById('commandView').classList.remove('hidden-view');
     document.getElementById('roster').innerHTML = '<p class="py-16 text-center text-mint font-bold animate-pulse text-[9px]">Loading...</p>';
     try {
         const r = await fetch(`${SCRIPT_URL}?action=getStudents&batch=${encodeURIComponent(b)}&date=${viewMonth}-01`);
         const data = await r.json();
         students = (data.students || []).map(s => {
-            s.fees = Number(s.fees);
-            s.paidSoFar = Number(s.paidSoFar);
-            s.balance = Number(s.balance);
-            s.remindCount = Number(s.remindCount) || 0;
+            s.fees = Number(s.fees); s.paidSoFar = Number(s.paidSoFar); s.balance = Number(s.balance); s.remindCount = Number(s.remindCount) || 0; s.studentId = s.studentId || 'N/A';
             return s;
         });
         updateDashboard(); render();
@@ -225,34 +317,82 @@ function updateDashboard() {
     document.getElementById('dashTarget').innerText = `₹${t}`; document.getElementById('dashPaid').innerText = `₹${p}`; document.getElementById('dashPending').innerText = `₹${b}`;
 }
 
-function getStatusForStudent(s) {
-    if (s.balance === 0) return 'paid';
-    if (s.balance === s.fees) return 'pending';
-    return 'partial';
-}
+function getStatusForStudent(s) { if (s.balance === 0) return 'paid'; if (s.balance === s.fees) return 'pending'; return 'partial'; }
 
 function generateMonthChips(i) {
     const months = ["MAY", "APR", "MAR", "FEB"];
     let html = '';
-    for (let j = 0; j <= 3; j++) {
-        html += `<div onclick="toggleMonth(${i}, ${j})" id="mchip-${i}-${j}" class="month-chip ${j === 0 ? 'selected' : ''}">${months[j]}</div>`;
-    }
+    for (let j = 0; j <= 3; j++) html += `<div onclick="toggleMonth(${i}, ${j})" id="mchip-${i}-${j}" class="month-chip ${j === 0 ? 'selected' : ''}">${months[j]}</div>`;
     return html;
 }
-
-function toggleMonth(i, j) { 
-    document.getElementById(`mchip-${i}-${j}`).classList.toggle('selected'); 
-    calcBalance(i); 
-}
-
+function toggleMonth(i, j) { document.getElementById(`mchip-${i}-${j}`).classList.toggle('selected'); calcBalance(i); }
 function calcBalance(i) {
     const s = students[i];
-    const months = document.querySelectorAll(`[id^="mchip-${i}-"].selected`).length;
+    const monthsCount = document.querySelectorAll(`[id^="mchip-${i}-"].selected`).length;
     const paidInput = parseFloat(document.getElementById(`paid-${i}`).value || 0);
-    const newPend = Math.max(0, (s.fees * months) - (s.paidSoFar + paidInput));
+    const newPend = Math.max(0, (s.fees * monthsCount) - (s.paidSoFar + paidInput));
     document.getElementById(`pend-${i}`).innerText = `₹${newPend}`;
 }
-
+function getSelectedMonthStrings(i) {
+    const selectedChips = document.querySelectorAll(`[id^="mchip-${i}-"].selected`);
+    const curDate = new Date();
+    const months = [];
+    selectedChips.forEach(chip => {
+        const j = parseInt(chip.id.split('-').pop());
+        let mIdx = curDate.getMonth() - j;
+        if (mIdx < 0) mIdx += 12;
+        let year = curDate.getFullYear(), month = mIdx + 1;
+        if (mIdx > curDate.getMonth()) year--;
+        months.push(`${year}-${String(month).padStart(2, '0')}`);
+    });
+    return months;
+}
+async function liveSettle(i) {
+    const s = students[i], btn = document.getElementById(`settle-btn-${i}`);
+    const amt = parseFloat(document.getElementById(`paid-${i}`).value || 0);
+    const selectedMonths = getSelectedMonthStrings(i);
+    const monthsCount = selectedMonths.length;
+    if (amt <= 0) return alert("Enter amount");
+    if (monthsCount === 0) return alert("Select at least one month");
+    btn.innerText = "SAVING..."; btn.disabled = true;
+    const splitAmount = Math.floor(amt / monthsCount), remainder = amt - (splitAmount * monthsCount);
+    const records = selectedMonths.map((month, idx) => ({
+        studentId: s.studentId, name: s.name, contact: s.contact, batch: s.batch, fees: s.fees,
+        paidAmount: idx === 0 ? splitAmount + remainder : splitAmount,
+        balance: Math.max(0, s.fees - (idx === 0 ? splitAmount + remainder : splitAmount)),
+        feeType: document.getElementById(`type-${i}`).value, paidTo: document.getElementById(`pst-${i}`).value,
+        note: document.getElementById(`note-${i}`).value, targetMonth: month, paymentDate: document.getElementById('feeDate').value
+    }));
+    try {
+        const response = await fetch(SCRIPT_URL, { method: 'POST', body: new URLSearchParams({ payload: JSON.stringify({ action: 'saveFees', date: document.getElementById('feeDate').value, data: records }) }) });
+        const out = await response.json();
+        if (out.status === 'success') {
+            s.tempPaid = true; s.lastPaidAmt = amt; s.lastMonthsCount = monthsCount; s.paidSoFar += amt; s.balance = Math.max(0, s.balance - amt); s.note = records[0].note;
+            updateDashboard(); render();
+        } else throw new Error();
+    } catch(e) { alert("Sync Failed"); btn.innerText = "SETTLE"; btn.disabled = false; }
+}
+async function liveRemind(i) {
+    const s = students[i], btn = document.getElementById(`rem-btn-${i}`);
+    btn.innerText = "LOGGING...";
+    const newCount = (Number(s.remindCount) || 0) + 1;
+    const record = { studentId: s.studentId, name: s.name, batch: s.batch, newRemindSent: true, remindCount: newCount, paidAmount: 0, paymentDate: document.getElementById('feeDate').value };
+    try { await fetch(SCRIPT_URL, { method: 'POST', body: new URLSearchParams({ payload: JSON.stringify({ action: 'saveFees', date: document.getElementById('feeDate').value, data: [record] }) }) }); s.remindCount = newCount; render(); sendWA(i, 'remind'); } 
+    catch(e) { s.remindCount = newCount; render(); sendWA(i, 'remind'); }
+}
+function sendWA(i, type) {
+    const s = students[i]; let ph = String(s.contact || '').replace(/\D/g, ''); if (!ph.startsWith('91')) ph = '91' + ph;
+    const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+    const curDate = new Date(); const paidAmount = document.getElementById(`paid-${i}`)?.value || (s.lastPaidAmt || "0");
+    const selectedMonths = getSelectedMonthStrings(i);
+    let monthLabel = "";
+    if (selectedMonths.length > 0) {
+        const labels = selectedMonths.map(m => { const d = new Date(m + "-01"); return monthNames[d.getMonth()]; });
+        monthLabel = labels.join(", ");
+    } else { monthLabel = monthNames[curDate.getMonth()]; }
+    let msg = type === 'receipt' ? `✅ Payment Successful\n\n${s.name}\nAmount: ₹${paidAmount}\nMonths: ${monthLabel}\nBalance: ₹${s.balance}\n\nThanks - Coffeeland FC` : `⚠️ Fee Reminder\n\n${s.name}\nDue: ₹${s.balance}\nMonth: ${monthLabel}\nUPI: 8867742269@ptaxis\n\nPlease pay at earliest - Coffeeland FC`;
+    window.open(`https://wa.me/${ph}?text=${encodeURIComponent(msg)}`);
+}
 function render() {
     const container = document.getElementById('roster');
     container.innerHTML = '';
@@ -264,105 +404,40 @@ function render() {
     document.getElementById('filter-all').innerHTML = `All (${counts.all})`;
 
     students.forEach((s, i) => {
-        const status = getStatusForStudent(s);
-        const isPaid = status === 'paid';
+        const status = getStatusForStudent(s), isPaid = status === 'paid';
         const rCount = Number(s.remindCount || 0);
-        let btnColor = "bg-black/5 text-gray-500 border-black/10";
-        if (rCount === 1) btnColor = "bg-amber-500/20 text-amber-700 border-amber-500/30";
-        if (rCount === 2) btnColor = "bg-orange-500/20 text-orange-700 border-orange-500/30";
-        if (rCount >= 3) btnColor = "bg-red-500/20 text-red-700 border-red-500/30";
-
+        let remindBtnColor = "bg-black/5 text-gray-500 border-black/10";
+        if (rCount === 1) remindBtnColor = "bg-amber-500/20 text-amber-700 border-amber-500/30";
+        if (rCount === 2) remindBtnColor = "bg-orange-500/20 text-orange-700 border-orange-500/30";
+        if (rCount >= 3) remindBtnColor = "bg-red-500/20 text-red-700 border-red-500/30";
         let cardClass = status === 'paid' ? 'card-paid' : (status === 'partial' ? 'card-partial' : 'card-pending');
         let badgeClass = status === 'paid' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' : (status === 'partial' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300');
-
+        const whatsappIcon = `<img src="https://i.ibb.co/60NPMpPd/Pngtree-whatsapp-icon-whatsapp-logo-whatsapp-3584845.png" class="whatsapp-icon" alt="WhatsApp">`;
         if (isPaid) {
-            container.innerHTML += `
-                <div class="student-card card-gradient p-4 space-y-3 rounded-xl ${cardClass}" data-name="${s.name.toLowerCase()}" data-status="paid">
-                    <div class="flex justify-between items-start"><div><h3 class="text-base font-extrabold">${escapeHtml(s.name)}</h3><p class="text-[9px] text-gray-500 font-bold">${escapeHtml(s.contact)}</p></div><span class="px-2 py-1 rounded-lg text-[8px] font-black uppercase ${badgeClass}">PAID</span></div>
-                    <div class="bg-mint/10 border border-mint/20 rounded-xl p-3 space-y-2">
-                        <div class="flex justify-between items-center"><p class="text-[8px] font-black text-mint uppercase tracking-wider">✓ PAID SUCCESSFULLY</p><button onclick="sendWA(${i}, 'receipt')" class="w-8 h-8 bg-mint/20 text-mint rounded-lg flex items-center justify-center text-sm">💬</button></div>
-                        <div class="space-y-1 pt-1 border-t border-mint/10"><p class="text-[8px] font-bold text-gray-600">Amount Paid: <span class="text-mint">₹${s.lastPaidAmt || s.paidSoFar}</span></p><p class="text-[8px] font-bold text-gray-600">Months Covered: <span class="text-mint">${s.lastMonthsCount || 'Current'}</span></p><p class="text-[8px] font-bold text-gray-600">Balance: <span class="${s.balance > 0 ? 'text-rose' : 'text-mint'}">₹${s.balance}</span></p>${s.note ? `<p class="text-[8px] italic text-gray-500 pt-1">📝 ${s.note}</p>` : ''}</div>
-                        <p class="text-[7px] text-gray-400 text-right mt-1">📅 ${document.getElementById('feeDate').value}</p>
-                    </div>
-                </div>`;
+            container.innerHTML += `<div class="student-card card-gradient p-4 space-y-3 rounded-xl ${cardClass}" data-name="${s.name.toLowerCase()}" data-status="paid"><div class="flex justify-between items-start"><div><h3 class="text-base font-extrabold">${escapeHtml(s.name)}</h3><div class="flex flex-wrap items-center gap-2 mt-0.5"><p class="text-[9px] text-gray-500 font-bold">${escapeHtml(s.contact)}</p><span class="student-id text-[8px]">ID: ${escapeHtml(s.studentId.substring(0,12))}</span></div></div><span class="px-2 py-1 rounded-lg text-[8px] font-black uppercase ${badgeClass}">PAID</span></div><div class="bg-mint/10 border border-mint/20 rounded-xl p-3 space-y-2"><div class="flex justify-between items-center"><p class="text-[8px] font-black text-mint uppercase tracking-wider">✓ PAID SUCCESSFULLY</p><button onclick="sendWA(${i}, 'receipt')" class="w-8 h-8 bg-mint/20 text-mint rounded-lg flex items-center justify-center">${whatsappIcon}</button></div><div class="space-y-1 pt-1 border-t border-mint/10"><p class="text-[8px] font-bold text-gray-600">Amount Paid: <span class="text-mint">₹${s.lastPaidAmt || s.paidSoFar}</span></p><p class="text-[8px] font-bold text-gray-600">Months Covered: <span class="text-mint">${s.lastMonthsCount || 'Current'}</span></p><p class="text-[8px] font-bold text-gray-600">Balance: <span class="${s.balance > 0 ? 'text-rose' : 'text-mint'}">₹${s.balance}</span></p>${s.note ? `<p class="text-[8px] italic text-gray-500 pt-1">📝 ${s.note}</p>` : ''}</div><p class="text-[7px] text-gray-400 text-right mt-1">📅 ${document.getElementById('feeDate').value}</p></div></div>`;
         } else {
-            container.innerHTML += `
-                <div class="student-card card-gradient p-4 space-y-4 rounded-xl ${cardClass}" data-name="${s.name.toLowerCase()}" data-status="${status}">
-                    <!-- Header -->
-                    <div class="flex justify-between items-start"><div><h3 class="text-base font-extrabold">${escapeHtml(s.name)}</h3><p class="text-[9px] text-gray-500 font-bold">${escapeHtml(s.contact)}</p></div><span class="px-2 py-1 rounded-lg text-[8px] font-black uppercase ${badgeClass}">${status === 'partial' ? 'PARTIAL' : 'PENDING'}</span></div>
-                    
-                    <!-- Fee Stats -->
-                    <div class="space-y-2">
-                        <div class="flex justify-between items-center border-b border-black/10 dark:border-white/10 pb-2"><span class="text-[9px] font-bold text-gray-500">Monthly Fee</span><span class="text-base font-black">₹${s.fees}</span></div>
-                        <div class="flex justify-between items-center border-b border-black/10 dark:border-white/10 pb-2"><span class="text-[9px] font-bold text-gray-500">Paid this month</span><span class="text-base font-black text-mint">₹${s.paidSoFar}</span></div>
-                        <div class="flex justify-between items-center"><span class="text-[9px] font-bold text-gray-500">Remaining</span><span class="text-lg font-black text-rose" id="pend-${i}">₹${s.balance}</span></div>
-                    </div>
-                    
-                    <!-- SELECT MONTHS (moved UP) -->
-                    <div class="space-y-2"><label class="text-[8px] font-black text-gray-400 uppercase tracking-wider">📆 SELECT MONTHS</label><div class="flex gap-2 flex-wrap">${generateMonthChips(i)}</div></div>
-                    
-                    <!-- EXTRA PAYMENT (after months) -->
-                    <div class="space-y-2"><label class="text-[8px] font-black text-gray-400 uppercase tracking-wider">💰 EXTRA PAYMENT</label><input type="number" id="paid-${i}" placeholder="Enter amount" oninput="calcBalance(${i})" class="input-dark w-full p-2.5 text-sm font-bold rounded-lg"></div>
-                    
-                    <!-- Payment Details -->
-                    <div class="grid grid-cols-2 gap-2"><select id="type-${i}" class="input-dark text-[9px] p-2.5 font-bold rounded-lg"><option>UPI</option><option>CASH</option></select><input id="pst-${i}" type="text" placeholder="Paid To" class="input-dark text-[9px] p-2.5 font-bold rounded-lg"></div>
-                    
-                    <input id="note-${i}" type="text" placeholder="📝 Add note..." class="input-dark text-[9px] p-2.5 font-bold rounded-lg w-full">
-                    
-                    <!-- Action Buttons -->
-                    <div class="flex gap-2 pt-1">
-                        <button onclick="showQR(${i})" class="bg-black/5 px-3 py-2.5 rounded-lg text-[9px] font-bold border border-black/10">QR</button>
-                        <button id="settle-btn-${i}" onclick="liveSettle(${i})" class="flex-1 bg-mint text-white rounded-lg py-2.5 text-[9px] font-black uppercase shadow-md">SETTLE</button>
-                        <button onclick="sendWA(${i}, 'receipt')" class="w-10 bg-emerald-500/10 text-emerald-500 rounded-lg text-sm border border-emerald-500/20">💬</button>
-                        <button id="rem-btn-${i}" onclick="liveRemind(${i})" class="flex-1 ${btnColor} border rounded-lg py-2.5 text-[9px] font-black uppercase">${rCount > 0 ? `REMIND x${rCount}` : 'REMIND'}</button>
-                    </div>
-                </div>`;
+            const monthChipsHtml = generateMonthChips(i);
+            container.innerHTML += `<div class="student-card card-gradient p-4 space-y-3 rounded-xl ${cardClass}" data-name="${s.name.toLowerCase()}" data-status="${status}"><div class="flex justify-between items-start"><div><h3 class="text-base font-extrabold">${escapeHtml(s.name)}</h3><div class="flex flex-wrap items-center gap-2 mt-0.5"><p class="text-[9px] text-gray-500 font-bold">${escapeHtml(s.contact)}</p><span class="student-id text-[8px]">ID: ${escapeHtml(s.studentId.substring(0,12))}</span></div></div><span class="px-2 py-1 rounded-lg text-[8px] font-black uppercase ${badgeClass}">${status === 'partial' ? 'PARTIAL' : 'PENDING'}</span></div><div class="space-y-3 py-1"><div class="flex justify-between items-center border-b border-black/10 dark:border-white/10 pb-2"><span class="fee-label">📊 Monthly Fee</span><span class="fee-amount">₹${s.fees}</span></div><div class="flex justify-between items-center border-b border-black/10 dark:border-white/10 pb-2"><span class="fee-label">✅ Paid this month</span><span class="fee-amount text-mint">₹${s.paidSoFar}</span></div><div class="flex justify-between items-center"><span class="fee-label">⚠️ Remaining</span><span class="fee-amount text-rose" id="pend-${i}">₹${s.balance}</span></div></div><div class="space-y-2"><label class="text-[8px] font-black text-gray-400 uppercase tracking-wider">📆 SELECT MONTHS</label><div class="flex gap-2 flex-wrap">${monthChipsHtml}</div></div><div class="space-y-2"><label class="text-[8px] font-black text-gray-400 uppercase tracking-wider">💰 PAYMENT AMOUNT</label><input type="number" id="paid-${i}" placeholder="Enter amount" oninput="calcBalance(${i})" class="input-dark w-full p-2.5 text-base font-bold rounded-lg"></div><div class="grid grid-cols-2 gap-2"><select id="type-${i}" class="input-dark text-[9px] p-2.5 font-bold rounded-lg"><option>UPI</option><option>CASH</option></select><input id="pst-${i}" type="text" placeholder="Paid To" class="input-dark text-[9px] p-2.5 font-bold rounded-lg"></div><input id="note-${i}" type="text" placeholder="📝 Add note..." class="input-dark text-[9px] p-2.5 font-bold rounded-lg w-full"><div class="grid grid-cols-3 gap-2 pt-2"><button onclick="showQR(${i})" class="bg-black/5 px-2 py-2.5 rounded-lg text-[9px] font-bold border border-black/10">QR</button><button onclick="sendWA(${i}, 'receipt')" class="bg-emerald-500/10 text-emerald-500 rounded-lg py-2.5 flex items-center justify-center border border-emerald-500/20">${whatsappIcon}</button><button id="rem-btn-${i}" onclick="liveRemind(${i})" class="${remindBtnColor} border rounded-lg py-2.5 text-[9px] font-black uppercase">${rCount > 0 ? `REMIND x${rCount}` : 'REMIND'}</button></div><button id="settle-btn-${i}" onclick="liveSettle(${i})" class="w-full bg-mint text-white rounded-xl py-3 text-[11px] font-black uppercase shadow-md tracking-wider mt-2">SETTLE</button></div>`;
         }
     });
     applyFilters();
 }
-
-async function liveSettle(i) {
-    const s = students[i]; const btn = document.getElementById(`settle-btn-${i}`);
-    const amt = parseFloat(document.getElementById(`paid-${i}`).value || 0);
-    const months = document.querySelectorAll(`[id^="mchip-${i}-"].selected`).length;
-    if (amt <= 0) return alert("Enter amount");
-    if (months === 0) return alert("Select at least one month");
-    btn.innerText = "SAVING..."; btn.disabled = true;
-    const newBalance = Math.max(0, (s.fees * months) - (s.paidSoFar + amt));
-    const record = { studentId: s.studentId, name: s.name, contact: s.contact, batch: s.batch, fees: s.fees, paidAmount: amt, balance: newBalance, monthsCovered: months, feeType: document.getElementById(`type-${i}`).value, paidTo: document.getElementById(`pst-${i}`).value, note: document.getElementById(`note-${i}`).value };
-    try {
-        const r = await fetch(SCRIPT_URL, { method: 'POST', body: new URLSearchParams({ payload: JSON.stringify({ action: 'saveFees', date: document.getElementById('feeDate').value, data: [record] }) }) });
-        const out = await r.json();
-        if (out.status === 'success') { s.tempPaid = true; s.lastPaidAmt = amt; s.lastMonthsCount = months; s.paidSoFar += amt; s.balance = newBalance; s.note = record.note; updateDashboard(); render(); }
-    } catch(e) { alert("Sync Failed"); btn.innerText = "SETTLE"; btn.disabled = false; }
-}
-
-async function liveRemind(i) {
-    const s = students[i]; const btn = document.getElementById(`rem-btn-${i}`);
-    btn.innerText = "LOGGING...";
-    const newCount = (Number(s.remindCount) || 0) + 1;
-    const record = { studentId: s.studentId, name: s.name, batch: s.batch, newRemindSent: true, remindCount: newCount, paidAmount: 0 };
-    try { await fetch(SCRIPT_URL, { method: 'POST', body: new URLSearchParams({ payload: JSON.stringify({ action: 'saveFees', date: document.getElementById('feeDate').value, data: [record] }) }) }); s.remindCount = newCount; render(); sendWA(i, 'remind'); } 
-    catch(e) { s.remindCount = newCount; render(); sendWA(i, 'remind'); }
-}
-
-function sendWA(i, type) {
-    const s = students[i]; let ph = String(s.contact || '').replace(/\D/g, ''); if (!ph.startsWith('91')) ph = '91' + ph;
-    const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-    const curDate = new Date(); const paidAmount = document.getElementById(`paid-${i}`)?.value || (s.lastPaidAmt || "0");
-    const selectedMonthChips = document.querySelectorAll(`[id^="mchip-${i}-"].selected`);
-    let monthLabel = "";
-    if (selectedMonthChips.length > 0) { const labels = Array.from(selectedMonthChips).map(chip => { const j = parseInt(chip.id.split('-').pop()); let mIdx = curDate.getMonth() - j; if (mIdx < 0) mIdx += 12; return monthNames[mIdx]; }); monthLabel = labels.join(", "); } 
-    else { monthLabel = monthNames[curDate.getMonth()]; }
-    let msg = type === 'receipt' ? `✅ Payment Successful\n\n${s.name}\nAmount: ₹${paidAmount}\nMonths: ${monthLabel}\nBalance: ₹${s.balance}\n\nThanks - Coffeeland FC` : `⚠️ Fee Reminder\n\n${s.name}\nDue: ₹${s.balance}\nMonth: ${monthLabel}\nUPI: 8867742269@ptaxis\n\nPlease pay at earliest - Coffeeland FC`;
-    window.open(`https://wa.me/${ph}?text=${encodeURIComponent(msg)}`);
-}
-
 function setStatusFilter(f) { currentStatusFilter = f; document.querySelectorAll('.filter-chip').forEach(c => c.classList.toggle('active', c.id === `filter-${f}`)); applyFilters(); }
-function applyFilters() { const query = document.getElementById('studentSearch').value.toLowerCase(); let visible = 0; document.querySelectorAll('.student-card').forEach(card => { const matchName = card.dataset.name.includes(query); const matchStatus = currentStatusFilter === 'all' || card.dataset.status === currentStatusFilter; const isVisible = matchName && matchStatus; card.style.display = isVisible ? '' : 'none'; if (isVisible) visible++; }); document.getElementById('searchMeta').innerText = `${visible} shown`; }
+function applyFilters() { const query = document.getElementById('studentSearch').value.toLowerCase(); let visible = 0; document.querySelectorAll('.student-card').forEach(card => { const matchName = card.dataset.name.includes(query); const matchStatus = currentStatusFilter === 'all' || card.dataset.status === currentStatusFilter; const isVisible = matchName && matchStatus; card.style.display = isVisible ? '' : 'none'; if (isVisible) visible++; }); document.getElementById('searchMeta').innerHTML = `${visible} shown`; }
 function showQR(i) { document.getElementById('qrPriceDisplay').innerText = `₹${document.getElementById(`paid-${i}`)?.value || 0}`; document.getElementById('qrModal').style.display = 'flex'; }
 function escapeHtml(str) { return String(str).replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
+async function searchHomePlayers() {
+    clearTimeout(homeSearchTimer);
+    homeSearchTimer = setTimeout(async () => {
+        const query = document.getElementById('homePlayerSearch').value.trim();
+        const container = document.getElementById('homeSearchResults');
+        if (query.length < 2) { container.innerHTML = ''; return; }
+        const r = await fetch(`${SCRIPT_URL}?action=searchStudents&q=${encodeURIComponent(query)}`);
+        const data = await r.json();
+        container.innerHTML = data.students.map(s => `<button onclick="jumpToStudent('${s.batch}', '${s.name}')" class="bg-white dark:bg-zinc-900 w-full p-3 rounded-xl text-left border border-black/5 shadow-sm"><h4 class="text-sm font-bold">${escapeHtml(s.name)}</h4><p class="text-[9px] text-gray-500">${s.batch}</p></button>`).join('');
+    }, 300);
+}
+function jumpToStudent(b, n) { document.getElementById('homePlayerSearch').value = n; selectBatch(b); }
 </script>
 </body>
 </html>
