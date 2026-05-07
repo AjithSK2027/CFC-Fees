@@ -348,29 +348,75 @@ function getSelectedMonthStrings(i) {
     return months;
 }
 async function liveSettle(i) {
-    const s = students[i], btn = document.getElementById(`settle-btn-${i}`);
+    const s = students[i];
+    const btn = document.getElementById(`settle-btn-${i}`);
     const amt = parseFloat(document.getElementById(`paid-${i}`).value || 0);
     const selectedMonths = getSelectedMonthStrings(i);
     const monthsCount = selectedMonths.length;
+
     if (amt <= 0) return alert("Enter amount");
     if (monthsCount === 0) return alert("Select at least one month");
-    btn.innerText = "SAVING..."; btn.disabled = true;
-    const splitAmount = Math.floor(amt / monthsCount), remainder = amt - (splitAmount * monthsCount);
+
+    btn.innerText = "SAVING...";
+    btn.disabled = true;
+
+    const splitAmount = Math.floor(amt / monthsCount);
+    const remainder = amt - (splitAmount * monthsCount);
+
+    // Generate month labels (e.g., "May, Apr, Mar")
+    const monthNamesShort = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const coveredMonthLabels = selectedMonths.map(month => {
+        const d = new Date(month + "-01");
+        return monthNamesShort[d.getMonth()];
+    }).join(", ");
+
     const records = selectedMonths.map((month, idx) => ({
-        studentId: s.studentId, name: s.name, contact: s.contact, batch: s.batch, fees: s.fees,
+        studentId: s.studentId,
+        name: s.name,
+        contact: s.contact,
+        batch: s.batch,
+        fees: s.fees,
         paidAmount: idx === 0 ? splitAmount + remainder : splitAmount,
         balance: Math.max(0, s.fees - (idx === 0 ? splitAmount + remainder : splitAmount)),
-        feeType: document.getElementById(`type-${i}`).value, paidTo: document.getElementById(`pst-${i}`).value,
-        note: document.getElementById(`note-${i}`).value, targetMonth: month, paymentDate: document.getElementById('feeDate').value
+        feeType: document.getElementById(`type-${i}`).value,
+        paidTo: document.getElementById(`pst-${i}`).value,
+        note: document.getElementById(`note-${i}`).value,
+        targetMonth: month,
+        paymentDate: document.getElementById('feeDate').value
     }));
+
     try {
-        const response = await fetch(SCRIPT_URL, { method: 'POST', body: new URLSearchParams({ payload: JSON.stringify({ action: 'saveFees', date: document.getElementById('feeDate').value, data: records }) }) });
+        const response = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: new URLSearchParams({
+                payload: JSON.stringify({
+                    action: 'saveFees',
+                    date: document.getElementById('feeDate').value,
+                    data: records
+                })
+            })
+        });
         const out = await response.json();
         if (out.status === 'success') {
-            s.tempPaid = true; s.lastPaidAmt = amt; s.lastMonthsCount = monthsCount; s.paidSoFar += amt; s.balance = Math.max(0, s.balance - amt); s.note = records[0].note;
-            updateDashboard(); render();
+            // Store extra info for the paid card
+            s.tempPaid = true;
+            s.lastPaidAmt = amt;
+            s.lastMonthsCount = monthsCount;
+            s.lastMonthsLabels = coveredMonthLabels;       // "May, Apr, Mar"
+            s.lastPaymentMode = records[0].feeType;        // "UPI" or "CASH"
+            s.lastPaidTo = records[0].paidTo;              // "Lexi" or whatever
+            s.lastPaymentDate = document.getElementById('feeDate').value;
+            s.paidSoFar += amt;
+            s.balance = Math.max(0, s.balance - amt);
+            s.note = records[0].note;
+            updateDashboard();
+            render();
         } else throw new Error();
-    } catch(e) { alert("Sync Failed"); btn.innerText = "SETTLE"; btn.disabled = false; }
+    } catch(e) {
+        alert("Sync Failed");
+        btn.innerText = "SETTLE";
+        btn.disabled = false;
+    }
 }
 async function liveRemind(i) {
     const s = students[i], btn = document.getElementById(`rem-btn-${i}`);
@@ -482,8 +528,57 @@ function render() {
         let cardClass = status === 'paid' ? 'card-paid' : (status === 'partial' ? 'card-partial' : 'card-pending');
         let badgeClass = status === 'paid' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' : (status === 'partial' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300');
         const whatsappIcon = `<img src="https://i.ibb.co/60NPMpPd/Pngtree-whatsapp-icon-whatsapp-logo-whatsapp-3584845.png" class="whatsapp-icon" alt="WhatsApp">`;
+        
         if (isPaid) {
-            container.innerHTML += `<div class="student-card card-gradient p-4 space-y-3 rounded-xl ${cardClass}" data-name="${s.name.toLowerCase()}" data-status="paid"><div class="flex justify-between items-start"><div><h3 class="text-base font-extrabold">${escapeHtml(s.name)}</h3><div class="flex flex-wrap items-center gap-2 mt-0.5"><p class="text-[9px] text-gray-500 font-bold">${escapeHtml(s.contact)}</p><span class="student-id text-[8px]">ID: ${escapeHtml(s.studentId.substring(0,12))}</span></div></div><span class="px-2 py-1 rounded-lg text-[8px] font-black uppercase ${badgeClass}">PAID</span></div><div class="bg-mint/10 border border-mint/20 rounded-xl p-3 space-y-2"><div class="flex justify-between items-center"><p class="text-[8px] font-black text-mint uppercase tracking-wider">✓ PAID SUCCESSFULLY</p><button onclick="sendWA(${i}, 'receipt')" class="w-8 h-8 bg-mint/20 text-mint rounded-lg flex items-center justify-center">${whatsappIcon}</button></div><div class="space-y-1 pt-1 border-t border-mint/10"><p class="text-[8px] font-bold text-gray-600">Amount Paid: <span class="text-mint">₹${s.lastPaidAmt || s.paidSoFar}</span></p><p class="text-[8px] font-bold text-gray-600">Months Covered: <span class="text-mint">${s.lastMonthsCount || 'Current'}</span></p><p class="text-[8px] font-bold text-gray-600">Balance: <span class="${s.balance > 0 ? 'text-rose' : 'text-mint'}">₹${s.balance}</span></p>${s.note ? `<p class="text-[8px] italic text-gray-500 pt-1">📝 ${s.note}</p>` : ''}</div><p class="text-[7px] text-gray-400 text-right mt-1">📅 ${document.getElementById('feeDate').value}</p></div></div>`;
+            // Build covered months string
+            let coveredMonthsDisplay = 'Current';
+            if (s.lastMonthsLabels) {
+                coveredMonthsDisplay = s.lastMonthsLabels;
+            } else if (s.lastMonthsCount && s.lastMonthsCount > 0) {
+                const shortNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+                let monthsList = [];
+                const cur = new Date();
+                for (let j = 0; j < s.lastMonthsCount; j++) {
+                    let mIdx = cur.getMonth() - j;
+                    if (mIdx < 0) mIdx += 12;
+                    monthsList.push(shortNames[mIdx]);
+                }
+                coveredMonthsDisplay = monthsList.join(", ");
+            }
+
+            const amountPaidDisplay = s.lastPaidAmt || s.paidSoFar;
+            const paymentModeDisplay = s.lastPaymentMode || '—';
+            const paidToDisplay = s.lastPaidTo || '—';
+            const paymentDateDisplay = s.lastPaymentDate || document.getElementById('feeDate').value;
+
+            container.innerHTML += `
+                <div class="student-card card-gradient p-4 space-y-3 rounded-xl ${cardClass}" data-name="${s.name.toLowerCase()}" data-status="paid">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="text-base font-extrabold">${escapeHtml(s.name)}</h3>
+                            <div class="flex flex-wrap items-center gap-2 mt-0.5">
+                                <p class="text-[9px] text-gray-500 font-bold">${escapeHtml(s.contact)}</p>
+                                <span class="student-id text-[8px]">ID: ${escapeHtml(s.studentId.substring(0,12))}</span>
+                            </div>
+                        </div>
+                        <span class="px-2 py-1 rounded-lg text-[8px] font-black uppercase ${badgeClass}">PAID</span>
+                    </div>
+                    <div class="bg-mint/10 border border-mint/20 rounded-xl p-3 space-y-2">
+                        <div class="flex justify-between items-center">
+                            <p class="text-[8px] font-black text-mint uppercase tracking-wider">✓ PAID SUCCESSFULLY</p>
+                            <button onclick="sendWA(${i}, 'receipt')" class="w-8 h-8 bg-mint/20 text-mint rounded-lg flex items-center justify-center">${whatsappIcon}</button>
+                        </div>
+                        <div class="space-y-1 pt-1 border-t border-mint/10">
+                            <p class="text-[8px] font-bold text-gray-600">Amount Paid: <span class="text-mint">₹${amountPaidDisplay}</span></p>
+                            <p class="text-[8px] font-bold text-gray-600">Months Covered: <span class="text-mint">${coveredMonthsDisplay}</span></p>
+                            <p class="text-[8px] font-bold text-gray-600">Payment Mode: <span class="text-mint">${paymentModeDisplay}</span></p>
+                            <p class="text-[8px] font-bold text-gray-600">Paid To: <span class="text-mint">${escapeHtml(paidToDisplay)}</span></p>
+                            <p class="text-[8px] font-bold text-gray-600">Payment Date: <span class="text-mint">${paymentDateDisplay}</span></p>
+                            <p class="text-[8px] font-bold text-gray-600">Balance: <span class="${s.balance > 0 ? 'text-rose' : 'text-mint'}">₹${s.balance}</span></p>
+                            ${s.note ? `<p class="text-[8px] italic text-gray-500 pt-1">📝 ${s.note}</p>` : ''}
+                        </div>
+                    </div>
+                </div>`;
         } else {
             const monthChipsHtml = generateMonthChips(i);
             container.innerHTML += `<div class="student-card card-gradient p-4 space-y-3 rounded-xl ${cardClass}" data-name="${s.name.toLowerCase()}" data-status="${status}"><div class="flex justify-between items-start"><div><h3 class="text-base font-extrabold">${escapeHtml(s.name)}</h3><div class="flex flex-wrap items-center gap-2 mt-0.5"><p class="text-[9px] text-gray-500 font-bold">${escapeHtml(s.contact)}</p><span class="student-id text-[8px]">ID: ${escapeHtml(s.studentId.substring(0,12))}</span></div></div><span class="px-2 py-1 rounded-lg text-[8px] font-black uppercase ${badgeClass}">${status === 'partial' ? 'PARTIAL' : 'PENDING'}</span></div><div class="space-y-3 py-1"><div class="flex justify-between items-center border-b border-black/10 dark:border-white/10 pb-2"><span class="fee-label">📊 Monthly Fee</span><span class="fee-amount">₹${s.fees}</span></div><div class="flex justify-between items-center border-b border-black/10 dark:border-white/10 pb-2"><span class="fee-label">✅ Paid this month</span><span class="fee-amount text-mint">₹${s.paidSoFar}</span></div><div class="flex justify-between items-center"><span class="fee-label">⚠️ Remaining</span><span class="fee-amount text-rose" id="pend-${i}">₹${s.balance}</span></div></div><div class="space-y-2"><label class="text-[8px] font-black text-gray-400 uppercase tracking-wider">📆 SELECT MONTHS</label><div class="flex gap-2 flex-wrap">${monthChipsHtml}</div></div><div class="space-y-2"><label class="text-[8px] font-black text-gray-400 uppercase tracking-wider">💰 PAYMENT AMOUNT</label><input type="number" id="paid-${i}" placeholder="Enter amount" oninput="calcBalance(${i})" class="input-dark w-full p-2.5 text-base font-bold rounded-lg"></div><div class="grid grid-cols-2 gap-2"><select id="type-${i}" class="input-dark text-[9px] p-2.5 font-bold rounded-lg"><option>UPI</option><option>CASH</option></select><input id="pst-${i}" type="text" placeholder="Paid To" class="input-dark text-[9px] p-2.5 font-bold rounded-lg"></div><input id="note-${i}" type="text" placeholder="📝 Add note..." class="input-dark text-[9px] p-2.5 font-bold rounded-lg w-full"><div class="grid grid-cols-3 gap-2 pt-2"><button onclick="showQR(${i})" class="bg-black/5 px-2 py-2.5 rounded-lg text-[9px] font-bold border border-black/10">QR</button><button onclick="sendWA(${i}, 'receipt')" class="bg-emerald-500/10 text-emerald-500 rounded-lg py-2.5 flex items-center justify-center border border-emerald-500/20">${whatsappIcon}</button><button id="rem-btn-${i}" onclick="liveRemind(${i})" class="${remindBtnColor} border rounded-lg py-2.5 text-[9px] font-black uppercase">${rCount > 0 ? `REMIND x${rCount}` : 'REMIND'}</button></div><button id="settle-btn-${i}" onclick="liveSettle(${i})" class="w-full bg-mint text-white rounded-xl py-3 text-[11px] font-black uppercase shadow-md tracking-wider mt-2">SETTLE</button></div>`;
