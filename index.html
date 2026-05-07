@@ -381,16 +381,85 @@ async function liveRemind(i) {
     catch(e) { s.remindCount = newCount; render(); sendWA(i, 'remind'); }
 }
 function sendWA(i, type) {
-    const s = students[i]; let ph = String(s.contact || '').replace(/\D/g, ''); if (!ph.startsWith('91')) ph = '91' + ph;
-    const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-    const curDate = new Date(); const paidAmount = document.getElementById(`paid-${i}`)?.value || (s.lastPaidAmt || "0");
+    const s = students[i];
+    let ph = String(s.contact || '').replace(/\D/g, '');
+    if (!ph.startsWith('91')) ph = '91' + ph;
+
+    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    const curDate = new Date();
+    const paidAmount = document.getElementById(`paid-${i}`)?.value || (s.lastPaidAmt || "0");
     const selectedMonths = getSelectedMonthStrings(i);
     let monthLabel = "";
     if (selectedMonths.length > 0) {
         const labels = selectedMonths.map(m => { const d = new Date(m + "-01"); return monthNames[d.getMonth()]; });
         monthLabel = labels.join(", ");
-    } else { monthLabel = monthNames[curDate.getMonth()]; }
-    let msg = type === 'receipt' ? `✅ Payment Successful\n\n${s.name}\nAmount: ₹${paidAmount}\nMonths: ${monthLabel}\nBalance: ₹${s.balance}\n\nThanks - Coffeeland FC` : `⚠️ Fee Reminder\n\n${s.name}\nDue: ₹${s.balance}\nMonth: ${monthLabel}\nUPI: 8867742269@ptaxis\n\nPlease pay at earliest - Coffeeland FC`;
+    } else {
+        monthLabel = monthNames[curDate.getMonth()];
+    }
+
+    const paymentLink = "https://upi.pe/8867742269@ptaxis";
+    let msg = "";
+
+    if (type === 'remind') {
+        // PENDING reminder
+        msg = `⚡ *Friendly Fee Reminder – Coffeeland FC* ⚡
+
+Dear Parent/Guardian,
+
+A gentle nudge regarding the pending fee for *${s.name}*.
+
+📆 *Month:* ${monthLabel}
+💸 *Amount Due:* ₹${s.balance}
+🔹 *Pay easily via:* ${paymentLink}
+🔹 *UPI ID:* 8867742269@ptaxis
+
+Let’s keep the momentum going! Please clear the dues at your earliest convenience and share the payment screenshot. We appreciate your cooperation. 🙌
+
+*Regards,*
+*Coffeeland Football Academy*
+*Together Towards Tomorrow* ⚽`;
+    } 
+    else if (s.balance === 0) {
+        // PAID (full) receipt
+        msg = `🎉 *Payment Confirmation – Coffeeland FC* 🎉
+
+Dear Parent/Guardian,
+
+We are delighted to confirm the successful payment of fees for *${s.name}*.
+
+✅ *Month(s) Covered:* ${monthLabel}
+💰 *Amount Received:* ₹${paidAmount}
+🏦 *Outstanding Balance:* ₹0
+
+Thank you for your timely support and commitment to the academy. Your enthusiasm fuels our players' growth! ⚽🔥
+
+*Regards,*
+*Coffeeland Football Academy*
+*Together Towards Tomorrow* 🌟`;
+    } 
+    else {
+        // PARTIAL payment receipt
+        msg = `🎯 *Partial Payment Received – Coffeeland FC* 🎯
+
+Dear Parent/Guardian,
+
+We acknowledge the partial fee payment for *${s.name}*. Thank you for your prompt action!
+
+📆 *Month(s) Covered:* ${monthLabel}
+💰 *Amount Paid:* ₹${paidAmount}
+🔸 *Remaining Balance:* ₹${s.balance}
+🗓️ *Payment Due for:* ${monthLabel} (unpaid portion)
+
+Please complete the remaining payment soon to keep your child's training uninterrupted. We are here to support you every step of the way! 🚀
+
+*Pay the balance easily:* ${paymentLink}
+*UPI:* 8867742269@ptaxis
+
+*Regards,*
+*Coffeeland Football Academy*
+*Together Towards Tomorrow* ⚡`;
+    }
+
     window.open(`https://wa.me/${ph}?text=${encodeURIComponent(msg)}`);
 }
 function render() {
