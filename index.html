@@ -305,9 +305,41 @@ async function loadStudents() {
         const r = await fetch(`${SCRIPT_URL}?action=getStudents&batch=${encodeURIComponent(b)}&date=${viewMonth}-01`);
         const data = await r.json();
         students = (data.students || []).map(s => {
-            s.fees = Number(s.fees); s.paidSoFar = Number(s.paidSoFar); s.balance = Number(s.balance); s.remindCount = Number(s.remindCount) || 0; s.studentId = s.studentId || 'N/A';
-            return s;
-        });
+    s.fees = Number(s.fees);
+    s.paidSoFar = Number(s.paidSoFar);
+    s.balance = Number(s.balance);
+    s.remindCount = Number(s.remindCount) || 0;
+    s.studentId = s.studentId || 'N/A';
+    
+    // Payment details for paid cards (sent from backend)
+    s.lastPaidAmt = s.lastPaidAmt || (s.balance === 0 ? s.fees : 0);
+    s.lastPaymentMode = s.lastPaymentMode || '';
+    s.lastPaidTo = s.lastPaidTo || '';
+    s.lastPaymentDate = s.lastPaymentDate || '';
+    s.lastPaymentMonth = s.lastPaymentMonth || '';
+    s.lastNote = s.lastNote || '';
+    
+    // Convert lastPaymentMonth to a short month label (e.g., "Apr")
+    if (s.lastPaymentMonth) {
+        const monthNamesShort = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+        const d = new Date(s.lastPaymentMonth + "-01");
+        s.lastMonthsLabels = monthNamesShort[d.getMonth()];
+    } else if (s.balance === 0) {
+        // Fallback: use the currently selected view month
+        const viewMonth = document.getElementById('viewMonthFilter').value;
+        if (viewMonth) {
+            const monthNamesShort = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+            const d = new Date(viewMonth + "-01");
+            s.lastMonthsLabels = monthNamesShort[d.getMonth()];
+        } else {
+            s.lastMonthsLabels = 'Current';
+        }
+    } else {
+        s.lastMonthsLabels = 'Current';
+    }
+    
+    return s;
+});
         updateDashboard(); render();
     } catch(e) { alert("Failed to load students"); document.getElementById('roster').innerHTML = '<p class="py-16 text-center text-rose text-xs">Error loading data</p>'; }
 }
