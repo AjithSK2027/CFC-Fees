@@ -532,7 +532,8 @@ function sendWA(i, type) {
     const s = students[i];
     let ph = String(s.contact || '').replace(/\D/g, '');
     if (!ph.startsWith('91')) ph = '91' + ph;
-    const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
     const curDate = new Date();
     const paidAmount = document.getElementById(`paid-${i}`)?.value || (s.lastPaidAmt || "0");
     const selectedMonths = getSelectedMonthStrings(i);
@@ -543,57 +544,78 @@ function sendWA(i, type) {
     } else {
         monthLabel = monthNames[curDate.getMonth()];
     }
+
     const paymentLink = "https://upi.pe/8867742269@ptaxis";
+    const upiId = "8867742269@ptaxis";
+    const academy = "Coffeeland Football Academy";
+    const tagline = "Together Towards Tomorrow";
+
     let msg = "";
+
     if (type === 'remind') {
-        msg = `⚡ Friendly Fee Reminder – Coffeeland FC ⚡
+        // PROFESSIONAL REMINDER
+        msg = `*📢 Friendly Fee Reminder – ${academy}*
 
 Dear Parent/Guardian,
 
-A gentle nudge regarding the pending fee for ${s.name}.
+We hope this message finds you well. This is a gentle reminder regarding the pending fee for *${s.name}*.
 
-📆 Month: ${monthLabel}
-💸 Amount Due: ₹${s.balance}
-🔹 Pay easily via: ${paymentLink}
-🔹 UPI ID: 8867742269@ptaxis
+📆 *Month:* ${monthLabel}
+💸 *Amount Due:* ₹${s.balance}
 
-Let’s keep the momentum going! Please clear the dues at your earliest convenience.
+🔹 *Pay easily via:* ${paymentLink}
+🔹 *UPI ID:* ${upiId}
+
+Please clear the dues at your earliest convenience. Your timely support helps us maintain quality training for your child.
+
+Thank you for your cooperation.
 
 Regards,
-Coffeeland Football Academy`;
+*${academy}*
+_${tagline}_`;
     } 
     else if (s.balance === 0) {
-        msg = `🎉 Payment Confirmation – Coffeeland FC 🎉
+        // FULL PAYMENT CONFIRMATION
+        msg = `*🎉 Payment Confirmation – ${academy}*
 
 Dear Parent/Guardian,
 
-We are delighted to confirm the successful payment of fees for ${s.name}.
+We are delighted to confirm the successful payment of fees for *${s.name}*.
 
-✅ Month(s) Covered: ${monthLabel}
-💰 Amount Received: ₹${paidAmount}
-🏦 Outstanding Balance: ₹0
+✅ *Month(s) Covered:* ${monthLabel}
+💰 *Amount Received:* ₹${paidAmount}
+🏦 *Outstanding Balance:* ₹0
 
-Thank you for your timely support! ⚽🔥
+Thank you for your timely payment and continued support. We look forward to seeing your child excel on the field! ⚽🔥
 
 Regards,
-Coffeeland Football Academy`;
+*${academy}*
+_${tagline}_`;
     } 
     else {
-        msg = `🎯 Partial Payment Received – Coffeeland FC 🎯
+        // PARTIAL PAYMENT ACKNOWLEDGEMENT
+        msg = `*🎯 Partial Payment Received – ${academy}*
 
 Dear Parent/Guardian,
 
-We acknowledge the partial fee payment for ${s.name}.
+We acknowledge the partial fee payment for *${s.name}*. Thank you for your prompt action.
 
-📆 Month(s) Covered: ${monthLabel}
-💰 Amount Paid: ₹${paidAmount}
-🔸 Remaining Balance: ₹${s.balance}
+📆 *Month(s) Covered:* ${monthLabel}
+💰 *Amount Paid:* ₹${paidAmount}
+🔸 *Remaining Balance:* ₹${s.balance}
 
-Please complete the remaining payment soon. Pay via: ${paymentLink}
+Please complete the remaining payment soon to ensure uninterrupted training. You can pay the balance here:
+
+🔹 *Pay now:* ${paymentLink}
+🔹 *UPI ID:* ${upiId}
+
+We appreciate your cooperation.
 
 Regards,
-Coffeeland Football Academy`;
+*${academy}*
+_${tagline}_`;
     }
+
     window.open(`https://wa.me/${ph}?text=${encodeURIComponent(msg)}`);
 }
 
