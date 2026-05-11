@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>CFC Fees | Card-based History</title>
+    <title>CFC Fees | Fluid Interactions v7.3</title>
 
     <link rel="apple-touch-icon" href="https://i.ibb.co/3nTMhbz/1000287652-0b4cd8d123cf04f03fc322309c337390-11-18-2025-1-04-51-PM.png">
     <link rel="icon" type="image/png" href="https://i.ibb.co/3nTMhbz/1000287652-0b4cd8d123cf04f03fc322309c337390-11-18-2025-1-04-51-PM.png">
     
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -37,7 +37,22 @@
                 --loader-bg: #050505; --loader-text: #FFFFFF;
             }
         }
-        body { background: var(--bg-body); color: var(--text-main); font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background: var(--bg-body); color: var(--text-main); font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+        
+        /* only interactive elements get press effect */
+        button, .month-chip, .filter-chip, .sort-option, .tab, .batch-tile, .history-card button {
+            touch-action: manipulation;
+            transition: transform 0.1s ease, background 0.1s ease;
+            will-change: transform;
+        }
+        button:active, .month-chip:active, .filter-chip:active, .sort-option:active, .tab:active, .batch-tile:active, .history-card button:active {
+            transform: scale(0.96);
+        }
+        
+        /* cards should not scale on tap, only shadow maybe */
+        .student-card, .card-gradient {
+            transition: box-shadow 0.2s ease;
+        }
         
         .main-fader { width: 100%; height: 100vh; position: fixed; top:0; left:0; background: var(--loader-bg); z-index:10000; display:flex; align-items:center; justify-content:center; transition: opacity 0.6s ease; }
         .main-fader.hidden { opacity:0; visibility:hidden; }
@@ -55,7 +70,7 @@
         
         .filter-chip { border: 1px solid var(--border); background: rgba(0,0,0,0.04); transition: all 0.2s; cursor: pointer; border-radius: 2rem; padding: 0.5rem 1rem; font-size: 0.7rem; font-weight: 800; }
         .filter-chip.active { background: #10B981; color: white; border-color: transparent; }
-        .month-chip { cursor: pointer; transition: all 0.2s; border: 1px solid var(--border); border-radius: 2rem; padding: 0.5rem 1rem; font-size: 0.7rem; font-weight: 700; text-align: center; }
+        .month-chip { cursor: pointer; transition: all 0.1s; border: 1px solid var(--border); border-radius: 2rem; padding: 0.5rem 1rem; font-size: 0.7rem; font-weight: 700; text-align: center; }
         .month-chip.selected { background: #10B981; color: white; border-color: transparent; }
         .search-shell { background: linear-gradient(180deg, rgba(16,185,129,0.08), rgba(255,255,255,0.02)); border: 1px solid var(--border); border-radius: 1.5rem; }
         
@@ -63,8 +78,6 @@
         .card-partial { border-top: 5px solid #EAB308; }
         .card-paid { border-top: 5px solid #10B981; }
         
-        button, .month-chip, .filter-chip { cursor: pointer; -webkit-tap-highlight-color: transparent; }
-        button:active { transform: scale(0.97); transition: transform 0.05s; }
         .whatsapp-icon { width: 20px; height: 20px; display: inline-block; vertical-align: middle; }
         .student-id { font-family: monospace; font-size: 9px; background: rgba(0,0,0,0.05); display: inline-block; padding: 2px 6px; border-radius: 20px; }
         .fee-label { font-size: 11px; font-weight: 700; color: #6B7280; letter-spacing: 0.3px; }
@@ -78,13 +91,34 @@
         .history-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--border); }
         .history-label { font-size: 11px; font-weight: 700; color: #6B7280; }
         .history-value { font-size: 14px; font-weight: 800; }
+        
+        .sort-toggle { display: inline-flex; background: rgba(0,0,0,0.04); border-radius: 30px; padding: 3px; }
+        .sort-option { padding: 5px 12px; font-size: 10px; font-weight: 800; border-radius: 30px; cursor: pointer; transition: all 0.1s; }
+        .sort-option.active { background: #10B981; color: white; }
+        
+        .stacked-bar { display: flex; height: 32px; width: 100%; border-radius: 16px; overflow: hidden; margin: 12px 0; }
+        .bar-segment { transition: width 0.2s ease; }
+        .stat-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.04); padding: 4px 10px; border-radius: 30px; font-size: 11px; font-weight: 700; }
+        .legend-dot { width: 10px; height: 10px; border-radius: 10px; display: inline-block; }
+        
+        /* disable double-tap zoom on interactive elements */
+        button, .month-chip, .filter-chip, .sort-option, .tab, select, input {
+            touch-action: manipulation;
+        }
+        
+        .batch-tile {
+            transition: transform 0.1s ease, box-shadow 0.2s ease;
+        }
+        .batch-tile:active {
+            transform: scale(0.97);
+        }
     </style>
 </head>
 <body class="min-h-screen pb-32">
 
 <div class="main-fader">
     <div class="loader text-center">
-        <svg viewBox="0 0 164.83 151.5"><!-- same paths as before --><path class="path-0" d="M117.24,69.24A8,8,0,0,0,115.67,67c-4.88-4-9.8-7.89-14.86-11.62A4.93,4.93,0,0,0,96.93,55c-5.76,1.89-11.4,4.17-17.18,6a4.36,4.36,0,0,0-3.42,4.12c-1,6.89-2.1,13.76-3,20.66a4,4,0,0,0,1,3.07c5.12,4.36,10.39,8.61,15.68,12.76a3.62,3.62,0,0,0,2.92.75c6.29-2.66,12.52-5.47,18.71-8.36a3.49,3.49,0,0,0,1.68-2.19c1.34-7.25,2.54-14.55,3.9-22.58Z"/><path class="path-1" d="M97.55,38.68A43.76,43.76,0,0,1,98,33.44c.41-2.36-.5-3.57-2.57-4.64C91.1,26.59,87,24,82.66,21.82a6.18,6.18,0,0,0-4-.71C73.45,22.55,68.32,24.25,63.22,26c-3.63,1.21-6.08,3.35-5.76,7.69a26.67,26.67,0,0,1-.6,4.92c-1.08,8.06-1.08,8.08,5.86,11.92,3.95,2.19,7.82,5.75,11.94,6.08s8.76-2.41,13.12-3.93c9.33-3.29,9.33-3.3,9.78-14Z"/><path class="path-2" d="M66.11,126.56c5.91-.91,11.37-1.7,16.81-2.71a3.3,3.3,0,0,0,1.87-2.17c1-4.06,1.73-8.19,2.84-12.24.54-2-.11-3-1.55-4.15-5-4-9.9-8.12-15-12a6.19,6.19,0,0,0-4.15-1.1c-5.35.66-10.7,1.54-16,2.54A4,4,0,0,0,48.34,97a109.13,109.13,0,0,0-3,12.19,4.47,4.47,0,0,0,1.34,3.6c5.54,4.36,11.23,8.53,16.91,12.69a10.84,10.84,0,0,0,2.57,1.11Z"/><path class="path-3" d="M127.42,104.12c4.1-2.1,8-3.93,11.72-6a6,6,0,0,0,2.27-3,58.22,58.22,0,0,0,3.18-29.92c-.26-1.7-8-7.28-9.71-6.85A5,5,0,0,0,133,59.65c-2.81,2.49-5.71,4.88-8.33,7.56a9.46,9.46,0,0,0-2.47,4.4c-1.29,6.49-2.38,13-3.35,19.55a5.73,5.73,0,0,0,.83,3.91c2.31,3.08,5,5.88,7.7,9Z"/><path class="path-4" d="M52.58,29.89c-2.15-.36-3.78-.54-5.39-.9-2.83-.64-4.92.1-7,2.32A64.1,64.1,0,0,0,26.09,54.64c-2.64,7.92-2.62,7.84,5.15,10.87,1.76.69,2.73.45,3.93-1C39.79,59,44.54,53.65,49.22,48.2a4.2,4.2,0,0,0,1.13-2c.8-5.32,1.49-10.68,2.24-16.34Z"/><path class="path-5" d="M23,68.13c0,2.51,0,4.7,0,6.87a60.49,60.49,0,0,0,9.75,32.15c1.37,2.13,6.4,3,7,1.2,1.55-5,2.68-10.2,3.82-15.34.13-.58-.58-1.38-.94-2.06-2.51-4.77-5.47-9.38-7.45-14.37C32.94,71,28.22,69.84,23,68.13Z"/><path class="path-6" d="M83.91,12.86c-.32.36-.66.71-1,1.07.9,1.13,1.57,2.62,2.73,3.33,4.71,2.84,9.56,5.48,14.39,8.1a9.29,9.29,0,0,0,3.13.83c5.45.69,10.89,1.38,16.35,1.94a10.41,10.41,0,0,0,3.07-.71c-11.48-9.9-24.26-14.61-38.71-14.56Z"/><path class="path-7" d="M66.28,132.51c13.36,3.78,25.62,3.5,38-.9C91.68,129.59,79.36,128,66.28,132.51Z"/><path class="path-8" d="M127.2,30.66l-1.27.37a18.58,18.58,0,0,0,1,3.08c3,5.52,6.21,10.89,8.89,16.54,1.34,2.83,3.41,3.82,6.49,4.9a60.38,60.38,0,0,0-15.12-24.9Z"/></svg>
+        <svg viewBox="0 0 164.83 151.5"><!-- same paths --><path class="path-0" d="M117.24,69.24A8,8,0,0,0,115.67,67c-4.88-4-9.8-7.89-14.86-11.62A4.93,4.93,0,0,0,96.93,55c-5.76,1.89-11.4,4.17-17.18,6a4.36,4.36,0,0,0-3.42,4.12c-1,6.89-2.1,13.76-3,20.66a4,4,0,0,0,1,3.07c5.12,4.36,10.39,8.61,15.68,12.76a3.62,3.62,0,0,0,2.92.75c6.29-2.66,12.52-5.47,18.71-8.36a3.49,3.49,0,0,0,1.68-2.19c1.34-7.25,2.54-14.55,3.9-22.58Z"/><path class="path-1" d="M97.55,38.68A43.76,43.76,0,0,1,98,33.44c.41-2.36-.5-3.57-2.57-4.64C91.1,26.59,87,24,82.66,21.82a6.18,6.18,0,0,0-4-.71C73.45,22.55,68.32,24.25,63.22,26c-3.63,1.21-6.08,3.35-5.76,7.69a26.67,26.67,0,0,1-.6,4.92c-1.08,8.06-1.08,8.08,5.86,11.92,3.95,2.19,7.82,5.75,11.94,6.08s8.76-2.41,13.12-3.93c9.33-3.29,9.33-3.3,9.78-14Z"/><path class="path-2" d="M66.11,126.56c5.91-.91,11.37-1.7,16.81-2.71a3.3,3.3,0,0,0,1.87-2.17c1-4.06,1.73-8.19,2.84-12.24.54-2-.11-3-1.55-4.15-5-4-9.9-8.12-15-12a6.19,6.19,0,0,0-4.15-1.1c-5.35.66-10.7,1.54-16,2.54A4,4,0,0,0,48.34,97a109.13,109.13,0,0,0-3,12.19,4.47,4.47,0,0,0,1.34,3.6c5.54,4.36,11.23,8.53,16.91,12.69a10.84,10.84,0,0,0,2.57,1.11Z"/><path class="path-3" d="M127.42,104.12c4.1-2.1,8-3.93,11.72-6a6,6,0,0,0,2.27-3,58.22,58.22,0,0,0,3.18-29.92c-.26-1.7-8-7.28-9.71-6.85A5,5,0,0,0,133,59.65c-2.81,2.49-5.71,4.88-8.33,7.56a9.46,9.46,0,0,0-2.47,4.4c-1.29,6.49-2.38,13-3.35,19.55a5.73,5.73,0,0,0,.83,3.91c2.31,3.08,5,5.88,7.7,9Z"/><path class="path-4" d="M52.58,29.89c-2.15-.36-3.78-.54-5.39-.9-2.83-.64-4.92.1-7,2.32A64.1,64.1,0,0,0,26.09,54.64c-2.64,7.92-2.62,7.84,5.15,10.87,1.76.69,2.73.45,3.93-1C39.79,59,44.54,53.65,49.22,48.2a4.2,4.2,0,0,0,1.13-2c.8-5.32,1.49-10.68,2.24-16.34Z"/><path class="path-5" d="M23,68.13c0,2.51,0,4.7,0,6.87a60.49,60.49,0,0,0,9.75,32.15c1.37,2.13,6.4,3,7,1.2,1.55-5,2.68-10.2,3.82-15.34.13-.58-.58-1.38-.94-2.06-2.51-4.77-5.47-9.38-7.45-14.37C32.94,71,28.22,69.84,23,68.13Z"/><path class="path-6" d="M83.91,12.86c-.32.36-.66.71-1,1.07.9,1.13,1.57,2.62,2.73,3.33,4.71,2.84,9.56,5.48,14.39,8.1a9.29,9.29,0,0,0,3.13.83c5.45.69,10.89,1.38,16.35,1.94a10.41,10.41,0,0,0,3.07-.71c-11.48-9.9-24.26-14.61-38.71-14.56Z"/><path class="path-7" d="M66.28,132.51c13.36,3.78,25.62,3.5,38-.9C91.68,129.59,79.36,128,66.28,132.51Z"/><path class="path-8" d="M127.2,30.66l-1.27.37a18.58,18.58,0,0,0,1,3.08c3,5.52,6.21,10.89,8.89,16.54,1.34,2.83,3.41,3.82,6.49,4.9a60.38,60.38,0,0,0-15.12-24.9Z"/></svg>
         <div class="mt-4"><h2 class="text-xl font-black uppercase tracking-tighter loader-brand-text">Coffeeland <span class="text-emerald-500">FC</span></h2><p class="text-emerald-500 font-black text-[7px] tracking-[0.5em] uppercase mt-1">Fees Portal</p></div>
     </div>
 </div>
@@ -94,6 +128,7 @@
         <h3 class="text-mint font-black uppercase text-[10px] tracking-widest">Scan to Pay</h3>
         <img src="https://i.ibb.co/f5dYVM1/Whats-App-Image-2026-04-08-at-12-56-51-PM.jpg" class="w-40 mx-auto rounded-2xl border-4 border-white shadow-xl">
         <p class="font-black text-2xl" id="qrPriceDisplay">₹0</p>
+        <p class="text-[9px] text-gray-500">UPI: 8867742269@ptaxis</p>
     </div>
 </div>
 
@@ -135,16 +170,43 @@
 
         <div class="search-shell rounded-xl p-3 mt-3"><div class="flex gap-2 items-center"><div class="text-base">🔎</div><input id="studentSearch" type="text" placeholder="Search in batch..." oninput="applyFilters()" class="bg-transparent w-full outline-none text-sm font-bold"></div></div>
 
-        <div class="flex flex-wrap items-center justify-between gap-2 mt-3">
+        <!-- SORT + VIEW MONTH FILTER -->
+        <div class="flex justify-between items-center mt-2">
+            <div class="sort-toggle">
+                <div id="sort-unpaid" class="sort-option active" onclick="setSortMode('unpaid')">Unpaid first</div>
+                <div id="sort-alpha" class="sort-option" onclick="setSortMode('alpha')">A-Z</div>
+            </div>
+            <div class="flex items-center gap-1.5">
+                <span class="text-[7px] text-gray-400">📅 View</span>
+                <select id="viewMonthFilter" onchange="loadStudents()" class="input-dark px-2 py-1.5 text-[9px] font-bold rounded-lg"></select>
+            </div>
+        </div>
+
+        <!-- STACKED BAR OVERVIEW CARD -->
+        <div class="card-gradient p-4 mt-3 rounded-xl">
+            <div class="flex justify-between items-center mb-2">
+                <span class="text-[10px] font-bold text-gray-500">📊 MONTH AT A GLANCE</span>
+                <span id="overviewMonthLabel" class="text-[9px] font-black text-mint bg-mint/10 px-2 py-0.5 rounded-full">—</span>
+            </div>
+            <div class="stacked-bar" id="stackedBar">
+                <div class="bar-segment" style="width: 0%; background: #10B981;"></div>
+                <div class="bar-segment" style="width: 0%; background: #EAB308;"></div>
+                <div class="bar-segment" style="width: 0%; background: #F43F5E;"></div>
+            </div>
+            <div class="flex flex-wrap justify-between items-center gap-2 text-[10px] font-bold mt-2">
+                <div class="stat-badge"><span class="legend-dot" style="background: #10B981;"></span> Paid <span id="overviewPaidCount">0</span> (<span id="overviewPaidPct">0%</span>)</div>
+                <div class="stat-badge"><span class="legend-dot" style="background: #EAB308;"></span> Partial <span id="overviewPartialCount">0</span> (<span id="overviewPartialPct">0%</span>)</div>
+                <div class="stat-badge"><span class="legend-dot" style="background: #F43F5E;"></span> Pending <span id="overviewPendingCount">0</span> (<span id="overviewPendingPct">0%</span>)</div>
+            </div>
+        </div>
+
+        <!-- STATUS FILTER CHIPS -->
+        <div class="flex flex-wrap items-center justify-between gap-2 mt-2">
             <div class="flex flex-wrap gap-1.5">
                 <button id="filter-all" onclick="setStatusFilter('all')" class="filter-chip active">All</button>
                 <button id="filter-pending" onclick="setStatusFilter('pending')" class="filter-chip">Pending</button>
                 <button id="filter-partial" onclick="setStatusFilter('partial')" class="filter-chip">Partial</button>
                 <button id="filter-paid" onclick="setStatusFilter('paid')" class="filter-chip">Paid</button>
-            </div>
-            <div class="flex items-center gap-1.5">
-                <span class="text-[7px] text-gray-400">📅</span>
-                <select id="viewMonthFilter" onchange="loadStudents()" class="input-dark px-2 py-1.5 text-[9px] font-bold rounded-lg"></select>
             </div>
         </div>
         <p id="searchMeta" class="text-[9px] font-bold text-mint text-right -mt-2">0 shown</p>
@@ -165,6 +227,7 @@ let students = [];
 let currentStatusFilter = 'all';
 let homeSearchTimer = null;
 let allPayments = [];
+let sortMode = 'unpaid'; // 'unpaid' or 'alpha'
 
 function hideLoader() { document.querySelector('.main-fader')?.classList.add('hidden'); }
 
@@ -180,10 +243,13 @@ window.onload = async () => {
         if (d.batches) {
             d.batches.forEach(b => {
                 const opt = `<option value="${b.name}">${b.name}</option>`;
-                hSelect.innerHTML += opt; bSelect.innerHTML += opt;
-                grid.innerHTML += `<button onclick="selectBatch('${b.name}')" class="card-gradient p-4 flex flex-col justify-between aspect-square text-left active:scale-95 transition-all rounded-xl"><div class="text-lg">⚽</div><div><h3 class="text-xs font-extrabold uppercase">${b.name}</h3><p class="text-[7px] text-mint font-black uppercase tracking-wider">Enter Hub</p></div></button>`;
+                hSelect.innerHTML += opt;
+                bSelect.innerHTML += opt;
+                grid.innerHTML += `<button onclick="selectBatch('${b.name}')" class="batch-tile card-gradient p-4 flex flex-col justify-between aspect-square text-left transition-all rounded-xl"><div class="text-lg">⚽</div><div><h3 class="text-xs font-extrabold uppercase">${b.name}</h3><p class="text-[7px] text-mint font-black uppercase tracking-wider">Enter Hub</p></div></button>`;
             });
         }
+        // Force batch select event listener for fluid change
+        bSelect.addEventListener('change', () => loadStudents());
         setTimeout(hideLoader, 800);
     } catch(e) { alert("Unable to load hubs"); hideLoader(); }
 };
@@ -193,6 +259,7 @@ function selectBatch(batchName) {
     document.getElementById('lobbyView').classList.add('hidden-view');
     document.getElementById('commandView').classList.remove('hidden-view');
     loadStudents();
+    loadAllPayments();
 }
 
 function switchTab(tab) {
@@ -206,19 +273,16 @@ function switchTab(tab) {
     } else {
         document.getElementById('historyView').classList.remove('hidden-view');
         document.getElementById('tab-history').classList.add('active');
-        loadAllPayments();
+        renderHistoryCards();
     }
 }
 
 async function loadAllPayments() {
-    const container = document.getElementById('historyCardContainer');
-    container.innerHTML = '<div class="text-center py-8 text-gray-500">Loading payments...</div>';
     try {
         const r = await fetch(`${SCRIPT_URL}?action=getAllPayments`);
         const data = await r.json();
         allPayments = data.payments || [];
-        renderHistoryCards();
-    } catch(e) { console.error(e); container.innerHTML = '<div class="text-center py-8 text-red-500">Failed to load payments</div>'; }
+    } catch(e) { console.warn("Could not load payment history"); }
 }
 
 function renderHistoryCards() {
@@ -284,7 +348,20 @@ function editPayment(uuid, currentMonth, currentAmount, currentDate, currentNote
         .catch(() => alert("Update failed"));
 }
 
-// ========== FEES COLLECTION FUNCTIONS (unchanged from your original working code) ==========
+function editPaymentForStudent(studentId, month, amount, date, note) {
+    const payment = allPayments.find(p => p.studentId === studentId && p.month === month);
+    if (payment && payment.uuid) editPayment(payment.uuid, month, amount, date, note);
+    else alert("Payment record not found. Use History tab.");
+}
+
+function setSortMode(mode) {
+    sortMode = mode;
+    document.getElementById('sort-unpaid').classList.toggle('active', mode === 'unpaid');
+    document.getElementById('sort-alpha').classList.toggle('active', mode === 'alpha');
+    render();
+}
+
+// ========== FEES COLLECTION FUNCTIONS ==========
 function populateViewMonthFilter() {
     let months = [], today = new Date();
     for (let i = 0; i <= 3; i++) {
@@ -305,59 +382,83 @@ async function loadStudents() {
         const r = await fetch(`${SCRIPT_URL}?action=getStudents&batch=${encodeURIComponent(b)}&date=${viewMonth}-01`);
         const data = await r.json();
         students = (data.students || []).map(s => {
-    s.fees = Number(s.fees);
-    s.paidSoFar = Number(s.paidSoFar);
-    s.balance = Number(s.balance);
-    s.remindCount = Number(s.remindCount) || 0;
-    s.studentId = s.studentId || 'N/A';
-    
-    // Payment details for paid cards (sent from backend)
-    s.lastPaidAmt = s.lastPaidAmt || (s.balance === 0 ? s.fees : 0);
-    s.lastPaymentMode = s.lastPaymentMode || '';
-    s.lastPaidTo = s.lastPaidTo || '';
-    s.lastPaymentDate = s.lastPaymentDate || '';
-    s.lastPaymentMonth = s.lastPaymentMonth || '';
-    s.lastNote = s.lastNote || '';
-    
-    // Convert lastPaymentMonth to a short month label (e.g., "Apr")
-    if (s.lastPaymentMonth) {
-        const monthNamesShort = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-        const d = new Date(s.lastPaymentMonth + "-01");
-        s.lastMonthsLabels = monthNamesShort[d.getMonth()];
-    } else if (s.balance === 0) {
-        // Fallback: use the currently selected view month
-        const viewMonth = document.getElementById('viewMonthFilter').value;
-        if (viewMonth) {
-            const monthNamesShort = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-            const d = new Date(viewMonth + "-01");
-            s.lastMonthsLabels = monthNamesShort[d.getMonth()];
-        } else {
-            s.lastMonthsLabels = 'Current';
-        }
-    } else {
-        s.lastMonthsLabels = 'Current';
-    }
-    
-    return s;
-});
-        updateDashboard(); render();
+            s.fees = Number(s.fees); s.paidSoFar = Number(s.paidSoFar); s.balance = Number(s.balance); s.remindCount = Number(s.remindCount) || 0; s.studentId = s.studentId || 'N/A';
+            s.lastPaidAmt = s.lastPaidAmt || (s.balance === 0 ? s.fees : 0);
+            s.lastPaymentMode = s.lastPaymentMode || '';
+            s.lastPaidTo = s.lastPaidTo || '';
+            s.lastPaymentDate = s.lastPaymentDate || '';
+            s.lastPaymentMonth = s.lastPaymentMonth || '';
+            s.lastNote = s.lastNote || '';
+            if (s.lastPaymentMonth) {
+                const short = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+                const d = new Date(s.lastPaymentMonth + "-01");
+                s.lastMonthsLabels = short[d.getMonth()];
+            } else if (s.balance === 0) {
+                const view = document.getElementById('viewMonthFilter').value;
+                if (view) {
+                    const short = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+                    const d = new Date(view + "-01");
+                    s.lastMonthsLabels = short[d.getMonth()];
+                } else s.lastMonthsLabels = 'Current';
+            } else s.lastMonthsLabels = '';
+            return s;
+        });
+        updateDashboard();
+        render();
     } catch(e) { alert("Failed to load students"); document.getElementById('roster').innerHTML = '<p class="py-16 text-center text-rose text-xs">Error loading data</p>'; }
 }
 
 function updateDashboard() {
     let t = 0, p = 0, b = 0; students.forEach(s => { t += s.fees; p += s.paidSoFar; b += s.balance; });
-    document.getElementById('dashTarget').innerText = `₹${t}`; document.getElementById('dashPaid').innerText = `₹${p}`; document.getElementById('dashPending').innerText = `₹${b}`;
+    document.getElementById('dashTarget').innerText = `₹${t}`;
+    document.getElementById('dashPaid').innerText = `₹${p}`;
+    document.getElementById('dashPending').innerText = `₹${b}`;
+    
+    const total = students.length;
+    const paid = students.filter(s => s.balance === 0).length;
+    const partial = students.filter(s => s.balance > 0 && s.balance < s.fees).length;
+    const pending = students.filter(s => s.balance === s.fees && s.balance > 0).length;
+    const paidPct = total ? (paid/total)*100 : 0;
+    const partialPct = total ? (partial/total)*100 : 0;
+    const pendingPct = total ? (pending/total)*100 : 0;
+    document.getElementById('stackedBar').innerHTML = `
+        <div class="bar-segment" style="width: ${paidPct}%; background: #10B981;"></div>
+        <div class="bar-segment" style="width: ${partialPct}%; background: #EAB308;"></div>
+        <div class="bar-segment" style="width: ${pendingPct}%; background: #F43F5E;"></div>
+    `;
+    document.getElementById('overviewPaidCount').innerText = paid;
+    document.getElementById('overviewPaidPct').innerText = `${Math.round(paidPct)}%`;
+    document.getElementById('overviewPartialCount').innerText = partial;
+    document.getElementById('overviewPartialPct').innerText = `${Math.round(partialPct)}%`;
+    document.getElementById('overviewPendingCount').innerText = pending;
+    document.getElementById('overviewPendingPct').innerText = `${Math.round(pendingPct)}%`;
+    const viewMonth = document.getElementById('viewMonthFilter').value;
+    document.getElementById('overviewMonthLabel').innerText = viewMonth || '—';
 }
 
 function getStatusForStudent(s) { if (s.balance === 0) return 'paid'; if (s.balance === s.fees) return 'pending'; return 'partial'; }
 
 function generateMonthChips(i) {
-    const months = ["MAY", "APR", "MAR", "FEB"];
+    const viewMonth = document.getElementById('viewMonthFilter').value;
+    if (!viewMonth) return '';
+    const baseDate = new Date(viewMonth + "-01");
+    const baseMonth = baseDate.getMonth();
+    const short = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
     let html = '';
-    for (let j = 0; j <= 3; j++) html += `<div onclick="toggleMonth(${i}, ${j})" id="mchip-${i}-${j}" class="month-chip ${j === 0 ? 'selected' : ''}">${months[j]}</div>`;
+    for (let off = 0; off <= 3; off++) {
+        let m = baseMonth - off;
+        if (m < 0) m += 12;
+        const label = short[m];
+        html += `<div onclick="toggleMonth(${i}, ${off})" id="mchip-${i}-${off}" class="month-chip ${off === 0 ? 'selected' : ''}">${label}</div>`;
+    }
     return html;
 }
-function toggleMonth(i, j) { document.getElementById(`mchip-${i}-${j}`).classList.toggle('selected'); calcBalance(i); }
+
+function toggleMonth(i, offset) {
+    document.getElementById(`mchip-${i}-${offset}`).classList.toggle('selected');
+    calcBalance(i);
+}
+
 function calcBalance(i) {
     const s = students[i];
     const monthsCount = document.querySelectorAll(`[id^="mchip-${i}-"].selected`).length;
@@ -365,91 +466,59 @@ function calcBalance(i) {
     const newPend = Math.max(0, (s.fees * monthsCount) - (s.paidSoFar + paidInput));
     document.getElementById(`pend-${i}`).innerText = `₹${newPend}`;
 }
+
 function getSelectedMonthStrings(i) {
-    const selectedChips = document.querySelectorAll(`[id^="mchip-${i}-"].selected`);
-    const curDate = new Date();
+    const selected = document.querySelectorAll(`[id^="mchip-${i}-"].selected`);
+    const viewMonth = document.getElementById('viewMonthFilter').value;
+    if (!viewMonth) return [];
+    const baseDate = new Date(viewMonth + "-01");
+    let baseYear = baseDate.getFullYear();
+    let baseMonth = baseDate.getMonth();
     const months = [];
-    selectedChips.forEach(chip => {
-        const j = parseInt(chip.id.split('-').pop());
-        let mIdx = curDate.getMonth() - j;
-        if (mIdx < 0) mIdx += 12;
-        let year = curDate.getFullYear(), month = mIdx + 1;
-        if (mIdx > curDate.getMonth()) year--;
-        months.push(`${year}-${String(month).padStart(2, '0')}`);
+    selected.forEach(chip => {
+        const off = parseInt(chip.id.split('-').pop());
+        let monthIdx = baseMonth - off;
+        let year = baseYear;
+        if (monthIdx < 0) {
+            monthIdx += 12;
+            year--;
+        }
+        months.push(`${year}-${String(monthIdx+1).padStart(2,'0')}`);
     });
     return months;
 }
+
 async function liveSettle(i) {
-    const s = students[i];
-    const btn = document.getElementById(`settle-btn-${i}`);
+    const s = students[i], btn = document.getElementById(`settle-btn-${i}`);
     const amt = parseFloat(document.getElementById(`paid-${i}`).value || 0);
     const selectedMonths = getSelectedMonthStrings(i);
     const monthsCount = selectedMonths.length;
-
     if (amt <= 0) return alert("Enter amount");
     if (monthsCount === 0) return alert("Select at least one month");
-
-    btn.innerText = "SAVING...";
-    btn.disabled = true;
-
-    const splitAmount = Math.floor(amt / monthsCount);
-    const remainder = amt - (splitAmount * monthsCount);
-
-    // Generate month labels (e.g., "May, Apr, Mar")
-    const monthNamesShort = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    const coveredMonthLabels = selectedMonths.map(month => {
-        const d = new Date(month + "-01");
-        return monthNamesShort[d.getMonth()];
-    }).join(", ");
-
+    btn.innerText = "SAVING..."; btn.disabled = true;
+    const split = Math.floor(amt / monthsCount), rem = amt - (split * monthsCount);
+    const short = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    const coveredLabels = selectedMonths.map(m => { const d = new Date(m+"-01"); return short[d.getMonth()]; }).join(", ");
     const records = selectedMonths.map((month, idx) => ({
-        studentId: s.studentId,
-        name: s.name,
-        contact: s.contact,
-        batch: s.batch,
-        fees: s.fees,
-        paidAmount: idx === 0 ? splitAmount + remainder : splitAmount,
-        balance: Math.max(0, s.fees - (idx === 0 ? splitAmount + remainder : splitAmount)),
-        feeType: document.getElementById(`type-${i}`).value,
-        paidTo: document.getElementById(`pst-${i}`).value,
-        note: document.getElementById(`note-${i}`).value,
-        targetMonth: month,
-        paymentDate: document.getElementById('feeDate').value
+        studentId: s.studentId, name: s.name, contact: s.contact, batch: s.batch, fees: s.fees,
+        paidAmount: idx === 0 ? split + rem : split,
+        balance: Math.max(0, s.fees - (idx === 0 ? split + rem : split)),
+        feeType: document.getElementById(`type-${i}`).value, paidTo: document.getElementById(`pst-${i}`).value,
+        note: document.getElementById(`note-${i}`).value, targetMonth: month, paymentDate: document.getElementById('feeDate').value
     }));
-
     try {
-        const response = await fetch(SCRIPT_URL, {
-            method: 'POST',
-            body: new URLSearchParams({
-                payload: JSON.stringify({
-                    action: 'saveFees',
-                    date: document.getElementById('feeDate').value,
-                    data: records
-                })
-            })
-        });
+        const response = await fetch(SCRIPT_URL, { method: 'POST', body: new URLSearchParams({ payload: JSON.stringify({ action: 'saveFees', date: document.getElementById('feeDate').value, data: records }) }) });
         const out = await response.json();
         if (out.status === 'success') {
-            // Store extra info for the paid card
-            s.tempPaid = true;
-            s.lastPaidAmt = amt;
-            s.lastMonthsCount = monthsCount;
-            s.lastMonthsLabels = coveredMonthLabels;       // "May, Apr, Mar"
-            s.lastPaymentMode = records[0].feeType;        // "UPI" or "CASH"
-            s.lastPaidTo = records[0].paidTo;              // "Lexi" or whatever
-            s.lastPaymentDate = document.getElementById('feeDate').value;
-            s.paidSoFar += amt;
-            s.balance = Math.max(0, s.balance - amt);
-            s.note = records[0].note;
-            updateDashboard();
-            render();
+            s.tempPaid = true; s.lastPaidAmt = amt; s.lastMonthsCount = monthsCount; s.lastMonthsLabels = coveredLabels;
+            s.lastPaymentMode = records[0].feeType; s.lastPaidTo = records[0].paidTo; s.lastPaymentDate = document.getElementById('feeDate').value;
+            s.paidSoFar += amt; s.balance = Math.max(0, s.balance - amt); s.note = records[0].note;
+            updateDashboard(); render();
+            loadAllPayments();
         } else throw new Error();
-    } catch(e) {
-        alert("Sync Failed");
-        btn.innerText = "SETTLE";
-        btn.disabled = false;
-    }
+    } catch(e) { alert("Sync Failed"); btn.innerText = "SETTLE"; btn.disabled = false; }
 }
+
 async function liveRemind(i) {
     const s = students[i], btn = document.getElementById(`rem-btn-${i}`);
     btn.innerText = "LOGGING...";
@@ -458,12 +527,12 @@ async function liveRemind(i) {
     try { await fetch(SCRIPT_URL, { method: 'POST', body: new URLSearchParams({ payload: JSON.stringify({ action: 'saveFees', date: document.getElementById('feeDate').value, data: [record] }) }) }); s.remindCount = newCount; render(); sendWA(i, 'remind'); } 
     catch(e) { s.remindCount = newCount; render(); sendWA(i, 'remind'); }
 }
+
 function sendWA(i, type) {
     const s = students[i];
     let ph = String(s.contact || '').replace(/\D/g, '');
     if (!ph.startsWith('91')) ph = '91' + ph;
-
-    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
     const curDate = new Date();
     const paidAmount = document.getElementById(`paid-${i}`)?.value || (s.lastPaidAmt || "0");
     const selectedMonths = getSelectedMonthStrings(i);
@@ -474,72 +543,60 @@ function sendWA(i, type) {
     } else {
         monthLabel = monthNames[curDate.getMonth()];
     }
-
     const paymentLink = "https://upi.pe/8867742269@ptaxis";
     let msg = "";
-
     if (type === 'remind') {
-        // PENDING reminder
-        msg = `⚡ *Friendly Fee Reminder – Coffeeland FC* ⚡
+        msg = `⚡ Friendly Fee Reminder – Coffeeland FC ⚡
 
 Dear Parent/Guardian,
 
-A gentle nudge regarding the pending fee for *${s.name}*.
+A gentle nudge regarding the pending fee for ${s.name}.
 
-📆 *Month:* ${monthLabel}
-💸 *Amount Due:* ₹${s.balance}
-🔹 *Pay easily via:* ${paymentLink}
-🔹 *UPI ID:* 8867742269@ptaxis
+📆 Month: ${monthLabel}
+💸 Amount Due: ₹${s.balance}
+🔹 Pay easily via: ${paymentLink}
+🔹 UPI ID: 8867742269@ptaxis
 
-Let’s keep the momentum going! Please clear the dues at your earliest convenience and share the payment screenshot. We appreciate your cooperation. 🙌
+Let’s keep the momentum going! Please clear the dues at your earliest convenience.
 
-*Regards,*
-*Coffeeland Football Academy*
-*Together Towards Tomorrow* ⚽`;
+Regards,
+Coffeeland Football Academy`;
     } 
     else if (s.balance === 0) {
-        // PAID (full) receipt
-        msg = `🎉 *Payment Confirmation – Coffeeland FC* 🎉
+        msg = `🎉 Payment Confirmation – Coffeeland FC 🎉
 
 Dear Parent/Guardian,
 
-We are delighted to confirm the successful payment of fees for *${s.name}*.
+We are delighted to confirm the successful payment of fees for ${s.name}.
 
-✅ *Month(s) Covered:* ${monthLabel}
-💰 *Amount Received:* ₹${paidAmount}
-🏦 *Outstanding Balance:* ₹0
+✅ Month(s) Covered: ${monthLabel}
+💰 Amount Received: ₹${paidAmount}
+🏦 Outstanding Balance: ₹0
 
-Thank you for your timely support and commitment to the academy. Your enthusiasm fuels our players' growth! ⚽🔥
+Thank you for your timely support! ⚽🔥
 
-*Regards,*
-*Coffeeland Football Academy*
-*Together Towards Tomorrow* 🌟`;
+Regards,
+Coffeeland Football Academy`;
     } 
     else {
-        // PARTIAL payment receipt
-        msg = `🎯 *Partial Payment Received – Coffeeland FC* 🎯
+        msg = `🎯 Partial Payment Received – Coffeeland FC 🎯
 
 Dear Parent/Guardian,
 
-We acknowledge the partial fee payment for *${s.name}*. Thank you for your prompt action!
+We acknowledge the partial fee payment for ${s.name}.
 
-📆 *Month(s) Covered:* ${monthLabel}
-💰 *Amount Paid:* ₹${paidAmount}
-🔸 *Remaining Balance:* ₹${s.balance}
-🗓️ *Payment Due for:* ${monthLabel} (unpaid portion)
+📆 Month(s) Covered: ${monthLabel}
+💰 Amount Paid: ₹${paidAmount}
+🔸 Remaining Balance: ₹${s.balance}
 
-Please complete the remaining payment soon to keep your child's training uninterrupted. We are here to support you every step of the way! 🚀
+Please complete the remaining payment soon. Pay via: ${paymentLink}
 
-*Pay the balance easily:* ${paymentLink}
-*UPI:* 8867742269@ptaxis
-
-*Regards,*
-*Coffeeland Football Academy*
-*Together Towards Tomorrow* ⚡`;
+Regards,
+Coffeeland Football Academy`;
     }
-
     window.open(`https://wa.me/${ph}?text=${encodeURIComponent(msg)}`);
 }
+
 function render() {
     const container = document.getElementById('roster');
     container.innerHTML = '';
@@ -550,8 +607,20 @@ function render() {
     document.getElementById('filter-paid').innerHTML = `Paid (${counts.paid})`;
     document.getElementById('filter-all').innerHTML = `All (${counts.all})`;
 
-    students.forEach((s, i) => {
-        const status = getStatusForStudent(s), isPaid = status === 'paid';
+    let sorted = [...students];
+    if (sortMode === 'unpaid') {
+        sorted.sort((a,b) => {
+            const order = { pending: 0, partial: 1, paid: 2 };
+            return order[getStatusForStudent(a)] - order[getStatusForStudent(b)];
+        });
+    } else {
+        sorted.sort((a,b) => a.name.localeCompare(b.name));
+    }
+
+    sorted.forEach((s, idx) => {
+        const i = students.findIndex(st => st.studentId === s.studentId);
+        const status = getStatusForStudent(s);
+        const isPaid = status === 'paid';
         const rCount = Number(s.remindCount || 0);
         let remindBtnColor = "bg-black/5 text-gray-500 border-black/10";
         if (rCount === 1) remindBtnColor = "bg-amber-500/20 text-amber-700 border-amber-500/30";
@@ -560,29 +629,12 @@ function render() {
         let cardClass = status === 'paid' ? 'card-paid' : (status === 'partial' ? 'card-partial' : 'card-pending');
         let badgeClass = status === 'paid' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' : (status === 'partial' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300');
         const whatsappIcon = `<img src="https://i.ibb.co/60NPMpPd/Pngtree-whatsapp-icon-whatsapp-logo-whatsapp-3584845.png" class="whatsapp-icon" alt="WhatsApp">`;
-        
         if (isPaid) {
-            // Build covered months string
-            let coveredMonthsDisplay = 'Current';
-            if (s.lastMonthsLabels) {
-                coveredMonthsDisplay = s.lastMonthsLabels;
-            } else if (s.lastMonthsCount && s.lastMonthsCount > 0) {
-                const shortNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-                let monthsList = [];
-                const cur = new Date();
-                for (let j = 0; j < s.lastMonthsCount; j++) {
-                    let mIdx = cur.getMonth() - j;
-                    if (mIdx < 0) mIdx += 12;
-                    monthsList.push(shortNames[mIdx]);
-                }
-                coveredMonthsDisplay = monthsList.join(", ");
-            }
-
+            let coveredMonthsDisplay = s.lastMonthsLabels || 'Current';
             const amountPaidDisplay = s.lastPaidAmt || s.paidSoFar;
             const paymentModeDisplay = s.lastPaymentMode || '—';
             const paidToDisplay = s.lastPaidTo || '—';
             const paymentDateDisplay = s.lastPaymentDate || document.getElementById('feeDate').value;
-
             container.innerHTML += `
                 <div class="student-card card-gradient p-4 space-y-3 rounded-xl ${cardClass}" data-name="${s.name.toLowerCase()}" data-status="paid">
                     <div class="flex justify-between items-start">
@@ -593,7 +645,10 @@ function render() {
                                 <span class="student-id text-[8px]">ID: ${escapeHtml(s.studentId.substring(0,12))}</span>
                             </div>
                         </div>
-                        <span class="px-2 py-1 rounded-lg text-[8px] font-black uppercase ${badgeClass}">PAID</span>
+                        <div class="flex gap-2 items-center">
+                            <button onclick="editPaymentForStudent('${s.studentId}', '${s.lastPaymentMonth || document.getElementById('viewMonthFilter').value}', ${amountPaidDisplay}, '${paymentDateDisplay}', '${escapeHtml(s.lastNote || '')}')" class="text-blue-500 text-sm bg-blue-500/10 px-2 py-1 rounded-lg">✏️</button>
+                            <span class="px-2 py-1 rounded-lg text-[8px] font-black uppercase ${badgeClass}">PAID</span>
+                        </div>
                     </div>
                     <div class="bg-mint/10 border border-mint/20 rounded-xl p-3 space-y-2">
                         <div class="flex justify-between items-center">
@@ -618,6 +673,7 @@ function render() {
     });
     applyFilters();
 }
+
 function setStatusFilter(f) { currentStatusFilter = f; document.querySelectorAll('.filter-chip').forEach(c => c.classList.toggle('active', c.id === `filter-${f}`)); applyFilters(); }
 function applyFilters() { const query = document.getElementById('studentSearch').value.toLowerCase(); let visible = 0; document.querySelectorAll('.student-card').forEach(card => { const matchName = card.dataset.name.includes(query); const matchStatus = currentStatusFilter === 'all' || card.dataset.status === currentStatusFilter; const isVisible = matchName && matchStatus; card.style.display = isVisible ? '' : 'none'; if (isVisible) visible++; }); document.getElementById('searchMeta').innerHTML = `${visible} shown`; }
 function showQR(i) { document.getElementById('qrPriceDisplay').innerText = `₹${document.getElementById(`paid-${i}`)?.value || 0}`; document.getElementById('qrModal').style.display = 'flex'; }
