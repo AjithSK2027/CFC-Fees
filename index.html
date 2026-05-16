@@ -514,7 +514,8 @@ async function liveSettle(i) {
             s.lastPaymentMode = records[0].feeType; s.lastPaidTo = records[0].paidTo; s.lastPaymentDate = document.getElementById('feeDate').value;
             s.paidSoFar += amt; s.balance = Math.max(0, s.balance - amt); s.note = records[0].note;
             updateDashboard(); render();
-            loadAllPayments();
+            // 🔥 Automatically open WhatsApp receipt after successful settlement
+            sendWA(i, 'receipt');
         } else throw new Error();
     } catch(e) { alert("Sync Failed"); btn.innerText = "SETTLE"; btn.disabled = false; }
 }
